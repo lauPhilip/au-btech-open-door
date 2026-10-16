@@ -6,7 +6,7 @@ Open Door is a browser game for teams of three to five students. Each team walks
 
 Behind the play sits the CyPro method from the [Digital Business Development toolbox](https://dbd.au.dk/p/toolbox) at Aarhus University: context establishment, system modelling, assets, threat identification and threat analysis. Students practise the method first and learn its names in the debrief. The game is being designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning, and runs in any browser on the university network (eduroam) without accounts or logins.
 
-> **Status:** milestone M1. The concept book, first scenario and backlog are done. The first running piece is the *hello room*, a live network test for the classroom — see [the M1 test plan](docs/testing/m1-eduroam-test.md).
+> **Status:** milestone M2 – Playable is in progress. The hello room network test works; the eduroam classroom test is planned for later. See [next steps](docs/dev-notes/next-steps.md).
 
 ## What is in this repository
 
@@ -38,6 +38,7 @@ This builds the app and starts two local servers: the rooms on port 8787 and the
 | Command | What it does |
 |---|---|
 | `npm run dev` | Runs the app and the rooms locally |
+| `npm run scenarios` | Checks the scenario files and turns them into code for the game |
 | `npm run check` | Type-checks all three parts |
 | `npm test` | Runs the unit tests |
 | `npm run build` | Builds the app into `app/dist` |

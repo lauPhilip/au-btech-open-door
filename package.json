@@ -14,15 +14,18 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "npm run build -w app && concurrently -n room,app -c blue,green \"npm run dev -w room\" \"npm run dev -w app\"",
-    "build": "npm run build -w app",
-    "check": "npm run check --workspaces --if-present",
+    "scenarios": "node scripts/build-scenarios.mjs",
+    "dev": "npm run scenarios && npm run build -w app && concurrently -n room,app -c blue,green \"npm run dev -w room\" \"npm run dev -w app\"",
+    "build": "npm run scenarios && npm run build -w app",
+    "check": "node scripts/build-scenarios.mjs --check && npm run check --workspaces --if-present",
     "test": "vitest run",
     "deploy": "npm run build && npm run deploy -w room"
   },
   "devDependencies": {
+    "ajv": "^8.20.0",
     "concurrently": "^10.0.6",
     "typescript": "~6.0.3",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "yaml": "^2.9.1"
   }
 }

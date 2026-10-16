@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { RoomConnection } from "../lib/room.svelte";
-  import { latencyLabel } from "../lib/format";
-  import DeviceIcon from "../lib/DeviceIcon.svelte";
+  import { RoomConnection } from "../../lib/room.svelte";
+  import { latencyLabel } from "../../lib/format";
+  import DeviceIcon from "../../lib/DeviceIcon.svelte";
 
   let { room, name }: { room: string; name: string } = $props();
 

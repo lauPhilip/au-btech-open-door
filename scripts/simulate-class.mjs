@@ -1,9 +1,14 @@
 #!/usr/bin/env node
-// Simulates a class of students joining the hello room, to test the room before
-// a real classroom test. Uses the WebSocket built into Node 22.
+// Simulates a class of students, to test the rooms before a real classroom test.
+// Uses the WebSocket built into Node 22.
 //
+// Network test (the hello room):
 //   node scripts/simulate-class.mjs                         # 40 players on localhost:8787
 //   node scripts/simulate-class.mjs --url https://open-door.example.workers.dev --players 30 --seconds 60
+//
+// Game session (teacher, projector, students who join, pick teams and walk):
+//   node scripts/simulate-class.mjs --mode game             # 25 players, 30 s of walking
+//   node scripts/simulate-class.mjs --mode game --players 30 --seconds 60 --url https://…
 //
 // Prints what a projector would see, then a short summary.
 
@@ -11,6 +16,13 @@ const args = new Map();
 for (let i = 2; i < process.argv.length; i += 2) args.set(process.argv[i].replace(/^--/, ""), process.argv[i + 1]);
 
 const base = new URL(args.get("url") ?? "http://localhost:8787");
+
+if (args.get("mode") === "game") {
+  const { simulateGame } = await import("./simulate-game.mjs");
+  const ok = await simulateGame({ base, players: Number(args.get("players") ?? 25), seconds: Number(args.get("seconds") ?? 30) });
+  process.exit(ok ? 0 : 1);
+}
+
 const players = Number(args.get("players") ?? 40);
 const seconds = Number(args.get("seconds") ?? 20);
 const room = args.get("room") ?? "load-test";

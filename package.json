@@ -19,9 +19,11 @@
     "build": "npm run scenarios && npm run build -w app",
     "check": "node scripts/build-scenarios.mjs --check && npm run check --workspaces --if-present",
     "test": "vitest run",
-    "deploy": "npm run build && npm run deploy -w room"
+    "deploy": "npm run build && npm run deploy -w room",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "ajv": "^8.20.0",
     "concurrently": "^10.0.6",
     "typescript": "~6.0.3",

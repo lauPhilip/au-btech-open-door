@@ -6,7 +6,7 @@ Open Door is a browser game for teams of three to five students. Each team walks
 
 Behind the play sits the CyPro method from the [Digital Business Development toolbox](https://dbd.au.dk/p/toolbox) at Aarhus University: context establishment, system modelling, assets, threat identification and threat analysis. Students practise the method first and learn its names in the debrief. The game is being designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning, and runs in any browser on the university network (eduroam) without accounts or logins.
 
-> **Status:** concept stage. The design is captured in the concept book; development has not started yet.
+> **Status:** planning (roadmap phase 1). The design is captured in the concept book, the first scenario is written, and the backlog is ready. Development has not started yet.
 
 ## What is in this repository
 
@@ -14,6 +14,9 @@ Behind the play sits the CyPro method from the [Digital Business Development too
 |---|---|
 | [`docs/concept-book/`](docs/concept-book/index.html) | The concept book: target group, journey, core loop, UX rules, design system, assets, mockups, teacher kit and architecture — 15 boards in one HTML page |
 | [`docs/roadmap.md`](docs/roadmap.md) | The development roadmap, from repository setup to version 1 |
+| [`docs/backlog.md`](docs/backlog.md) | 45 work items in four milestones; [`scripts/`](scripts/) turns them into GitHub issues |
+| [`scenarios/`](scenarios/) | Game content as text files: the first scenario, *Nordknit · Black Friday*, and the file format’s schema |
+| [`docs/scenario-format.md`](docs/scenario-format.md) | How to write a new scenario, with no coding needed |
 | [`docs/decisions/`](docs/decisions/) | Short records of the main decisions and why they were made |
 | [`docs/README.md`](docs/README.md) | An index of all documentation |
 

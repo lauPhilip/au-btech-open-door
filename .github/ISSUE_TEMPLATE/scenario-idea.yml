@@ -1,0 +1,32 @@
+name: Scenario idea
+description: Suggest a company or a bad day for students to explore
+title: "Scenario idea: "
+labels: ["content", "area: scenario"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the idea. Please keep companies fictional — no real company names or real security weaknesses.
+  - type: input
+    id: company
+    attributes:
+      label: What kind of company?
+      placeholder: A family-owned dairy with a webshop and a delivery fleet
+    validations:
+      required: true
+  - type: textarea
+    id: day
+    attributes:
+      label: What goes wrong that day?
+      description: One to three problems, in a few sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: learning
+    attributes:
+      label: What should students learn from it?
+      description: For example a trust boundary that is easy to miss, or a supplier that is part of the system.
+  - type: dropdown
+    id: course
+    attributes:
+      label: Would you use it in your own teaching?
+      options: ["Yes", "Maybe", "No, just an idea"]

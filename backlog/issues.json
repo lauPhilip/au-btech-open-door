@@ -1,0 +1,569 @@
+{
+  "milestones": [
+    {
+      "title": "M1 - Works on eduroam",
+      "week": 2,
+      "description": "A small live room works for 30 devices on eduroam in a real classroom."
+    },
+    {
+      "title": "M2 - Playable",
+      "week": 7,
+      "description": "One full class can play the Black Friday scenario from join to finish screen."
+    },
+    {
+      "title": "M3 - Pilot class",
+      "week": 10,
+      "description": "Ready for a pilot with a real class and teacher: debrief, teacher control, export, accessibility."
+    },
+    {
+      "title": "M4 - Version 1",
+      "week": 12,
+      "description": "Teacher kit complete and a second scenario, ready for regular teaching."
+    }
+  ],
+  "labels": [
+    {
+      "name": "feature",
+      "color": "2E5BDB",
+      "description": "Something students or teachers can do"
+    },
+    {
+      "name": "content",
+      "color": "FFE27A",
+      "description": "Scenario text, art or teaching material"
+    },
+    {
+      "name": "infra",
+      "color": "5A6574",
+      "description": "Build, hosting and pipelines"
+    },
+    {
+      "name": "test",
+      "color": "2F9E6E",
+      "description": "Tests and quality checks"
+    },
+    {
+      "name": "docs",
+      "color": "8C6AD9",
+      "description": "Documentation"
+    },
+    {
+      "name": "a11y",
+      "color": "1E40A8",
+      "description": "Accessibility"
+    },
+    {
+      "name": "research",
+      "color": "E8573F",
+      "description": "User testing and evaluation"
+    },
+    {
+      "name": "bug",
+      "color": "B93A25",
+      "description": "Something does not work"
+    },
+    {
+      "name": "area: session",
+      "color": "DDE2E9",
+      "description": "Live session room and networking"
+    },
+    {
+      "name": "area: lobby",
+      "color": "DDE2E9",
+      "description": "Join screen and lobby"
+    },
+    {
+      "name": "area: story",
+      "color": "DDE2E9",
+      "description": "Opening story"
+    },
+    {
+      "name": "area: map",
+      "color": "DDE2E9",
+      "description": "Walkable top-down office"
+    },
+    {
+      "name": "area: close-up",
+      "color": "DDE2E9",
+      "description": "Illustrated close-ups and dialogue"
+    },
+    {
+      "name": "area: notes",
+      "color": "DDE2E9",
+      "description": "Sticky notes"
+    },
+    {
+      "name": "area: day",
+      "color": "DDE2E9",
+      "description": "The day happens"
+    },
+    {
+      "name": "area: debrief",
+      "color": "DDE2E9",
+      "description": "Projector debrief"
+    },
+    {
+      "name": "area: teacher",
+      "color": "DDE2E9",
+      "description": "Teacher view"
+    },
+    {
+      "name": "area: export",
+      "color": "DDE2E9",
+      "description": "Worksheet and summary export"
+    },
+    {
+      "name": "area: scenario",
+      "color": "DDE2E9",
+      "description": "Scenario files and checks"
+    }
+  ],
+  "issues": [
+    {
+      "title": "Set up the TypeScript project: app, room server and shared game rules",
+      "body": "**As a** developer, **I want** one project with the app, the session room and shared game rules, **so that** the same rules run in the browser and on the server.\n\n**Done when**\n- [ ] `npm install` and `npm run dev` start the app and a local room\n- [ ] Folders: `app/`, `room/`, `shared/`\n- [ ] README explains how to run it\n\nPart of: **Foundations** · Concept book board 15\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "infra"
+      ],
+      "milestone": "M1 - Works on eduroam",
+      "epic": "Foundations"
+    },
+    {
+      "title": "Run lint, type checks and unit tests on every pull request",
+      "body": "**As a** developer, **I want** automatic checks on every pull request, **so that** mistakes are caught before they reach main.\n\n**Done when**\n- [ ] GitHub Actions workflow runs lint, type check and Vitest\n- [ ] Pull requests cannot merge when checks fail\n\nPart of: **Foundations** · Concept book board 15\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "infra",
+        "test"
+      ],
+      "milestone": "M1 - Works on eduroam",
+      "epic": "Foundations"
+    },
+    {
+      "title": "Deploy a preview for every pull request",
+      "body": "**As a** reviewer, **I want** a link to try each change, **so that** I can test it on my own phone before it is merged.\n\n**Done when**\n- [ ] Each pull request gets a preview link\n- [ ] main deploys to production\n\nPart of: **Foundations** · Concept book board 15\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "infra"
+      ],
+      "milestone": "M1 - Works on eduroam",
+      "epic": "Foundations"
+    },
+    {
+      "title": "Hello room: 30 devices in one live room on eduroam",
+      "body": "**As a** developer, **I want** to prove live rooms work on the university network, **so that** we know the architecture holds before building on it.\n\n**Done when**\n- [ ] A minimal page shows everyone connected to one room\n- [ ] Tested with 30 devices on eduroam in a Herning classroom\n- [ ] Result written up in `docs/decisions/`\n\nPart of: **Session room** · Concept book board 15\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: session"
+      ],
+      "milestone": "M1 - Works on eduroam",
+      "epic": "Session room"
+    },
+    {
+      "title": "Create sessions with a short code and a QR link",
+      "body": "**As a** teacher, **I want** a short code and QR code for my class, **so that** students can join in seconds.\n\n**Done when**\n- [ ] Four-character codes without look-alike letters\n- [ ] QR code opens the join screen with the code filled in\n\nPart of: **Session room** · Concept book board 09\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: session"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Session room"
+    },
+    {
+      "title": "Reconnect after a network drop without losing your place",
+      "body": "**As a** student, **I want** to come back to my team after Wi-Fi hiccups, **so that** a short drop does not throw me out of the game.\n\n**Done when**\n- [ ] Reconnect within 2 minutes restores name, team, position and notes\n- [ ] Teammates see a short 'reconnecting' state\n\nPart of: **Session room** · Concept book board 05\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: session"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Session room"
+    },
+    {
+      "title": "Close the room and delete all data after the session",
+      "body": "**As a** student, **I want** my nickname and notes deleted after class, **so that** no personal data is kept.\n\n**Done when**\n- [ ] Room deletes itself a few hours after the session ends\n- [ ] Teacher can end and delete at once\n- [ ] Privacy note shown on the join screen\n\nPart of: **Session room** · Concept book board 05\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: session"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Session room"
+    },
+    {
+      "title": "Load test: a class of 40 simulated players",
+      "body": "**As a** teacher, **I want** the game to stay fast with a full class, **so that** nobody waits during class.\n\n**Done when**\n- [ ] Playwright robots play a full scenario with 40 players\n- [ ] Moves appear for others in under 400 ms\n\nPart of: **Session room** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "test",
+        "area: session"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Session room"
+    },
+    {
+      "title": "Join screen: code, nickname and face",
+      "body": "**As a** student, **I want** to join with only a code, a name and a face, **so that** I am in within 30 seconds.\n\n**Done when**\n- [ ] No account or e-mail\n- [ ] Works on a phone and a laptop\n- [ ] Joining takes under 30 seconds in a hallway test\n\nPart of: **Join and lobby** · Concept book board 09\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: lobby"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Join and lobby"
+    },
+    {
+      "title": "Pick a team table, up to five players",
+      "body": "**As a** student, **I want** to choose a team or be placed in one, **so that** groups form quickly.\n\n**Done when**\n- [ ] Teams show their members live\n- [ ] A full team cannot be joined\n- [ ] The teacher can move players\n\nPart of: **Join and lobby** · Concept book board 09\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: lobby"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Join and lobby"
+    },
+    {
+      "title": "Projector lobby with QR, code and live teams",
+      "body": "**As a** teacher, **I want** a projector screen that fills up as students join, **so that** I can see when everyone is ready.\n\n**Done when**\n- [ ] Readable from the back row: code 64 px, body 20 px or more\n- [ ] Shows how many students have joined\n\nPart of: **Join and lobby** · Concept book board 09\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: lobby"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Join and lobby"
+    },
+    {
+      "title": "Play the opening story and pin the goal",
+      "body": "**As a** student, **I want** a short story from the CEO before playing, **so that** I know what I am trying to do.\n\n**Done when**\n- [ ] Story lines come from the scenario file\n- [ ] Plays in sync on all screens\n- [ ] The goal stays visible all game\n\nPart of: **Story** · Concept book board 04\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: story"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Story"
+    },
+    {
+      "title": "Draw the top-down office from the scenario map",
+      "body": "**As a** student, **I want** to see the company as a floor plan, **so that** I can explore it like a real building.\n\n**Done when**\n- [ ] Rooms, labels and furniture drawn from the scenario file\n- [ ] Fits a 13-inch laptop and a phone\n\nPart of: **Walkable office** · Concept book board 10\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: map"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Walkable office"
+    },
+    {
+      "title": "Walk with arrow keys, WASD or a click",
+      "body": "**As a** student, **I want** to move around easily without gaming skills, **so that** walking never gets in the way.\n\n**Done when**\n- [ ] Arrow keys and WASD work\n- [ ] Click or tap a spot to walk there\n- [ ] No precise movement needed\n\nPart of: **Walkable office** · Concept book board 10\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: map"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Walkable office"
+    },
+    {
+      "title": "See teammates move live, with names",
+      "body": "**As a** student, **I want** to see where my teammates are, **so that** we can split up and talk about rooms.\n\n**Done when**\n- [ ] Teammates' tokens move in real time\n- [ ] Your own token has a clear ring\n\nPart of: **Walkable office** · Concept book board 10\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: map"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Walkable office"
+    },
+    {
+      "title": "Room checklist and 'you are here'",
+      "body": "**As a** student, **I want** to see which rooms we have visited, **so that** I never feel lost.\n\n**Done when**\n- [ ] Checklist shows all rooms and ticks visited ones\n- [ ] Current room is highlighted\n\nPart of: **Walkable office** · Concept book board 10\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: map"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Walkable office"
+    },
+    {
+      "title": "Room list as a keyboard and screen-reader alternative",
+      "body": "**As a** student using a screen reader, **I want** a list of rooms I can move through, **so that** I can play without seeing the map.\n\n**Done when**\n- [ ] Every room, person and thing can be reached with Tab\n- [ ] Screen readers announce where you are\n\nPart of: **Walkable office** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "a11y",
+        "area: map"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Walkable office"
+    },
+    {
+      "title": "Walk-up prompt and close-up window",
+      "body": "**As a** student, **I want** a prompt when I stand next to a person or thing, **so that** I know I can talk or look closer.\n\n**Done when**\n- [ ] Prompt appears near people and things\n- [ ] E key, click or tap opens the close-up\n- [ ] Back to the map in one click\n\nPart of: **Close-ups** · Concept book board 11\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: close-up"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Close-ups"
+    },
+    {
+      "title": "Conversations from the scenario file",
+      "body": "**As a** student, **I want** to ask people up to three questions, **so that** I learn what the company depends on.\n\n**Done when**\n- [ ] Greeting and topics come from the scenario file\n- [ ] Answers can reveal assets for later checks\n\nPart of: **Close-ups** · Concept book board 11\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: close-up"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Close-ups"
+    },
+    {
+      "title": "'Look closer' technical layer",
+      "body": "**As a** student with a technical background, **I want** optional technical details, **so that** I can go deeper without slowing others down.\n\n**Done when**\n- [ ] Hidden by default\n- [ ] Shows the scenario's `closer` text and STRIDE words\n\nPart of: **Close-ups** · Concept book board 11\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: close-up"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Close-ups"
+    },
+    {
+      "title": "First illustrated close-ups: packing, server, reception, webshop",
+      "body": "**As a** student, **I want** warm, simple illustrations of people and places, **so that** the company feels real.\n\n**Done when**\n- [ ] Four close-up scenes and six character busts as SVG\n- [ ] Style follows the design system board\n\nPart of: **Close-ups** · Concept book board 08\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "content",
+        "area: close-up"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Close-ups"
+    },
+    {
+      "title": "Sticky note form: what, harm, who, how likely",
+      "body": "**As a** student, **I want** to write a note on anything that could go wrong, **so that** my team builds a threat list.\n\n**Done when**\n- [ ] Fields: target, text, leak/change/stop, actor, likelihood 1–4\n- [ ] Text up to 240 characters\n- [ ] Uses the plain words from the scenario format\n\nPart of: **Sticky notes** · Concept book board 11\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: notes"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Sticky notes"
+    },
+    {
+      "title": "Private notes first, then share and merge",
+      "body": "**As a** quieter student, **I want** to write my notes before the group discusses, **so that** my ideas count too.\n\n**Done when**\n- [ ] Notes are private until shared\n- [ ] The team can merge duplicate notes\n\nPart of: **Sticky notes** · Concept book board 04\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: notes"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Sticky notes"
+    },
+    {
+      "title": "Show team notes as pins on the map",
+      "body": "**As a** student, **I want** to see where my team has left notes, **so that** we can spot rooms nobody has checked.\n\n**Done when**\n- [ ] Pins show the number of notes per spot\n- [ ] Clicking a pin lists the notes\n\nPart of: **Sticky notes** · Concept book board 10\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: notes"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Sticky notes"
+    },
+    {
+      "title": "Day engine: clock, chat messages and alert",
+      "body": "**As a** student, **I want** the day to unfold with messages and a clock, **so that** it feels real and urgent.\n\n**Done when**\n- [ ] Clock speed and events come from the scenario file\n- [ ] Alert banner and chat in sync for everyone\n\nPart of: **The day happens** · Concept book board 12\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: day"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "The day happens"
+    },
+    {
+      "title": "Clues in rooms and a clue counter",
+      "body": "**As a** student, **I want** to find clues by walking to rooms, **so that** exploring the building pays off.\n\n**Done when**\n- [ ] Clues appear in their rooms during the day\n- [ ] Counter shows found clues\n\nPart of: **The day happens** · Concept book board 12\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: day"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "The day happens"
+    },
+    {
+      "title": "Final team vote and finish screen",
+      "body": "**As a** student, **I want** to decide together what the CEO should do, **so that** the day ends with a clear result.\n\n**Done when**\n- [ ] Each player votes; majority decides\n- [ ] Finish screen shows the result from the scenario\n\nPart of: **The day happens** · Concept book board 12\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: day"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "The day happens"
+    },
+    {
+      "title": "Match notes with the answer key: 'you saw it coming'",
+      "body": "**As a** student, **I want** to see which problems my notes predicted, **so that** I feel what good threat modelling is worth.\n\n**Done when**\n- [ ] A note matches when target and harm match a threat\n- [ ] Finish screen shows predicted problems and the matching note\n\nPart of: **The day happens** · Concept book board 12\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: day"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "The day happens"
+    },
+    {
+      "title": "Projector debrief: who saw it coming",
+      "body": "**As a** teacher, **I want** a table of all teams against the day's problems, **so that** the class can compare and discuss.\n\n**Done when**\n- [ ] Uses symbols as well as colour\n- [ ] Readable from the back row\n\nPart of: **Debrief** · Concept book board 13\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: debrief"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Debrief"
+    },
+    {
+      "title": "Reveal the CyPro terms and show prompts",
+      "body": "**As a** teacher, **I want** to link what students did to the method, **so that** they leave knowing the terms.\n\n**Done when**\n- [ ] Game words mapped to CyPro terms\n- [ ] Prompts come from the scenario file\n\nPart of: **Debrief** · Concept book board 13\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: debrief"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Debrief"
+    },
+    {
+      "title": "Teacher setup: choose scenario and length, then start",
+      "body": "**As a** teacher, **I want** to set up a session in under two minutes, **so that** I actually use it.\n\n**Done when**\n- [ ] Pick scenario and 45 or 90 minutes\n- [ ] Opens the projector lobby\n\nPart of: **Teacher view** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: teacher"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Teacher view"
+    },
+    {
+      "title": "Teacher controls: pause, add time, start the day",
+      "body": "**As a** teacher, **I want** to steer the whole class, **so that** I can adapt to the room.\n\n**Done when**\n- [ ] Pause and resume all teams\n- [ ] Add five minutes\n- [ ] Start the day for everyone\n\nPart of: **Teacher view** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: teacher"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Teacher view"
+    },
+    {
+      "title": "Live team overview with 'stuck' signal and hints",
+      "body": "**As a** teacher, **I want** to see which team needs help, **so that** I can step in at the right time.\n\n**Done when**\n- [ ] Progress per team: notes and rooms\n- [ ] Flag when a team has not moved for 3 minutes\n- [ ] Send a hint to one team\n\nPart of: **Teacher view** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: teacher"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Teacher view"
+    },
+    {
+      "title": "Export team notes as the CyPro threat table",
+      "body": "**As a** student, **I want** my team's notes as a filled-in CyPro table, **so that** I can use it in my project report.\n\n**Done when**\n- [ ] PDF and CSV\n- [ ] Columns follow the CyPro threat likelihood and impact table\n\nPart of: **Export** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: export"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Export"
+    },
+    {
+      "title": "Class summary for the teacher",
+      "body": "**As a** teacher, **I want** a summary of the whole class, **so that** I can follow up next lesson.\n\n**Done when**\n- [ ] Notes per team and the debrief table\n- [ ] Downloaded before the room is deleted\n\nPart of: **Export** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: export"
+      ],
+      "milestone": "M4 - Version 1",
+      "epic": "Export"
+    },
+    {
+      "title": "Load scenario files and check them against the schema",
+      "body": "**As a** teacher who writes scenarios, **I want** clear errors when a scenario file is wrong, **so that** broken files never reach a class.\n\n**Done when**\n- [ ] Schema validation in CI\n- [ ] Checks that every room, person and threat id exists\n\nPart of: **Scenarios**\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "feature",
+        "area: scenario"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Scenarios"
+    },
+    {
+      "title": "Readability check for scenario texts",
+      "body": "**As a** student reading English as a second language, **I want** short, plain texts, **so that** I understand without a dictionary.\n\n**Done when**\n- [ ] Flesch Reading Ease 60 or more per scenario\n- [ ] Fails on sentences of 20 words or more\n\nPart of: **Scenarios** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "test",
+        "area: scenario"
+      ],
+      "milestone": "M2 - Playable",
+      "epic": "Scenarios"
+    },
+    {
+      "title": "Second scenario: 'New bank details' at Nordknit",
+      "body": "**As a** teacher, **I want** a second bad day in the same company, **so that** I can run the game twice in a course.\n\n**Done when**\n- [ ] Written in the scenario format\n- [ ] Passes schema and readability checks\n\nPart of: **Scenarios**\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "content",
+        "area: scenario"
+      ],
+      "milestone": "M4 - Version 1",
+      "epic": "Scenarios"
+    },
+    {
+      "title": "Accessibility checks with axe in CI",
+      "body": "**As a** student with a disability, **I want** the game to meet WCAG 2.2 AA, **so that** I can take part like everyone else.\n\n**Done when**\n- [ ] axe runs on every main screen\n- [ ] No serious or critical issues\n\nPart of: **Quality and accessibility** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "a11y",
+        "test"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Quality and accessibility"
+    },
+    {
+      "title": "Reduced motion and colour-safe states",
+      "body": "**As a** student, **I want** calm motion and states I can tell apart, **so that** the game works for me.\n\n**Done when**\n- [ ] Respects 'reduce motion'\n- [ ] Every status has a symbol or text, not colour alone\n\nPart of: **Quality and accessibility** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "a11y"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Quality and accessibility"
+    },
+    {
+      "title": "Hallway test with five students",
+      "body": "**As a** designer, **I want** to watch five new students play without help, **so that** we find what confuses people.\n\n**Done when**\n- [ ] Five-second test on each main screen\n- [ ] Findings written as issues\n\nPart of: **Quality and accessibility** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "research"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Quality and accessibility"
+    },
+    {
+      "title": "Pilot class plan and feedback form",
+      "body": "**As a** teacher, **I want** a plan and a short survey for the pilot, **so that** we can measure if it works.\n\n**Done when**\n- [ ] System Usability Scale plus three open questions\n- [ ] Consent and data handling described\n\nPart of: **Quality and accessibility** · Concept book board 06\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "research",
+        "docs"
+      ],
+      "milestone": "M3 - Pilot class",
+      "epic": "Quality and accessibility"
+    },
+    {
+      "title": "Facilitator guide for 45 and 90 minutes",
+      "body": "**As a** teacher, **I want** a minute-by-minute guide, **so that** I can run the class without preparation.\n\n**Done when**\n- [ ] What to say and do in each phase\n- [ ] Tested by a teacher who was not involved\n\nPart of: **Teaching material** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "docs",
+        "content"
+      ],
+      "milestone": "M4 - Version 1",
+      "epic": "Teaching material"
+    },
+    {
+      "title": "Debrief slide deck",
+      "body": "**As a** teacher, **I want** slides that connect the game to CyPro, **so that** the method sticks.\n\n**Done when**\n- [ ] Intro, method recap and debrief slides\n- [ ] Shared under CC BY-SA 4.0\n\nPart of: **Teaching material** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "docs",
+        "content"
+      ],
+      "milestone": "M4 - Version 1",
+      "epic": "Teaching material"
+    },
+    {
+      "title": "Paper backup kit",
+      "body": "**As a** teacher, **I want** a printable version, **so that** class can go on if the network fails.\n\n**Done when**\n- [ ] Printable floor plan, character cards and note sheets\n\nPart of: **Teaching material** · Concept book board 14\n\n_Created from `backlog/issues.json`._",
+      "labels": [
+        "docs",
+        "content"
+      ],
+      "milestone": "M4 - Version 1",
+      "epic": "Teaching material"
+    }
+  ]
+}

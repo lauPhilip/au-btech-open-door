@@ -1,0 +1,21 @@
+name: Something does not work
+description: Report a problem in the game or the docs
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device, browser and network
+      placeholder: Windows laptop, Edge, eduroam at AU Herning
+  - type: dropdown
+    id: role
+    attributes:
+      label: You were playing as
+      options: [Student, Teacher, Projector screen, Not playing — reading the docs]

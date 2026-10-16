@@ -6,6 +6,8 @@ This folder holds everything written about Open Door so far. The concept book is
 |---|---|
 | [Concept book](concept-book/index.html) | Fifteen boards: the idea on one page, target group, journey, core loop and method, screen map, UX rules, design system, design assets, five mockups, the teacher kit, and the roadmap with architecture |
 | [Roadmap](roadmap.md) | Phases, milestones and quality gates for the first twelve weeks |
+| [Backlog](backlog.md) | All 45 work items as user stories, grouped by part of the game and milestone |
+| [Writing a scenario](scenario-format.md) | The scenario file format, the plain words used in the answer key, and writing rules |
 | [Decision 0001 · Tech stack](decisions/0001-tech-stack.md) | Why TypeScript, Svelte, PixiJS and a small live “session room” |
 | [Decision 0002 · Licensing](decisions/0002-licensing.md) | Why the code is MIT and the content is CC BY-SA 4.0 |
 

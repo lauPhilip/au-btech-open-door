@@ -36,6 +36,12 @@ Every change to the main branch passes the same automated checks. Game rules hav
 | Readability of scenario texts | Own script | Every pull request |
 | Page speed | Lighthouse | Before each release |
 
-## Phase 0 in detail
+## Where we are
 
-Phase 0 is where the project is now. The repository holds the concept book, this roadmap and the first decision records. The workflow in `.github/workflows/pages.yml` publishes the `docs` folder to GitHub Pages, so the concept book can be shared with colleagues as a link. To turn it on, go to the repository’s **Settings → Pages** and choose **GitHub Actions** as the source.
+| Phase | Status |
+|---|---|
+| 0 · Set up the repository | Done. The repository holds the concept book, this roadmap, decision records and licences, and the concept book is published on GitHub Pages |
+| 1 · Plan features | In progress. The [backlog](backlog.md) lists 45 work items, the [scenario format](scenario-format.md) is defined with a schema, and the first scenario, *Nordknit · Black Friday*, is written. Next: create the issues on GitHub with `scripts/create-issues.ps1` |
+| 2 · Design and architecture | Next. Starts with the “hello room” test on eduroam — milestone M1 |
+
+GitHub Pages publishes the `docs` folder automatically on every push that changes it, so the concept book can always be shared as a link.

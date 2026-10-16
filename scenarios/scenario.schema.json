@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lauphilip.github.io/au-btech-open-door/scenario.schema.json",
+  "title": "Open Door scenario",
+  "description": "One company and one bad day, written as a text file. See docs/scenario-format.md.",
+  "type": "object",
+  "required": ["id", "format", "title", "company", "goal", "story", "map", "people", "things", "assets", "threats", "day", "debrief"],
+  "additionalProperties": false,
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "time": { "type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$" },
+    "harm": { "enum": ["leak", "change", "stop"] },
+    "actor": { "enum": ["online", "visitor", "employee", "supplier", "accident"] },
+    "stride": { "enum": ["spoofing", "tampering", "repudiation", "information-disclosure", "denial-of-service", "elevation-of-privilege"] }
+  },
+  "properties": {
+    "id": { "$ref": "#/$defs/id" },
+    "format": { "const": 1 },
+    "title": { "type": "string" },
+    "lengths": { "type": "array", "items": { "enum": [45, 90] } },
+    "company": {
+      "type": "object",
+      "required": ["id", "name", "place", "fictional", "summary"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string" },
+        "place": { "type": "string" },
+        "fictional": { "type": "boolean" },
+        "summary": { "type": "string" }
+      }
+    },
+    "learning_goals": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "goal": { "$ref": "#/$defs/text" },
+    "story": {
+      "type": "array", "minItems": 1, "maxItems": 6,
+      "items": { "type": "object", "required": ["speaker", "text"], "properties": { "speaker": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" } } }
+    },
+    "map": {
+      "type": "object",
+      "required": ["width", "height", "rooms", "zones"],
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "rooms": {
+          "type": "array", "minItems": 3, "maxItems": 12,
+          "items": {
+            "type": "object", "required": ["id", "name", "rect", "zone"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "name": { "type": "string" },
+              "rect": { "type": "array", "items": { "type": "integer" }, "minItems": 4, "maxItems": 4 },
+              "zone": { "$ref": "#/$defs/id" },
+              "start": { "type": "boolean" }
+            }
+          }
+        },
+        "zones": {
+          "type": "array", "minItems": 2,
+          "items": { "type": "object", "required": ["id", "name", "inside"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "inside": { "type": "boolean" } } }
+        }
+      }
+    },
+    "people": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["id", "name", "role", "room", "hello", "topics"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "room": { "$ref": "#/$defs/id" },
+          "hello": { "$ref": "#/$defs/text" },
+          "topics": {
+            "type": "array", "minItems": 1, "maxItems": 3,
+            "items": { "type": "object", "required": ["ask", "answer"], "properties": { "ask": { "$ref": "#/$defs/text" }, "answer": { "$ref": "#/$defs/text" }, "reveals": { "type": "array", "items": { "$ref": "#/$defs/id" } } } }
+          }
+        }
+      }
+    },
+    "things": {
+      "type": "array",
+      "items": { "type": "object", "required": ["id", "name", "room", "text"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "room": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" }, "closer": { "$ref": "#/$defs/text" } } }
+    },
+    "assets": {
+      "type": "array",
+      "items": { "type": "object", "required": ["id", "name", "lives_in"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "lives_in": { "type": "array", "items": { "$ref": "#/$defs/id" } } } }
+    },
+    "flows": {
+      "type": "array",
+      "items": { "type": "object", "required": ["from", "to", "carries"], "properties": { "from": { "$ref": "#/$defs/id" }, "to": { "$ref": "#/$defs/id" }, "via": { "$ref": "#/$defs/id" }, "carries": { "type": "array", "items": { "$ref": "#/$defs/id" } } } }
+    },
+    "threats": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["id", "target", "text", "harm", "actor", "likelihood"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "target": { "$ref": "#/$defs/id" },
+          "text": { "$ref": "#/$defs/text" },
+          "harm": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/harm" } },
+          "actor": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/actor" } },
+          "likelihood": { "type": "integer", "minimum": 1, "maximum": 4 },
+          "stride": { "type": "array", "items": { "$ref": "#/$defs/stride" } }
+        }
+      }
+    },
+    "day": {
+      "type": "object",
+      "required": ["name", "starts", "ends", "alert", "problems", "events", "clues", "final_choice"],
+      "properties": {
+        "name": { "type": "string" },
+        "starts": { "$ref": "#/$defs/time" },
+        "ends": { "$ref": "#/$defs/time" },
+        "minutes_per_game_minute": { "type": "number", "exclusiveMinimum": 0 },
+        "alert": { "$ref": "#/$defs/text" },
+        "problems": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "$ref": "#/$defs/id" } },
+        "events": {
+          "type": "array",
+          "items": { "type": "object", "required": ["at", "from", "text"], "properties": { "at": { "$ref": "#/$defs/time" }, "from": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" } } }
+        },
+        "clues": {
+          "type": "array", "minItems": 1, "maxItems": 5,
+          "items": { "type": "object", "required": ["room", "text", "points_to"], "properties": { "room": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" }, "points_to": { "$ref": "#/$defs/id" } } }
+        },
+        "final_choice": {
+          "type": "object", "required": ["question", "options"],
+          "properties": {
+            "question": { "$ref": "#/$defs/text" },
+            "options": {
+              "type": "array", "minItems": 2, "maxItems": 3,
+              "items": { "type": "object", "required": ["text", "result", "score"], "properties": { "text": { "$ref": "#/$defs/text" }, "result": { "$ref": "#/$defs/text" }, "score": { "type": "integer", "minimum": 0, "maximum": 3 }, "best": { "type": "boolean" } } }
+            }
+          }
+        }
+      }
+    },
+    "debrief": {
+      "type": "object", "required": ["prompts"],
+      "properties": {
+        "prompts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "next_class": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

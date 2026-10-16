@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Door · Concept book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ECEEF1;--ink:#1C2430;--muted:#5A6574}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Figtree',sans-serif}
+header.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #DDE2E9;padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+header.top strong{font-family:'Bricolage Grotesque',sans-serif;font-size:20px}
+header.top details{margin-left:auto}
+header.top summary{cursor:pointer;padding:8px 12px;border-radius:10px;border:1px solid #DDE2E9;min-height:44px;display:flex;align-items:center}
+nav.toc{position:absolute;right:16px;margin-top:8px;background:#fff;border:1px solid #DDE2E9;border-radius:12px;padding:8px;display:flex;flex-direction:column;max-height:70vh;overflow:auto;box-shadow:0 10px 30px rgba(28,36,48,.15)}
+nav.toc a{padding:8px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
+nav.toc a:hover,nav.toc a:focus{background:#EEF2FC}
+main{max-width:1600px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;gap:24px}
+.board{scroll-margin-top:80px}
+.frame{width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:14px;box-shadow:0 2px 12px rgba(28,36,48,.12);background:#fff;position:relative}
+.inner{width:1920px;height:1080px;transform-origin:0 0;position:absolute;left:0;top:0}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:0 16px 40px}
+footer a{color:#2E5BDB}
+@media print{header.top{display:none}.frame{box-shadow:none;break-inside:avoid}}
+#b01 a{color:#2E5BDB}
+#b01 a:hover{color:#1E40A8}
+#b02 a{color:#2E5BDB}
+#b02 a:hover{color:#1E40A8}
+#b02 .k{font-size:12px;font-weight:700;letter-spacing:1px;color:#5A6574}
+#b02 .t{font-size:15px;line-height:1.45;color:#2A3442}
+#b03 a{color:#2E5BDB}
+#b03 a:hover{color:#1E40A8}
+#b03 .lab{font-size:12px;font-weight:700;letter-spacing:1px;color:#5A6574;padding-top:4px}
+#b03 .cell{font-size:15px;line-height:1.42;color:#2A3442}
+#b04 a{color:#2E5BDB}
+#b04 a:hover{color:#1E40A8}
+#b04 .box{padding:16px 18px;border-radius:16px;background:#F2F4F7;display:flex;flex-direction:column;gap:4px}
+#b04 .bt{font-family:'Bricolage Grotesque',sans-serif;font-size:21px;font-weight:700}
+#b04 .bs{font-size:14px;line-height:1.4;color:#3A4554}
+#b04 .term{font-size:12px;font-weight:700;color:#2E5BDB}
+#b05 a{color:#2E5BDB}
+#b05 a:hover{color:#1E40A8}
+#b05 .lane{font-size:13px;font-weight:700;letter-spacing:1px;color:#5A6574;display:flex;flex-direction:column;gap:6px;justify-content:center}
+#b05 .cellx{display:flex;flex-direction:column;gap:8px}
+#b05 .scr{border-radius:12px;border:1px solid #DDE2E9;background:#FFFFFF;padding:10px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 6px rgba(28,36,48,0.05)}
+#b05 .st{font-size:14px;font-weight:700}
+#b05 .ln{height:6px;border-radius:3px;background:#E3E8EE}
+#b05 .ph{padding:10px 12px;border-radius:12px;background:#F2F4F7;font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:700}
+#b06 a{color:#2E5BDB}
+#b06 a:hover{color:#1E40A8}
+#b06 .card{padding:20px;border-radius:18px;background:#F7F8FA;display:flex;flex-direction:column;gap:8px}
+#b06 .law{font-size:12px;font-weight:700;letter-spacing:1px;color:#2E5BDB}
+#b06 .rule{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;line-height:1.2}
+#b06 .ex{font-size:15px;line-height:1.45;color:#3A4554}
+#b07 a{color:#2E5BDB}
+#b07 a:hover{color:#1E40A8}
+#b07 button{font:inherit}
+#b07 .h2{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:700}
+#b07 .sw{display:flex;flex-direction:column;gap:4px}
+#b07 .chip{height:56px;border-radius:12px}
+#b07 .nm{font-size:13px;font-weight:700}
+#b07 .vl{font-size:12px;color:#5A6574}
+#b07 .lbl{font-size:12px;font-weight:700;letter-spacing:1px;color:#5A6574}
+#b08 a{color:#2E5BDB}
+#b08 a:hover{color:#1E40A8}
+#b08 .h2{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:700}
+#b08 .p{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:16px;background:#FBE9DA}
+#b08 .pn{font-size:14px;font-weight:700}
+#b08 .pr{font-size:12px;color:#5A6574;text-align:center}
+#b08 .o{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:14px;background:#F7F8FA}
+#b08 .on{font-size:12px;font-weight:600;text-align:center}
+#b08 .r{border-radius:10px;border:3px solid #fff;box-shadow:0 0 0 1px #DDE2E9;padding:8px;box-sizing:border-box;font-size:12px;font-weight:700;height:64px}
+#b08 th{font-size:12px;letter-spacing:1px;color:#5A6574;text-align:left;padding:8px 10px;border-bottom:1px solid #DDE2E9}
+#b08 td{font-size:14px;padding:8px 10px;border-bottom:1px solid #EEF1F5;color:#2A3442}
+#b09 a{color:#2E5BDB}
+#b09 a:hover{color:#1E40A8}
+#b09 button{font:inherit}
+#b09 .av{width:44px;height:44px;border-radius:50%}
+#b09 .tm{padding:14px;border-radius:16px;background:#FFFFFF;display:flex;flex-direction:column;gap:10px}
+#b09 .dot{width:30px;height:30px;border-radius:50%;border:3px solid #fff;margin-left:-8px}
+#b09 .q{background:#1C2430}
+#b10 a{color:#2E5BDB}
+#b10 a:hover{color:#1E40A8}
+#b10 button{font:inherit}
+#b10 .rm{position:absolute;box-sizing:border-box;border:6px solid #FFFFFF;border-radius:16px}
+#b10 .rl{position:absolute;font-size:12px;font-weight:700;letter-spacing:1px;color:#5A6574}
+#b10 .desk{position:absolute;width:70px;height:38px;border-radius:6px;background:#FFFFFF;box-shadow:0 2px 0 #C9CFD8}
+#b10 .mon{position:absolute;width:28px;height:8px;border-radius:2px;background:#3A4558}
+#b10 .ch{position:absolute;width:18px;height:18px;border-radius:50%;background:#9AA4B2}
+#b10 .sh{position:absolute;height:26px;border-radius:6px;background:#B9C6E6}
+#b10 .plant{position:absolute;width:26px;height:26px;border-radius:50%;background:#4FA88B;box-shadow:inset -4px -4px 0 #3D8C72}
+#b10 .tok{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px}
+#b10 .tc{width:32px;height:32px;border-radius:50%;border:3px solid #fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+#b10 .tn{padding:1px 7px;border-radius:999px;background:#1C2430;color:#fff;font-size:11px;font-weight:600}
+#b10 .note{position:absolute;width:22px;height:22px;background:#FFE27A;transform:rotate(-6deg);box-shadow:0 2px 4px rgba(28,36,48,0.2);font-size:11px;font-weight:700;display:grid;place-items:center}
+#b10 .ck{display:flex;align-items:center;gap:10px;font-size:15px}
+#b10 .box{width:22px;height:22px;border-radius:6px;border:2px solid #C9CFD8;display:grid;place-items:center}
+#b10 .done{background:#2F9E6E;border-color:#2F9E6E}
+#b11 a{color:#2E5BDB}
+#b11 a:hover{color:#1E40A8}
+#b11 button{font:inherit}
+#b11 .q{font-size:15px;font-weight:700}
+#b11 .c{min-height:44px;padding:0 14px;border-radius:12px;border:1px solid #C9CFD8;background:#FFFFFF;color:#1C2430;font-size:15px}
+#b11 .on{border:2px solid #2E5BDB;background:#EEF2FC;color:#1E40A8;font-weight:600}
+#b12 a{color:#2E5BDB}
+#b12 a:hover{color:#1E40A8}
+#b12 button{font:inherit}
+#b12 .rm{position:absolute;box-sizing:border-box;border:5px solid #FFFFFF;border-radius:14px}
+#b12 .rl{position:absolute;font-size:11px;font-weight:700;letter-spacing:1px;color:#5A6574}
+#b12 .clue{position:absolute;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:700}
+#b12 .frame{border-radius:16px;border:8px solid #1C2430;background:#F2F4F7;overflow:hidden;position:relative}
+#b12 .opt{padding:14px 16px;border-radius:14px;border:1px solid #C9CFD8;background:#FFFFFF;font-size:15px;line-height:1.4;text-align:left}
+#b13 a{color:#2E5BDB}
+#b13 a:hover{color:#1E40A8}
+#b13 th{font-size:16px;font-weight:700;text-align:center;padding:12px 8px;border-bottom:2px solid #DDE2E9}
+#b13 td{font-size:17px;padding:14px 8px;border-bottom:1px solid #EEF1F5;text-align:center}
+#b13 td.l{text-align:left;font-weight:600}
+#b13 .y{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#2F9E6E;color:#fff;font-weight:700}
+#b13 .p{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#FFE27A;color:#7A5B0A;font-weight:700}
+#b13 .n{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#F2F4F7;color:#9AA4B2;font-weight:700}
+#b13 .map{display:grid;grid-template-columns:150px 30px 1fr;align-items:center;gap:8px;font-size:17px}
+#b14 a{color:#2E5BDB}
+#b14 a:hover{color:#1E40A8}
+#b14 button{font:inherit}
+#b14 .tc{padding:14px;border-radius:14px;background:#FFFFFF;display:flex;flex-direction:column;gap:8px;border:1px solid #DDE2E9}
+#b14 .bar{height:8px;border-radius:999px;background:#E3E8EE;overflow:hidden}
+#b14 .mat{display:flex;gap:14px;align-items:flex-start;padding:14px;border-radius:16px;background:#F7F8FA}
+#b14 .th{width:64px;height:80px;flex-shrink:0;border-radius:8px;background:#FFFFFF;border:1px solid #DDE2E9;display:flex;flex-direction:column;gap:5px;padding:8px;box-sizing:border-box}
+#b14 .ln{height:4px;border-radius:2px;background:#DDE2E9}
+#b14 .mt{font-size:17px;font-weight:700}
+#b14 .md{font-size:14px;line-height:1.4;color:#3A4554}
+#b15 a{color:#2E5BDB}
+#b15 a:hover{color:#1E40A8}
+#b15 .ph{font-size:15px;font-weight:600;display:flex;align-items:center}
+#b15 .b{height:30px;border-radius:8px;display:flex;align-items:center;padding:0 10px;font-size:13px;font-weight:600;color:#1C2430;white-space:nowrap;overflow:hidden}
+#b15 .wk{font-size:12px;color:#5A6574;text-align:center}
+#b15 .ab{padding:14px 16px;border-radius:14px;background:#FFFFFF;border:1px solid #DDE2E9;display:flex;flex-direction:column;gap:4px}
+#b15 .at{font-size:16px;font-weight:700}
+#b15 .as{font-size:13px;line-height:1.4;color:#5A6574}
+#b15 .arr{display:grid;place-items:center}
+</style>
+</head>
+<body>
+<header class="top">
+<strong>Open Door · Concept book</strong>
+<span style="color:var(--muted);font-size:14px">15 boards · work in progress</span>
+<details><summary>Contents</summary><nav class="toc" aria-label="Contents"><a href="#b01">01 · Open Door on one page</a><a href="#b02">02 · Target group</a><a href="#b03">03 · Journey</a><a href="#b04">04 · Core loop and method</a><a href="#b05">05 · Screen map</a><a href="#b06">06 · UX principles</a><a href="#b07">07 · Design system</a><a href="#b08">08 · Design assets</a><a href="#b09">09 · Mockup – join and lobby</a><a href="#b10">10 · Mockup – walk the office</a><a href="#b11">11 · Mockup – close-up and sticky note</a><a href="#b12">12 · Mockup – the day happens</a><a href="#b13">13 · Mockup – debrief on the projector</a><a href="#b14">14 · Teacher kit</a><a href="#b15">15 · Roadmap and architecture</a></nav></details>
+</header>
+<main>
+<section class="board" id="b01" aria-label="Open Door on one page"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 36px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>01 / 15</span></div>
+
+  <div style="display: flex; gap: 64px; flex-grow: 1; min-height: 0">
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; align-items: center; gap: 18px">
+        <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><rect x="14" y="6" width="44" height="62" rx="8" fill="#2E5BDB"></rect><path d="M22 14 L46 10 L46 66 L22 62 Z" fill="#FFE27A"></path><circle cx="40" cy="38" r="3" fill="#1C2430"></circle></svg>
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 96px; line-height: 1; font-weight: 700">Open Door</h1>
+      </div>
+      <p style="margin: 0; font-size: 30px; line-height: 1.35; font-weight: 500; max-width: 820px">A walk-through game where student teams explore a real-feeling company, spot what could go wrong, and live through the day it does.</p>
+      <p style="margin: 0; font-size: 19px; line-height: 1.6; color: #3A4554; max-width: 820px">Students walk around a top-down office with their teammates. When they talk to someone or look closely at something, an illustrated close-up opens. They leave sticky notes on risks. Then the scenario plays out, and the class compares what each team saw coming. Behind the play sits the CyPro method from the Digital Business Development toolbox: assets, system model, threats and likelihood — named only at the end.</p>
+
+      <div style="margin-top: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <span style="padding: 10px 16px; border-radius: 999px; background: #F2F4F7; font-size: 16px; font-weight: 600">Join</span><span style="color: #9AA4B2">→</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #F2F4F7; font-size: 16px; font-weight: 600">The story</span><span style="color: #9AA4B2">→</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #FFF4C7; font-size: 16px; font-weight: 600">Walk and spot</span><span style="color: #9AA4B2">→</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #FDE3DD; font-size: 16px; font-weight: 600">The day happens</span><span style="color: #9AA4B2">→</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #E2F3EC; font-size: 16px; font-weight: 600">Talk it through</span><span style="color: #9AA4B2">→</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #EEF2FC; font-size: 16px; font-weight: 600">Worksheet</span>
+      </div>
+    </div>
+
+    <div style="width: 760px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px">
+      <div style="position: relative; height: 470px; border-radius: 24px; background: #E3E8EE; overflow: hidden">
+        <div style="position: absolute; left: 20px; top: 20px; width: 420px; height: 240px; border-radius: 14px; background: #EADBC8"></div>
+        <div style="position: absolute; left: 450px; top: 20px; width: 290px; height: 240px; border-radius: 14px; background: #F3F5F8"></div>
+        <div style="position: absolute; left: 20px; top: 270px; width: 720px; height: 180px; border-radius: 14px; background: #F3F5F8"></div>
+        <span style="position: absolute; left: 36px; top: 32px; font-size: 13px; font-weight: 700; color: #7A5B3A">PACKING STATION</span>
+        <span style="position: absolute; left: 466px; top: 32px; font-size: 13px; font-weight: 700; color: #5A6574">OFFICE</span>
+        <span style="position: absolute; left: 36px; top: 282px; font-size: 13px; font-weight: 700; color: #5A6574">WAREHOUSE</span>
+        <div style="position: absolute; left: 80px; top: 90px; width: 240px; height: 54px; border-radius: 10px; background: #C9A27C"></div>
+        <div style="position: absolute; left: 104px; top: 100px; width: 46px; height: 34px; border-radius: 8px; background: #3A4558"></div>
+        <div style="position: absolute; left: 500px; top: 80px; width: 90px; height: 46px; border-radius: 8px; background: #FFFFFF"></div>
+        <div style="position: absolute; left: 610px; top: 80px; width: 90px; height: 46px; border-radius: 8px; background: #FFFFFF"></div>
+        <div style="position: absolute; left: 500px; top: 160px; width: 90px; height: 46px; border-radius: 8px; background: #FFFFFF"></div>
+        <div style="position: absolute; left: 70px; top: 330px; width: 300px; height: 26px; border-radius: 8px; background: #B9C6E6"></div>
+        <div style="position: absolute; left: 70px; top: 380px; width: 300px; height: 26px; border-radius: 8px; background: #B9C6E6"></div>
+        <div style="position: absolute; left: 410px; top: 330px; width: 300px; height: 26px; border-radius: 8px; background: #B9C6E6"></div>
+        <div style="position: absolute; left: 410px; top: 380px; width: 300px; height: 26px; border-radius: 8px; background: #B9C6E6"></div>
+        <div style="position: absolute; left: 150px; top: 152px; width: 34px; height: 34px; border-radius: 50%; background: #2F9E6E; border: 3px solid #fff"></div>
+        <div style="position: absolute; left: 210px; top: 190px; width: 42px; height: 42px; border-radius: 50%; background: #2E5BDB; border: 4px solid #fff; box-shadow: 0 0 0 5px rgba(46,91,219,0.25)"></div>
+        <div style="position: absolute; left: 640px; top: 170px; width: 34px; height: 34px; border-radius: 50%; background: #8C6AD9; border: 3px solid #fff"></div>
+        <div style="position: absolute; left: 330px; top: 92px; width: 86px; padding: 8px; background: #FFE27A; transform: rotate(-4deg); font-size: 11px; line-height: 1.3; box-shadow: 0 3px 8px rgba(28,36,48,0.15)">Printer on guest Wi-Fi?</div>
+        <div style="position: absolute; right: 20px; bottom: 20px; width: 330px; border-radius: 18px; background: #FBE9DA; box-shadow: 0 10px 30px rgba(28,36,48,0.25); overflow: hidden; display: flex; flex-direction: column">
+          <svg width="330" height="150" viewBox="0 0 330 150" aria-hidden="true"><rect x="0" y="110" width="330" height="40" fill="#EBCDB0"></rect><rect x="20" y="70" width="120" height="12" rx="6" fill="#C98E5B"></rect><rect x="34" y="34" width="54" height="36" rx="8" fill="#3A4558"></rect><path d="M220 150 C220 110 236 94 262 90 C288 94 304 110 304 150 Z" fill="#4FA88B"></path><circle cx="262" cy="60" r="28" fill="#8C5A3C"></circle><path d="M234 56 C234 26 290 26 290 56 C282 44 242 44 234 56 Z" fill="#2B1B12"></path><path d="M252 70 Q262 76 272 70" fill="none" stroke="#2B1B12" stroke-width="2.5" stroke-linecap="round"></path></svg>
+          <div style="padding: 12px 14px; background: #FFFFFF; font-size: 14px; line-height: 1.4"><strong>Jana:</strong> The printer says “paused by admin”.</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <div style="padding: 16px; border-radius: 16px; background: #F2F4F7; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5A6574">Who</span><strong style="font-size: 18px">Teams of 3–5</strong><span style="font-size: 14px; color: #3A4554">MSc students, TBBD</span></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F2F4F7; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5A6574">How long</span><strong style="font-size: 18px">45 or 90 min</strong><span style="font-size: 14px; color: #3A4554">One class, one session</span></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F2F4F7; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5A6574">Where</span><strong style="font-size: 18px">Any browser</strong><span style="font-size: 14px; color: #3A4554">Eduroam, no login</span></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F2F4F7; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5A6574">Data</span><strong style="font-size: 18px">Session only</strong><span style="font-size: 14px; color: #3A4554">Nicknames, deleted after</span></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F2F4F7; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5A6574">Built with</span><strong style="font-size: 18px">Open source</strong><span style="font-size: 14px; color: #3A4554">Free hosting, GitHub</span></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F2F4F7; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5A6574">Method</span><strong style="font-size: 18px">CyPro</strong><span style="font-size: 14px; color: #3A4554">CC BY-SA material</span></div>
+      </div>
+    </div>
+  </div>
+</div></div></div></section>
+<section class="board" id="b02" aria-label="Target group"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 28px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>02 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">Who plays, and who teaches</h1>
+    <p style="margin: 0; max-width: 760px; font-size: 18px; line-height: 1.5; color: #3A4554">MSc students aged 24–32, women and men, from Denmark, the rest of Europe and Asia. Engineers by training, often with work experience — not gamers. Three student sketches and one teacher, based on the programme’s intake.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
+    <section style="padding: 22px; border-radius: 20px; background: #F7F8FA; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="36" fill="#FFE9D9"></circle><path d="M14 72 C14 54 24 48 36 48 C48 48 58 54 58 72 Z" fill="#2E5BDB"></path><circle cx="36" cy="30" r="13" fill="#F2C9A6"></circle><path d="M22 30 C21 14 51 14 50 30 C50 40 48 46 50 52 C44 46 46 24 36 22 C26 24 28 46 22 52 C24 46 22 40 22 30 Z" fill="#E1B460"></path></svg>
+        <div style="display: flex; flex-direction: column"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Sofie, 25</strong><span style="font-size: 14px; color: #5A6574">Danish · BEng, industrial</span></div>
+      </div>
+      <p style="margin: 0; font-size: 18px; line-height: 1.4; font-weight: 600">“Show me why this matters for a real company.”</p>
+      <span class="k">BACKGROUND</span><span class="t">Part-time job at a manufacturer near Herning. Practical, good at processes, little IT security.</span>
+      <span class="k">NEEDS</span><span class="t">Recognisable companies and situations. Clear link to the exam project.</span>
+      <span class="k">WORRY</span><span class="t">“Games feel childish and waste time.”</span>
+    </section>
+
+    <section style="padding: 22px; border-radius: 20px; background: #F7F8FA; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="36" fill="#E2F3EC"></circle><path d="M14 72 C14 54 24 48 36 48 C48 48 58 54 58 72 Z" fill="#3A4558"></path><circle cx="36" cy="30" r="13" fill="#D9A27E"></circle><path d="M23 26 C24 14 48 14 49 26 C44 20 30 20 23 26 Z" fill="#2B1B12"></path><path d="M26 38 C30 46 42 46 46 38 C44 44 40 47 36 47 C32 47 28 44 26 38 Z" fill="#2B1B12"></path></svg>
+        <div style="display: flex; flex-direction: column"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Marco, 29</strong><span style="font-size: 14px; color: #5A6574">Italian · software engineer</span></div>
+      </div>
+      <p style="margin: 0; font-size: 18px; line-height: 1.4; font-weight: 600">“I want to see the technical detail behind it.”</p>
+      <span class="k">BACKGROUND</span><span class="t">Three years as a developer before the MSc. Knows networks and logins, less about business impact.</span>
+      <span class="k">NEEDS</span><span class="t">Optional depth: logs, data flows, STRIDE terms on demand.</span>
+      <span class="k">WORRY</span><span class="t">“Too simple — I’ll be bored and take over the group.”</span>
+    </section>
+
+    <section style="padding: 22px; border-radius: 20px; background: #F7F8FA; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="36" fill="#EADFFF"></circle><path d="M14 72 C14 54 24 48 36 48 C48 48 58 54 58 72 Z" fill="#E8573F"></path><circle cx="36" cy="30" r="13" fill="#EFC9A4"></circle><path d="M21 34 C19 12 53 12 51 34 L52 50 C46 46 48 24 36 22 C24 24 26 46 20 50 Z" fill="#1C1C22"></path></svg>
+        <div style="display: flex; flex-direction: column"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Linh, 26</strong><span style="font-size: 14px; color: #5A6574">Vietnamese · technical design</span></div>
+      </div>
+      <p style="margin: 0; font-size: 18px; line-height: 1.4; font-weight: 600">“I need a moment to read before we decide.”</p>
+      <span class="k">BACKGROUND</span><span class="t">English is her second language. Careful and thorough, quiet when the group talks fast.</span>
+      <span class="k">NEEDS</span><span class="t">Short sentences, time to read, ways to give input without speaking first.</span>
+      <span class="k">WORRY</span><span class="t">“The fast talkers decide everything.”</span>
+    </section>
+
+    <section style="padding: 22px; border-radius: 20px; background: #EEF2FC; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <svg width="72" height="72" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="36" fill="#FFFFFF"></circle><path d="M14 72 C14 54 24 48 36 48 C48 48 58 54 58 72 Z" fill="#2F9E6E"></path><circle cx="36" cy="30" r="13" fill="#F0C7A8"></circle><path d="M22 30 C20 14 52 14 50 30 C46 22 26 22 22 30 Z" fill="#8C8C94"></path><rect x="26" y="28" width="20" height="6" rx="3" fill="none" stroke="#1C2430" stroke-width="1.5"></rect></svg>
+        <div style="display: flex; flex-direction: column"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Anne, 46</strong><span style="font-size: 14px; color: #5A6574">Teacher · associate professor</span></div>
+      </div>
+      <p style="margin: 0; font-size: 18px; line-height: 1.4; font-weight: 600">“If setup takes more than five minutes, I won’t use it.”</p>
+      <span class="k">BACKGROUND</span><span class="t">Teaches digital business development. Knows CyPro well, not a game designer.</span>
+      <span class="k">NEEDS</span><span class="t">One-click start, control of the room, ready slides and prompts.</span>
+      <span class="k">WORRY</span><span class="t">“Students play but don’t learn the method.”</span>
+    </section>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <span class="k" style="font-size: 13px">WHAT THIS MEANS FOR THE DESIGN</span>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+      <div style="padding: 16px 18px; border-radius: 14px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px">Grown-up, not cartoonish</strong><span class="t">Real company, calm colours, humour in the writing, not in childish art.</span></div>
+      <div style="padding: 16px 18px; border-radius: 14px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px">Plain English everywhere</strong><span class="t">Short sentences for second-language readers. Every text checked for readability.</span></div>
+      <div style="padding: 16px 18px; border-radius: 14px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px">No reflex skills needed</strong><span class="t">Walking is slow and forgiving. Time pressure only on decisions, never on movement.</span></div>
+      <div style="padding: 16px 18px; border-radius: 14px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px">Every voice counts</strong><span class="t">Private votes before group talk. Each player owns a room or a person.</span></div>
+      <div style="padding: 16px 18px; border-radius: 14px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px">Depth on demand</strong><span class="t">A “look closer” layer with logs and terms for the Marcos, hidden for others.</span></div>
+      <div style="padding: 16px 18px; border-radius: 14px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px">A diverse cast</strong><span class="t">Names, faces and roles from many backgrounds, without stereotypes.</span></div>
+    </div>
+  </section>
+</div></div></div></section>
+<section class="board" id="b03" aria-label="Journey"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 24px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>03 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">One class, from QR code to worksheet</h1>
+    <p style="margin: 0; max-width: 700px; font-size: 18px; line-height: 1.5; color: #3A4554">A 90-minute session. The curve shows how it should feel; the risk row shows where it could go wrong, and the design answer shows how we prevent that.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 150px repeat(7, minmax(0, 1fr)); column-gap: 14px; row-gap: 12px">
+    <span></span>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #F2F4F7"><span style="display: block; font-size: 12px; color: #5A6574">Before · 2 min</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">Set up</strong></div>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #F2F4F7"><span style="display: block; font-size: 12px; color: #5A6574">0–3 min</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">Join</strong></div>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #F2F4F7"><span style="display: block; font-size: 12px; color: #5A6574">3–6 min</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">The story</strong></div>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #FFF4C7"><span style="display: block; font-size: 12px; color: #7A5B0A">6–30 min</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">Walk and spot</strong></div>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #FDE3DD"><span style="display: block; font-size: 12px; color: #8A2E1E">30–55 min</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">The day happens</strong></div>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #E2F3EC"><span style="display: block; font-size: 12px; color: #1E6B4E">55–85 min</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">Talk it through</strong></div>
+    <div style="padding: 12px 14px; border-radius: 14px; background: #EEF2FC"><span style="display: block; font-size: 12px; color: #1E40A8">After</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px">Take it home</strong></div>
+
+    <span class="lab">STUDENT DOES</span>
+    <span class="cell" style="color: #9AA4B2">—</span>
+    <span class="cell">Scans the QR, types a nickname, picks a face, joins a team table.</span>
+    <span class="cell">Watches a 60-second illustrated story from the CEO.</span>
+    <span class="cell">Walks the top-down office; close-ups open when talking or inspecting; leaves sticky notes.</span>
+    <span class="cell">Phone buzzes. Follows clues room to room. Tells the CEO what to do.</span>
+    <span class="cell">Sees all teams’ notes on the projector; real CyPro terms appear.</span>
+    <span class="cell">Downloads the team’s CyPro threat table.</span>
+
+    <span class="lab">HOW IT FEELS</span>
+    <div style="grid-column: span 7; position: relative; height: 120px; border-radius: 14px; background: #F7F8FA">
+      <svg width="100%" height="120" viewBox="0 0 1600 120" preserveAspectRatio="none" aria-hidden="true" style="position: absolute; left: 0; top: 0"><polyline points="114,70 343,84 571,58 800,48 1029,18 1257,26 1486,40" fill="none" stroke="#2E5BDB" stroke-width="4" stroke-linejoin="round"></polyline><polyline points="800,48 860,74 920,52" fill="none" stroke="#E8573F" stroke-width="3" stroke-dasharray="6 6"></polyline></svg>
+      <span style="position: absolute; left: 4%; top: 86px; font-size: 13px; color: #3A4554">Calm</span>
+      <span style="position: absolute; left: 18%; top: 92px; font-size: 13px; color: #3A4554">“Another tool?”</span>
+      <span style="position: absolute; left: 32%; top: 72px; font-size: 13px; color: #3A4554">Curious</span>
+      <span style="position: absolute; left: 50%; top: 84px; font-size: 13px; color: #B93A25">risk: lost</span>
+      <span style="position: absolute; left: 61%; top: 34px; font-size: 13px; font-weight: 700">Tense, fun</span>
+      <span style="position: absolute; left: 75%; top: 44px; font-size: 13px; font-weight: 700">“We saw it coming!”</span>
+      <span style="position: absolute; left: 88%; top: 58px; font-size: 13px; color: #3A4554">Useful</span>
+    </div>
+
+    <span class="lab">COULD GO WRONG</span>
+    <span class="cell">Setup fails on a projector laptop.</span>
+    <span class="cell">Network blocks it; people wait.</span>
+    <span class="cell">Rules dump; eyes glaze over.</span>
+    <span class="cell">One player drives, others watch. Teams get lost.</span>
+    <span class="cell">Stress without a clear finish.</span>
+    <span class="cell">Fun but no learning link.</span>
+    <span class="cell">Nothing to reuse.</span>
+
+    <span class="lab">DESIGN ANSWER</span>
+    <span class="cell">Pick a ready scenario, press Start. Works in any browser.</span>
+    <span class="cell">HTTPS only, works on eduroam. In under 30 seconds.</span>
+    <span class="cell">Story first. Goal pinned on screen all game.</span>
+    <span class="cell">Everyone walks; each owns rooms. Room checklist, team on map, private notes first.</span>
+    <span class="cell">Clue counter, timer, one final choice, finish screen.</span>
+    <span class="cell">Reveal: sticky note = threat, room = component, crate = asset.</span>
+    <span class="cell">Export to the CyPro table, ready for reports.</span>
+
+    <span class="lab">TEACHER</span>
+    <span class="cell">Chooses company, scenario, 45 or 90 min.</span>
+    <span class="cell">Watches teams fill the lobby.</span>
+    <span class="cell">Presses Start for all.</span>
+    <span class="cell">Sees every team live; sends hints.</span>
+    <span class="cell">Can pause the whole class.</span>
+    <span class="cell">Uses ready prompts and “surprises”.</span>
+    <span class="cell">Downloads a class summary.</span>
+  </div>
+</div></div></div></section>
+<section class="board" id="b04" aria-label="Core loop and method"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 30px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>04 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">What you do, and what you learn</h1>
+    <p style="margin: 0; max-width: 700px; font-size: 18px; line-height: 1.5; color: #3A4554">The game layer (top) is what students experience. Each step quietly covers a CyPro step (blue labels). One loop — walk, look closer, write a note — repeats until time is up.</p>
+  </div>
+
+  <div style="display: flex; align-items: stretch; gap: 0">
+    <div class="box" style="width: 170px"><span class="bt">Join</span><span class="bs">QR, nickname, face</span></div>
+    <div style="width: 44px; display: grid; place-items: center"><svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 9h20M15 2l7 7-7 7" fill="none" stroke="#9AA4B2" stroke-width="2.5"></path></svg></div>
+    <div class="box" style="width: 200px"><span class="bt">The story</span><span class="bs">60 s from the CEO</span><span class="term">Context establishment</span></div>
+    <div style="width: 44px; display: grid; place-items: center"><svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 9h20M15 2l7 7-7 7" fill="none" stroke="#9AA4B2" stroke-width="2.5"></path></svg></div>
+
+    <div style="flex-grow: 1; padding: 16px; border-radius: 20px; border: 2px dashed #E1B800; background: #FFFBEA; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #7A5B0A">WALK AND SPOT · THE LOOP</span>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div class="box" style="flex: 1 1 0; background: #FFFFFF"><span class="bt">Walk</span><span class="bs">Move through the top-down office</span><span class="term">System modelling</span></div>
+        <svg width="34" height="26" viewBox="0 0 34 26" aria-hidden="true"><path d="M2 8h26M22 2l6 6-6 6M32 18H6M12 12l-6 6 6 6" fill="none" stroke="#9AA4B2" stroke-width="2.2"></path></svg>
+        <div class="box" style="flex: 1 1 0; background: #FFFFFF"><span class="bt">Look closer</span><span class="bs">Illustrated close-up: talk, inspect</span><span class="term">Asset identification</span></div>
+        <svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 9h20M15 2l7 7-7 7" fill="none" stroke="#9AA4B2" stroke-width="2.5"></path></svg>
+        <div class="box" style="flex: 1 1 0; background: #FFE27A"><span class="bt">Sticky note</span><span class="bs">What could go wrong here?</span><span class="term">Threat identification · analysis</span></div>
+      </div>
+      <span style="font-size: 13px; color: #7A5B0A">↺ repeat until the timer ends</span>
+    </div>
+
+    <div style="width: 44px; display: grid; place-items: center"><svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 9h20M15 2l7 7-7 7" fill="none" stroke="#9AA4B2" stroke-width="2.5"></path></svg></div>
+    <div class="box" style="width: 200px; background: #FDE3DD"><span class="bt">The day</span><span class="bs">Scenario plays; follow the clues</span><span class="term">Testing the threat model</span></div>
+    <div style="width: 44px; display: grid; place-items: center"><svg width="26" height="18" viewBox="0 0 26 18" aria-hidden="true"><path d="M2 9h20M15 2l7 7-7 7" fill="none" stroke="#9AA4B2" stroke-width="2.5"></path></svg></div>
+    <div class="box" style="width: 200px; background: #E2F3EC"><span class="bt">Talk it through</span><span class="bs">Compare teams, name the terms</span><span class="term">Reflection · risk management next</span></div>
+  </div>
+
+  <div style="display: flex; gap: 56px; flex-grow: 1; min-height: 0">
+    <section style="flex: 1 1 0; display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px">Anatomy of a sticky note</h2>
+      <div style="display: flex; gap: 28px; align-items: flex-start">
+        <div style="width: 330px; flex-shrink: 0; padding: 22px; background: #FFE27A; transform: rotate(-2deg); box-shadow: 0 10px 24px rgba(28,36,48,0.15); display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 13px; font-weight: 700">ON: LABEL PRINTER</span>
+          <span style="font-size: 18px; line-height: 1.35">Anyone on the guest Wi-Fi could stop it on Black Friday.</span>
+          <span style="font-size: 14px">It would: <strong>stop the work</strong></span>
+          <span style="font-size: 14px">Who: <strong>a visitor or driver</strong></span>
+          <span style="font-size: 14px">Likely? <strong>Seen in companies like ours</strong></span>
+          <span style="font-size: 13px">— Laura</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 6px">
+          <div style="display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">On: a thing or a room</strong><span class="bs">→ asset and component in the system model</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">What could go wrong</strong><span class="bs">→ the threat, in the student’s own words</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">It would leak / change / stop</strong><span class="bs">→ confidentiality, integrity, availability</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">Who might cause it</strong><span class="bs">→ threat actor</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><strong style="font-size: 16px">How likely</strong><span class="bs">→ CyPro’s own four likelihood levels, in plain words</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="width: 760px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px">Likelihood without jargon</h2>
+      <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #3A4554">CyPro already offers a simple four-step likelihood scale based on experience. The game uses exactly those steps, so the notes drop straight into the CyPro threat table.</p>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+        <div style="padding: 14px; border-radius: 14px; background: #EEF2FC; display: flex; flex-direction: column; gap: 6px"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; color: #2E5BDB">1</strong><span style="font-size: 14px; line-height: 1.4">Could happen in theory</span></div>
+        <div style="padding: 14px; border-radius: 14px; background: #DCE5FA; display: flex; flex-direction: column; gap: 6px"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; color: #2E5BDB">2</strong><span style="font-size: 14px; line-height: 1.4">Heard of it elsewhere</span></div>
+        <div style="padding: 14px; border-radius: 14px; background: #BFD0F5; display: flex; flex-direction: column; gap: 6px"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; color: #1E40A8">3</strong><span style="font-size: 14px; line-height: 1.4">Seen in companies like ours</span></div>
+        <div style="padding: 14px; border-radius: 14px; background: #2E5BDB; color: #FFFFFF; display: flex; flex-direction: column; gap: 6px"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">4</strong><span style="font-size: 14px; line-height: 1.4">It has happened here</span></div>
+      </div>
+      <div style="margin-top: 8px; padding: 16px 18px; border-radius: 14px; background: #F2F4F7; font-size: 15px; line-height: 1.5; color: #2A3442">Each team member writes notes privately first, then the team sees them together and merges duplicates. This gives quieter players a voice and mirrors CyPro’s advice to vote before discussing.</div>
+    </section>
+  </div>
+</div></div></div></section>
+<section class="board" id="b05" aria-label="Screen map"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 26px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>05 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">Three screens, one session</h1>
+    <p style="margin: 0; max-width: 720px; font-size: 18px; line-height: 1.5; color: #3A4554">Students play on their own laptop or phone, the class sees the projector, and the teacher steers from a control view. All three stay in step through one live session room.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 150px repeat(6, minmax(0, 1fr)); column-gap: 14px; row-gap: 16px">
+    <span></span>
+    <span class="ph">Join</span><span class="ph">The story</span><span class="ph" style="background: #FFF4C7">Walk and spot</span><span class="ph" style="background: #FDE3DD">The day</span><span class="ph" style="background: #E2F3EC">Talk it through</span><span class="ph" style="background: #EEF2FC">After</span>
+
+    <div class="lane"><svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><rect x="2" y="2" width="26" height="15" rx="2" fill="none" stroke="#2E5BDB" stroke-width="2"></rect><path d="M0 20h30" stroke="#2E5BDB" stroke-width="2"></path></svg>STUDENT<br>laptop or phone</div>
+    <div class="cellx"><div class="scr"><span class="st">Enter code</span><div class="ln" style="width: 80%"></div></div><div class="scr"><span class="st">Name, face, team</span><div style="display: flex; gap: 4px"><span style="width: 14px; height: 14px; border-radius: 50%; background: #FFD7C2"></span><span style="width: 14px; height: 14px; border-radius: 50%; background: #CFE0FF"></span><span style="width: 14px; height: 14px; border-radius: 50%; background: #DDF1E7"></span></div></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Story cards</span><div class="ln"></div><div class="ln" style="width: 60%"></div></div><div class="scr"><span class="st">Your goal</span><div class="ln" style="width: 70%"></div></div></div>
+    <div class="cellx"><div class="scr" style="border-color: #E1B800"><span class="st">Top-down office</span><div style="height: 30px; border-radius: 6px; background: #EADBC8"></div></div><div class="scr"><span class="st">Close-up ⇄ office</span><div style="height: 18px; border-radius: 6px; background: #FBE9DA"></div></div><div class="scr" style="background: #FFF4C7"><span class="st">Sticky note</span></div></div>
+    <div class="cellx"><div class="scr" style="border-color: #E8573F"><span class="st">Alert</span><div class="ln" style="background: #FDE3DD"></div></div><div class="scr"><span class="st">Follow clues</span><div style="height: 24px; border-radius: 6px; background: #EADBC8"></div></div><div class="scr"><span class="st">Final choice</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Team result</span><div class="ln" style="width: 50%"></div></div><div class="scr"><span class="st">Terms revealed</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Download worksheet</span><div class="ln" style="width: 60%"></div></div></div>
+
+    <div class="lane"><svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><rect x="2" y="2" width="26" height="16" rx="1" fill="none" stroke="#2F9E6E" stroke-width="2"></rect><path d="M15 18v4" stroke="#2F9E6E" stroke-width="2"></path></svg>PROJECTOR<br>whole class</div>
+    <div class="cellx"><div class="scr"><span class="st">Lobby: QR + teams</span><div style="display: flex; gap: 4px"><span style="width: 22px; height: 22px; background: #1C2430"></span><div class="ln" style="flex-grow: 1; align-self: center"></div></div></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Story playback</span><div style="height: 22px; border-radius: 6px; background: #FBE9DA"></div></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Live progress</span><span style="font-size: 12px; color: #5A6574">Notes per team, no answers</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Clock and news ticker</span><div class="ln" style="background: #FDE3DD"></div></div></div>
+    <div class="cellx"><div class="scr" style="border-color: #2F9E6E"><span class="st">Compare teams</span><span style="font-size: 12px; color: #5A6574">Who saw it coming?</span></div><div class="scr"><span class="st">Method reveal</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Class summary</span></div></div>
+
+    <div class="lane"><svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><circle cx="15" cy="8" r="6" fill="none" stroke="#8C6AD9" stroke-width="2"></circle><path d="M4 22c2-6 6-8 11-8s9 2 11 8" fill="none" stroke="#8C6AD9" stroke-width="2"></path></svg>TEACHER<br>control view</div>
+    <div class="cellx"><div class="scr"><span class="st">Pick company, scenario, length</span></div><div class="scr"><span class="st">Move players</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Start for all</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Watch any team</span></div><div class="scr"><span class="st">Send a hint</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Pause all</span></div><div class="scr"><span class="st">Speed up the clock</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Prompt cards</span><span style="font-size: 12px; color: #5A6574">Ready questions per scenario</span></div></div>
+    <div class="cellx"><div class="scr"><span class="st">Export, end session</span><span style="font-size: 12px; color: #5A6574">Then all data is deleted</span></div></div>
+  </div>
+
+  <div style="margin-top: auto; display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 16px; background: #F2F4F7">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#2E5BDB"></circle><path d="M12 20h16M20 12v16" stroke="#fff" stroke-width="3"></path></svg>
+    <span style="font-size: 16px; line-height: 1.5; color: #2A3442">All three views connect to one <strong>session room</strong> over a normal secure web connection. The room holds positions, notes and the clock while the class plays, and disappears a few hours after the session ends.</span>
+  </div>
+</div></div></div></section>
+<section class="board" id="b06" aria-label="UX principles"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 26px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>06 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">Eight rules every screen follows</h1>
+    <p style="margin: 0; max-width: 700px; font-size: 18px; line-height: 1.5; color: #3A4554">Each rule comes from a well-known UX law or guideline, turned into something concrete for this game, so designers, developers and reviewers can check the same things.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px">
+    <div class="card"><span class="law">JAKOB’S LAW · FAMILIARITY</span><span class="rule">Feels like tools they already use</span><span class="ex">Chat looks like a messaging app, notes look like sticky notes, the office looks like an office.</span></div>
+    <div class="card"><span class="law">HICK’S LAW · FEW CHOICES</span><span class="rule">At most three choices at a time</span><span class="ex">A close-up offers two or three actions. The note asks one question per row.</span></div>
+    <div class="card"><span class="law">MILLER · CHUNKING</span><span class="rule">Small lists, always visible</span><span class="ex">Seven rooms on the checklist. Up to five clues per scenario.</span></div>
+    <div class="card"><span class="law">FITTS’S LAW · EASY TARGETS</span><span class="rule">Big, forgiving click areas</span><span class="ex">Whole rooms are clickable. Buttons at least 44 px. Walking never needs precision.</span></div>
+    <div class="card"><span class="law">DOHERTY · FAST FEEDBACK</span><span class="rule">Every action answers within 0.4 s</span><span class="ex">Moving, sticking a note and teammates’ moves appear instantly, even on eduroam.</span></div>
+    <div class="card"><span class="law">PROGRESSIVE DISCLOSURE</span><span class="rule">Depth only when asked for</span><span class="ex">A “look closer” link shows logs and STRIDE terms for those who want them.</span></div>
+    <div class="card"><span class="law">PEAK-END RULE</span><span class="rule">A clear peak, a good ending</span><span class="ex">The day is the peak. Every team ends on “what you saw coming”, never only on mistakes.</span></div>
+    <div class="card"><span class="law">READABILITY · PLAIN ENGLISH</span><span class="rule">Short sentences, everyday words</span><span class="ex">Flesch Reading Ease 60+ and sentences under 20 words, checked automatically on every scenario text.</span></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; flex-grow: 1; min-height: 0">
+    <section style="padding: 22px; border-radius: 18px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">Accessible by default</h2>
+      <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #2A3442">WCAG 2.2 level AA is the baseline, in line with what public-sector sites in the EU must meet. Text keeps a 4.5:1 contrast. Colour never carries meaning alone: risk levels also have numbers, and teammates have initials. Everything works with the keyboard — arrow keys to walk, Tab to reach rooms and buttons — and screen readers get a room list as an alternative to the map. Animations respect the “reduce motion” setting.</p>
+    </section>
+    <section style="padding: 22px; border-radius: 18px; background: #EEF2FC; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px">How we know it works</h2>
+      <div style="display: grid; grid-template-columns: 1fr auto; row-gap: 10px; column-gap: 20px; font-size: 16px">
+        <span>Time from QR scan to being in a team</span><strong>under 30 s</strong>
+        <span>Students who can say the goal after the story</span><strong>9 in 10</strong>
+        <span>Every team member leaves at least one note</span><strong>yes</strong>
+        <span>System Usability Scale after the pilot</span><strong>75 or higher</strong>
+        <span>Teacher setup time</span><strong>under 2 min</strong>
+      </div>
+    </section>
+  </div>
+</div></div></div></section>
+<section class="board" id="b07" aria-label="Design system"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 24px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>07 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">Design system: calm office, warm people</h1>
+    <p style="margin: 0; max-width: 700px; font-size: 18px; line-height: 1.5; color: #3A4554">Cool, light interface colours so the game feels like a grown-up tool. Warm colours are kept for people, illustrations and sticky notes — the things we want students to notice.</p>
+  </div>
+
+  <div style="display: flex; gap: 48px; flex-grow: 1; min-height: 0">
+    <div style="width: 820px; flex-shrink: 0; display: flex; flex-direction: column; gap: 22px">
+      <section style="display: flex; flex-direction: column; gap: 12px">
+        <h2 class="h2">Colour</h2>
+        <span class="lbl">INTERFACE</span>
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px">
+          <div class="sw"><div class="chip" style="background: #1C2430"></div><span class="nm">Ink</span><span class="vl">#1C2430 · text</span></div>
+          <div class="sw"><div class="chip" style="background: #5A6574"></div><span class="nm">Slate</span><span class="vl">#5A6574 · secondary</span></div>
+          <div class="sw"><div class="chip" style="background: #DDE2E9"></div><span class="nm">Line</span><span class="vl">#DDE2E9 · borders</span></div>
+          <div class="sw"><div class="chip" style="background: #F2F4F7; border: 1px solid #DDE2E9"></div><span class="nm">Mist</span><span class="vl">#F2F4F7 · surface</span></div>
+          <div class="sw"><div class="chip" style="background: #FFFFFF; border: 1px solid #DDE2E9"></div><span class="nm">Paper</span><span class="vl">#FFFFFF · cards</span></div>
+          <div class="sw"><div class="chip" style="background: #2E5BDB"></div><span class="nm">Door blue</span><span class="vl">#2E5BDB · actions, you</span></div>
+        </div>
+        <span class="lbl">MEANING</span>
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px">
+          <div class="sw"><div class="chip" style="background: #FFE27A"></div><span class="nm">Sticky</span><span class="vl">#FFE27A · notes</span></div>
+          <div class="sw"><div class="chip" style="background: #E8573F"></div><span class="nm">Alert</span><span class="vl">#E8573F · incidents</span></div>
+          <div class="sw"><div class="chip" style="background: #2F9E6E"></div><span class="nm">Safe</span><span class="vl">#2F9E6E · prevented</span></div>
+          <div class="sw"><div class="chip" style="background: #8C6AD9"></div><span class="nm">Lilac</span><span class="vl">#8C6AD9 · teammates</span></div>
+          <div class="sw"><div class="chip" style="background: #EADBC8"></div><span class="nm">Oak</span><span class="vl">#EADBC8 · floors</span></div>
+          <div class="sw"><div class="chip" style="background: #FBE9DA"></div><span class="nm">Peach</span><span class="vl">#FBE9DA · close-ups</span></div>
+        </div>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 10px">
+        <h2 class="h2">Type</h2>
+        <div style="display: flex; align-items: baseline; gap: 18px"><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 44px; font-weight: 700">Black Friday</span><span class="vl">Bricolage Grotesque 700 · 44 / 32 / 24 · titles</span></div>
+        <div style="display: flex; align-items: baseline; gap: 18px"><span style="font-size: 18px">The printer says “paused by admin”.</span><span class="vl">Figtree 400–700 · 18 / 16 / 14 · body, UI</span></div>
+        <div style="display: flex; gap: 24px; margin-top: 6px">
+          <div class="sw"><span class="lbl">SPACING</span><div style="display: flex; align-items: flex-end; gap: 6px"><span style="width: 4px; height: 4px; background: #2E5BDB"></span><span style="width: 8px; height: 8px; background: #2E5BDB"></span><span style="width: 12px; height: 12px; background: #2E5BDB"></span><span style="width: 16px; height: 16px; background: #2E5BDB"></span><span style="width: 24px; height: 24px; background: #2E5BDB"></span><span style="width: 32px; height: 32px; background: #2E5BDB"></span><span style="width: 48px; height: 48px; background: #2E5BDB"></span></div><span class="vl">4 · 8 · 12 · 16 · 24 · 32 · 48</span></div>
+          <div class="sw"><span class="lbl">CORNERS</span><div style="display: flex; gap: 8px"><span style="width: 44px; height: 44px; border-radius: 8px; background: #DDE2E9"></span><span style="width: 44px; height: 44px; border-radius: 14px; background: #DDE2E9"></span><span style="width: 44px; height: 44px; border-radius: 20px; background: #DDE2E9"></span><span style="width: 64px; height: 44px; border-radius: 999px; background: #DDE2E9"></span></div><span class="vl">8 · 14 · 20 · pill</span></div>
+          <div class="sw"><span class="lbl">ICONS</span><div style="display: flex; gap: 10px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2430" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"></path><path d="M9 21v-7h6v7"></path></svg><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2430" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-5-5"></path></svg><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2430" stroke-width="2" aria-hidden="true"><path d="M4 4h16v12H8l-4 4z"></path></svg><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1C2430" stroke-width="2" aria-hidden="true"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"></path></svg></div><span class="vl">2 px line icons, round ends</span></div>
+        </div>
+      </section>
+    </div>
+
+    <section style="flex-grow: 1; display: flex; flex-direction: column; gap: 14px">
+      <h2 class="h2">Components</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; flex-direction: column; gap: 10px"><span class="lbl">BUTTONS</span><div style="display: flex; gap: 10px"><button type="button" style="min-height: 48px; padding: 0 20px; border-radius: 14px; border: none; background: #2E5BDB; color: #fff; font-size: 16px; font-weight: 600">Stick it</button><button type="button" style="min-height: 48px; padding: 0 20px; border-radius: 14px; border: 1px solid #C9CFD8; background: #fff; color: #1C2430; font-size: 16px">Ask more</button></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; flex-direction: column; gap: 10px"><span class="lbl">CHOICE CHIPS</span><div style="display: flex; gap: 8px"><span style="padding: 10px 14px; border-radius: 12px; border: 2px solid #2E5BDB; background: #EEF2FC; color: #1E40A8; font-weight: 600; font-size: 15px">Stop the work</span><span style="padding: 10px 14px; border-radius: 12px; border: 1px solid #C9CFD8; background: #fff; font-size: 15px">Leak information</span></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; gap: 16px; align-items: center"><div style="width: 150px; padding: 12px; background: #FFE27A; transform: rotate(-3deg); box-shadow: 0 6px 14px rgba(28,36,48,0.15); font-size: 13px; line-height: 1.35">Server cupboard isn’t locked <strong style="display: block; margin-top: 4px">— Wei</strong></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="lbl">STICKY NOTE</span><span class="vl">Slight tilt, author initial, max 80 characters on the map</span></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; gap: 16px; align-items: center"><div style="display: flex; flex-direction: column; align-items: center; gap: 4px"><span style="width: 42px; height: 42px; border-radius: 50%; background: #2E5BDB; border: 4px solid #fff; box-shadow: 0 0 0 4px rgba(46,91,219,0.25)"></span><span style="padding: 2px 8px; border-radius: 999px; background: #1C2430; color: #fff; font-size: 11px; font-weight: 600">Laura</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: 4px"><span style="width: 34px; height: 34px; border-radius: 50%; background: #CFE0FF; border: 3px solid #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #1E40A8">W</span><span style="padding: 2px 8px; border-radius: 999px; background: #1C2430; color: #fff; font-size: 11px">Wei</span></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="lbl">AVATARS</span><span class="vl">You: blue ring. Teammates: initial + name.</span></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; flex-direction: column; gap: 10px"><span class="lbl">DIALOGUE CARD</span><div style="display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 14px; background: #fff; box-shadow: 0 4px 12px rgba(28,36,48,0.08)"><span style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; background: #8C5A3C"></span><span style="font-size: 15px; line-height: 1.4"><strong>Jana</strong> · Packing lead<br>Nobody here paused it.</span></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; flex-direction: column; gap: 10px"><span class="lbl">STATUS</span><div style="display: flex; gap: 8px; flex-wrap: wrap"><span style="padding: 6px 12px; border-radius: 999px; background: #1C2430; color: #fff; font-size: 14px; font-weight: 600">8:12 left</span><span style="padding: 6px 12px; border-radius: 999px; background: #EEF2FC; color: #1E40A8; font-size: 14px; font-weight: 600">Clues 2 / 4</span><span style="padding: 6px 12px; border-radius: 999px; background: #E8573F; color: #fff; font-size: 14px; font-weight: 600">Orders stopped</span><span style="padding: 6px 12px; border-radius: 999px; background: #E2F3EC; color: #1E6B4E; font-size: 14px; font-weight: 600">Prevented</span></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; flex-direction: column; gap: 10px"><span class="lbl">ROOM TILE (TOP-DOWN)</span><div style="height: 70px; border-radius: 14px; background: #EADBC8; border: 4px solid #fff; box-shadow: 0 0 0 1px #DDE2E9; padding: 10px; box-sizing: border-box"><strong style="font-size: 14px">Packing station</strong><span style="display: block; font-size: 12px; color: #5A6574">2 people · 3 things</span></div></div>
+        <div style="padding: 16px; border-radius: 16px; background: #F7F8FA; display: flex; flex-direction: column; gap: 10px"><span class="lbl">ALERT TOAST</span><div style="display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: #fff; border-left: 0; box-shadow: 0 6px 18px rgba(28,36,48,0.12)"><span style="width: 10px; height: 10px; border-radius: 50%; background: #E8573F"></span><span style="font-size: 15px"><strong>08:04 · Sofie:</strong> nothing has printed since 07:52!</span></div></div>
+      </div>
+    </section>
+  </div>
+</div></div></div></section>
+<section class="board" id="b08" aria-label="Design assets"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 22px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>08 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">Design assets: one cast, one building, many stories</h1>
+  </div>
+
+  <div style="display: flex; gap: 40px">
+    <section style="flex: 1 1 0; display: flex; flex-direction: column; gap: 12px">
+      <h2 class="h2">The cast (illustrated close-ups)</h2>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px">
+        <div class="p"><svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 80 C14 60 26 54 40 54 C54 54 66 60 66 80 Z" fill="#3A4558"></path><circle cx="40" cy="34" r="16" fill="#F0C7A8"></circle><path d="M24 32 C22 14 58 14 56 32 C52 24 28 24 24 32 Z" fill="#B8B8C0"></path></svg><span class="pn">Karin</span><span class="pr">CEO, 4th generation</span></div>
+        <div class="p"><svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 80 C14 60 26 54 40 54 C54 54 66 60 66 80 Z" fill="#4FA88B"></path><circle cx="40" cy="34" r="16" fill="#8C5A3C"></circle><path d="M24 32 C22 12 58 12 56 32 C50 22 30 22 24 32 Z" fill="#2B1B12"></path></svg><span class="pn">Jana</span><span class="pr">Packing lead</span></div>
+        <div class="p"><svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 80 C14 60 26 54 40 54 C54 54 66 60 66 80 Z" fill="#2E5BDB"></path><circle cx="40" cy="34" r="16" fill="#C98E6B"></circle><path d="M26 28 C28 16 52 16 54 28 Z" fill="#1C1C22"></path><path d="M28 42 C32 50 48 50 52 42 C50 48 46 51 40 51 C34 51 30 48 28 42 Z" fill="#1C1C22"></path></svg><span class="pn">Ahmed</span><span class="pr">Part-time IT</span></div>
+        <div class="p"><svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 80 C14 60 26 54 40 54 C54 54 66 60 66 80 Z" fill="#8C6AD9"></path><circle cx="40" cy="34" r="16" fill="#F2D0B4"></circle><path d="M22 36 C20 12 60 12 58 36 L58 52 C52 46 54 24 40 22 C26 24 28 46 22 52 Z" fill="#7A3B16"></path></svg><span class="pn">Elena</span><span class="pr">Accounting</span></div>
+        <div class="p"><svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 80 C14 60 26 54 40 54 C54 54 66 60 66 80 Z" fill="#E8573F"></path><circle cx="40" cy="34" r="16" fill="#EFC9A4"></circle><path d="M22 34 C20 12 60 12 58 34 C54 22 26 22 22 34 Z" fill="#1C1C22"></path></svg><span class="pn">Mei</span><span class="pr">Webshop manager</span></div>
+        <div class="p"><svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 80 C14 60 26 54 40 54 C54 54 66 60 66 80 Z" fill="#F5B83D"></path><circle cx="40" cy="34" r="16" fill="#E9B99A"></circle><path d="M24 30 C24 14 56 14 56 30 C50 24 30 24 24 30 Z" fill="#C2410C"></path></svg><span class="pn">Lukas</span><span class="pr">New intern</span></div>
+      </div>
+      <span style="font-size: 14px; color: #5A6574">Each person has a bust for close-ups and a small round token for the map. Plus Tomas (driver) and Rasa (factory contact, Lithuania).</span>
+    </section>
+
+    <section style="width: 620px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px">
+      <h2 class="h2">Room tiles (top-down)</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <div class="r" style="background: #E7EEFF">Webshop</div><div class="r" style="background: #F3EDFF">Accounting</div><div class="r" style="background: #FFF1E8">CEO</div><div class="r" style="background: #EAF6F0">Meeting</div>
+        <div class="r" style="background: #FFF8DF">Reception</div><div class="r" style="background: #E3E7EE">Server</div><div class="r" style="background: #EADBC8">Packing</div><div class="r" style="background: #EDF1F6">Warehouse</div>
+        <div class="r" style="background: #E6F3EC">Loading dock</div><div class="r" style="background: #DDEEF6">Dye works</div><div class="r" style="background: #FFFFFF; border-style: dashed">Cloud: webshops</div><div class="r" style="background: #FFFFFF; border-style: dashed">Factory, LT</div>
+      </div>
+    </section>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <h2 class="h2">Things you can inspect</h2>
+    <div style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 10px">
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="16" width="28" height="18" rx="4" fill="#3A4558"></rect><rect x="12" y="8" width="20" height="10" rx="2" fill="#FFFFFF" stroke="#C9CFD8"></rect><circle cx="30" cy="25" r="2.5" fill="#E8573F"></circle></svg><span class="on">Label printer</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="22" width="28" height="12" rx="4" fill="#FFFFFF" stroke="#9AA4B2" stroke-width="2"></rect><path d="M14 22V12M30 22V12" stroke="#9AA4B2" stroke-width="2"></path><rect x="14" y="36" width="16" height="6" fill="#FFE27A"></rect></svg><span class="on">Wi-Fi router</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="10" width="28" height="18" rx="2" fill="#3A4558"></rect><rect x="11" y="13" width="22" height="12" fill="#CFE0FF"></rect><rect x="4" y="30" width="36" height="4" rx="2" fill="#2B3445"></rect></svg><span class="on">Laptop</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="14" y="10" width="16" height="24" rx="3" fill="#2E5BDB"></rect><rect x="17" y="4" width="10" height="8" fill="#C9CFD8"></rect></svg><span class="on">USB stick</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="12" y="6" width="20" height="32" rx="4" fill="#1C2430"></rect><circle cx="22" cy="16" r="4" fill="#2F9E6E"></circle><rect x="16" y="26" width="12" height="6" rx="1" fill="#5A6574"></rect></svg><span class="on">Badge reader</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="6" y="14" width="26" height="14" rx="4" fill="#FFFFFF" stroke="#5A6574" stroke-width="2"></rect><circle cx="26" cy="21" r="4" fill="#1C2430"></circle><path d="M10 28v8h8" fill="none" stroke="#5A6574" stroke-width="2"></path></svg><span class="on">CCTV camera</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="10" y="6" width="24" height="32" rx="2" fill="#FFFFFF" stroke="#9AA4B2" stroke-width="2"></rect><path d="M15 14h14M15 20h14M15 26h9" stroke="#9AA4B2" stroke-width="2"></path></svg><span class="on">Visitor book</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path d="M8 10h28v24H8z" fill="#FFFFFF" stroke="#9AA4B2" stroke-width="2"></path><path d="M8 10l14 12 14-12" fill="none" stroke="#E8573F" stroke-width="2"></path></svg><span class="on">E-mail / invoice</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="14" y="4" width="16" height="36" rx="4" fill="#1C2430"></rect><rect x="16" y="8" width="12" height="24" fill="#CFE0FF"></rect></svg><span class="on">Phone</span></div>
+      <div class="o"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="4" y="14" width="24" height="18" rx="2" fill="#2E5BDB"></rect><path d="M28 20h8l4 6v6H28z" fill="#3E6BE8"></path><circle cx="12" cy="34" r="4" fill="#1C2430"></circle><circle cx="34" cy="34" r="4" fill="#1C2430"></circle></svg><span class="on">Delivery truck</span></div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <h2 class="h2">Asset list and sources</h2>
+    <table style="border-collapse: collapse; width: 100%">
+      <thead><tr><th>ASSET</th><th>FIRST VERSION</th><th>LATER</th><th>FORMAT</th><th>WHERE IT COMES FROM</th></tr></thead>
+      <tbody>
+        <tr><td>Characters (bust + map token)</td><td>8</td><td>16, swappable outfits</td><td>SVG</td><td>Own illustrations in one style; diverse by design</td></tr>
+        <tr><td>Room tiles and furniture</td><td>12 rooms</td><td>Second company (e.g. a farm or a port)</td><td>SVG tiles</td><td>Own vector set; free CC0 packs as placeholders</td></tr>
+        <tr><td>Close-up scenes</td><td>10</td><td>One per scenario clue</td><td>SVG, layered</td><td>Own illustrations, reusing the cast</td></tr>
+        <tr><td>Icons, notes, UI parts</td><td>30</td><td>—</td><td>SVG</td><td>Own line icons; fonts from Google Fonts (open licence)</td></tr>
+        <tr><td>Sounds (optional)</td><td>5</td><td>—</td><td>OGG</td><td>Soft notification sounds, muted by default</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div></div></div></section>
+<section class="board" id="b09" aria-label="Mockup – join and lobby"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 56px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 22px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574"><span>OPEN DOOR · CONCEPT BOOK</span><span>09 / 15</span></div>
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 48px">
+    <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px; font-weight: 700">Join in 30 seconds</h1>
+    <p style="margin: 0; max-width: 760px; font-size: 18px; line-height: 1.5; color: #3A4554">Left: a student’s phone or laptop. Right: the projector lobby. Three steps — code, name and face, team — and the student is in.</p>
+  </div>
+
+  <div style="display: flex; gap: 48px; align-items: flex-start">
+    <div style="width: 390px; height: 800px; flex-shrink: 0; box-sizing: border-box; border-radius: 40px; border: 10px solid #1C2430; background: #F2F4F7; padding: 26px 20px; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; gap: 10px"><svg width="30" height="30" viewBox="0 0 72 72" aria-hidden="true"><rect x="14" y="6" width="44" height="62" rx="8" fill="#2E5BDB"></rect><path d="M22 14 L46 10 L46 66 L22 62 Z" fill="#FFE27A"></path></svg><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px">Open Door</strong></div>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Code on the big screen
+        <input type="text" value="HXQ4" style="font: inherit; font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; letter-spacing: 8px; text-align: center; padding: 10px; border-radius: 14px; border: 2px solid #2E5BDB; background: #fff">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Your first name or a nickname
+        <input type="text" value="Laura" style="font: inherit; font-size: 17px; padding: 12px; border-radius: 14px; border: 1px solid #C9CFD8; background: #fff">
+      </label>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; font-weight: 600">Pick a face</span>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; justify-items: center">
+          <span class="av" style="background: #F0C7A8"></span><span class="av" style="background: #8C5A3C; box-shadow: 0 0 0 3px #fff, 0 0 0 6px #2E5BDB"></span><span class="av" style="background: #C98E6B"></span><span class="av" style="background: #EFC9A4"></span><span class="av" style="background: #E9B99A"></span>
+          <span class="av" style="background: #D9A27E"></span><span class="av" style="background: #F2D0B4"></span><span class="av" style="background: #6B4A2A"></span><span class="av" style="background: #E3B494"></span><span class="av" style="background: #B67E5C"></span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; font-weight: 600">Join a team</span>
+        <div style="padding: 12px 14px; border-radius: 14px; background: #EEF2FC; border: 2px solid #2E5BDB; display: flex; justify-content: space-between; font-size: 15px"><strong>Blue door</strong><span>3 of 5</span></div>
+        <div style="padding: 12px 14px; border-radius: 14px; background: #fff; border: 1px solid #DDE2E9; display: flex; justify-content: space-between; font-size: 15px"><span>Green door</span><span>4 of 5</span></div>
+        <div style="padding: 12px 14px; border-radius: 14px; background: #fff; border: 1px solid #DDE2E9; display: flex; justify-content: space-between; font-size: 15px"><span>Yellow door</span><span>2 of 5</span></div>
+      </div>
+      <button type="button" style="margin-top: auto; min-height: 54px; border-radius: 16px; border: none; background: #2E5BDB; color: #fff; font-size: 18px; font-weight: 700">I’m in</button>
+      <span style="font-size: 12px; color: #5A6574; text-align: center">No account. Your name is deleted after class.</span>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px">
+      <div style="height: 720px; border-radius: 18px; border: 10px solid #1C2430; background: #F2F4F7; box-sizing: border-box; padding: 40px 48px; display: flex; flex-direction: column; gap: 28px">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start">
+          <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 18px; font-weight: 700; color: #2E5BDB">TODAY’S COMPANY</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 52px">Nordknit, Sunds</strong><span style="font-size: 20px; color: #3A4554">Scenario: Black Friday · 90 minutes</span></div>
+          <div style="display: flex; gap: 22px; align-items: center; padding: 18px; border-radius: 20px; background: #fff">
+            <div style="width: 150px; height: 150px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px">
+              <span class="q"></span><span class="q"></span><span class="q"></span><span></span><span class="q"></span><span class="q"></span><span class="q"></span>
+              <span class="q"></span><span></span><span class="q"></span><span class="q"></span><span></span><span></span><span class="q"></span>
+              <span class="q"></span><span class="q"></span><span class="q"></span><span></span><span class="q"></span><span class="q"></span><span class="q"></span>
+              <span></span><span class="q"></span><span></span><span class="q"></span><span></span><span class="q"></span><span></span>
+              <span class="q"></span><span class="q"></span><span class="q"></span><span></span><span class="q"></span><span></span><span class="q"></span>
+              <span class="q"></span><span></span><span class="q"></span><span class="q"></span><span></span><span class="q"></span><span class="q"></span>
+              <span class="q"></span><span class="q"></span><span class="q"></span><span></span><span class="q"></span><span class="q"></span><span class="q"></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; color: #5A6574">Scan, or go to [game address]</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 64px; letter-spacing: 10px; font-weight: 700">HXQ4</span></div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+          <div class="tm" style="border-top: 6px solid #2E5BDB"><strong style="font-size: 20px">Blue door</strong><div style="display: flex; padding-left: 8px"><span class="dot" style="background: #8C5A3C"></span><span class="dot" style="background: #F0C7A8"></span><span class="dot" style="background: #C98E6B"></span></div><span style="font-size: 15px; color: #5A6574">Laura, Wei, Kasper</span></div>
+          <div class="tm" style="border-top: 6px solid #2F9E6E"><strong style="font-size: 20px">Green door</strong><div style="display: flex; padding-left: 8px"><span class="dot" style="background: #EFC9A4"></span><span class="dot" style="background: #D9A27E"></span><span class="dot" style="background: #6B4A2A"></span><span class="dot" style="background: #F2D0B4"></span></div><span style="font-size: 15px; color: #5A6574">Linh, Marco, Ida, Ola</span></div>
+          <div class="tm" style="border-top: 6px solid #E1B800"><strong style="font-size: 20px">Yellow door</strong><div style="display: flex; padding-left: 8px"><span class="dot" style="background: #E9B99A"></span><span class="dot" style="background: #B67E5C"></span></div><span style="font-size: 15px; color: #5A6574">Sofie, Priya</span></div>
+          <div class="tm" style="border-top: 6px solid #8C6AD9"><strong style="font-size: 20px">Lilac door</strong><div style="display: flex; padding-left: 8px"><span class="dot" style="background: #E3B494"></span></div><span style="font-size: 15px; color: #5A6574">Jonas</span></div>
+          <div class="tm" style="border-top: 6px solid #E8573F"><strong style="font-size: 20px">Red door</strong><span style="font-size: 15px; color: #5A6574">Waiting for players…</span></div>
+        </div>
+        <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center"><span style="font-size: 22px"><strong>10</strong> of 24 students are in</span><span style="padding: 12px 22px; border-radius: 14px; background: #1C2430; color: #fff; font-size: 18px; font-weight: 600">The teacher will start soon</span></div>
+      </div>
+      <span style="font-size: 14px; color: #5A6574">Projector · 16:9 · readable from the back row (body 20 px+, code 64 px)</span>
+    </div>
+  </div>
+</div></div></div></section>
+<section class="board" id="b10" aria-label="Mockup – walk the office"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 40px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: baseline">
+    <div style="display: flex; align-items: baseline; gap: 20px"><span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">OPEN DOOR · CONCEPT BOOK</span><h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">Walk the office — the main screen</h1></div>
+    <span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">10 / 15</span>
+  </div>
+
+  <div style="flex-grow: 1; border-radius: 18px; border: 10px solid #1C2430; background: #F2F4F7; overflow: hidden; display: flex; flex-direction: column">
+    <header style="height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 18px; padding: 0 22px; background: #FFFFFF; border-bottom: 1px solid #DDE2E9">
+      <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Nordknit, Sunds</strong>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 12px; background: #FFF4F1; border: 1px solid #F6C9BE; font-size: 15px"><strong style="color: #B93A25">Your goal</strong><span>Black Friday is in 3 days. Find what could stop an order reaching a customer.</span></div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 14px">
+        <span style="padding: 6px 12px; border-radius: 999px; background: #1C2430; color: #fff; font-size: 14px; font-weight: 600">14:20 left</span>
+        <div style="display: flex"><span class="tc" style="background: #8C5A3C; color: #fff; box-shadow: 0 0 0 2px #2E5BDB">L</span><span class="tc" style="background: #CFE0FF; color: #1E40A8; margin-left: -8px">W</span><span class="tc" style="background: #EADFFF; color: #5B3BB0; margin-left: -8px">K</span><span class="tc" style="background: #FFD7C2; color: #7A3A12; margin-left: -8px">S</span></div>
+      </div>
+    </header>
+
+    <div style="flex-grow: 1; display: flex; min-height: 0">
+      <main style="flex-grow: 1; position: relative; overflow: hidden; background: #D5DBE4">
+        <div class="rm" style="left: 16px; top: 16px; width: 380px; height: 250px; background: #E7EEFF"></div><span class="rl" style="left: 34px; top: 32px">WEBSHOP TEAM</span>
+        <div class="rm" style="left: 404px; top: 16px; width: 250px; height: 250px; background: #F3EDFF"></div><span class="rl" style="left: 422px; top: 32px">ACCOUNTING</span>
+        <div class="rm" style="left: 662px; top: 16px; width: 200px; height: 250px; background: #FFF1E8"></div><span class="rl" style="left: 680px; top: 32px">CEO</span>
+        <div class="rm" style="left: 870px; top: 16px; width: 336px; height: 250px; background: #EAF6F0"></div><span class="rl" style="left: 888px; top: 32px">MEETING ROOM</span>
+        <div style="position: absolute; left: 16px; top: 274px; width: 1190px; height: 56px; border-radius: 12px; background: #EEF1F5"></div>
+        <div class="rm" style="left: 16px; top: 338px; width: 270px; height: 200px; background: #FFF8DF"></div><span class="rl" style="left: 34px; top: 354px">RECEPTION</span>
+        <div class="rm" style="left: 294px; top: 338px; width: 140px; height: 200px; background: #E3E7EE"></div><span class="rl" style="left: 310px; top: 354px">SERVER</span>
+        <div class="rm" style="left: 16px; top: 546px; width: 418px; height: 220px; background: #EADBC8; box-shadow: 0 0 0 3px #2E5BDB"></div><span class="rl" style="left: 34px; top: 562px; color: #1E40A8">PACKING STATION · YOU ARE HERE</span>
+        <div class="rm" style="left: 442px; top: 338px; width: 540px; height: 428px; background: #EDF1F6"></div><span class="rl" style="left: 460px; top: 354px">WAREHOUSE</span>
+        <div class="rm" style="left: 990px; top: 338px; width: 216px; height: 428px; background: #E6F3EC"></div><span class="rl" style="left: 1008px; top: 354px">LOADING DOCK</span>
+
+        <div class="desk" style="left: 50px; top: 80px"></div><div class="mon" style="left: 71px; top: 86px"></div><div class="ch" style="left: 76px; top: 124px"></div>
+        <div class="desk" style="left: 150px; top: 80px"></div><div class="mon" style="left: 171px; top: 86px"></div><div class="ch" style="left: 176px; top: 124px"></div>
+        <div class="desk" style="left: 250px; top: 80px"></div><div class="mon" style="left: 271px; top: 86px"></div><div class="ch" style="left: 276px; top: 124px"></div>
+        <div class="desk" style="left: 50px; top: 170px; width: 300px; height: 60px; background: #1C2430"></div><span style="position: absolute; left: 70px; top: 190px; font-size: 12px; color: #9FE2DA; font-weight: 700">LIVE ORDERS · 9 SHOPS</span>
+        <div class="desk" style="left: 440px; top: 90px"></div><div class="mon" style="left: 461px; top: 96px"></div><div class="ch" style="left: 466px; top: 134px"></div>
+        <div class="desk" style="left: 540px; top: 90px"></div><div class="mon" style="left: 561px; top: 96px"></div><div class="ch" style="left: 566px; top: 134px"></div>
+        <div class="desk" style="left: 720px; top: 100px; width: 90px"></div><div class="ch" style="left: 756px; top: 146px"></div><div class="plant" style="left: 820px; top: 210px"></div>
+        <div style="position: absolute; left: 930px; top: 90px; width: 220px; height: 90px; border-radius: 45px; background: #FFFFFF; box-shadow: 0 2px 0 #C9CFD8"></div>
+        <div class="ch" style="left: 960px; top: 70px"></div><div class="ch" style="left: 1030px; top: 66px"></div><div class="ch" style="left: 1100px; top: 70px"></div><div class="ch" style="left: 960px; top: 186px"></div><div class="ch" style="left: 1030px; top: 190px"></div><div class="ch" style="left: 1100px; top: 186px"></div>
+        <div class="desk" style="left: 60px; top: 420px; width: 150px; height: 44px"></div><div class="plant" style="left: 230px; top: 480px"></div>
+        <div style="position: absolute; left: 330px; top: 400px; width: 64px; height: 110px; border-radius: 8px; background: #2B3445"></div><div style="position: absolute; left: 342px; top: 414px; width: 8px; height: 8px; border-radius: 50%; background: #2F9E6E"></div><div style="position: absolute; left: 342px; top: 430px; width: 8px; height: 8px; border-radius: 50%; background: #E8573F"></div>
+        <div class="desk" style="left: 60px; top: 610px; width: 300px; height: 52px; background: #C9A27C"></div><div style="position: absolute; left: 90px; top: 616px; width: 50px; height: 40px; border-radius: 8px; background: #3A4558"></div><div style="position: absolute; left: 84px; top: 610px; width: 62px; height: 52px; border-radius: 12px; border: 3px solid #E8573F"></div>
+        <div class="sh" style="left: 480px; top: 410px; width: 440px"></div><div class="sh" style="left: 480px; top: 480px; width: 440px"></div><div class="sh" style="left: 480px; top: 550px; width: 440px"></div><div class="sh" style="left: 480px; top: 620px; width: 440px"></div><div class="sh" style="left: 480px; top: 690px; width: 440px"></div>
+        <div style="position: absolute; left: 1030px; top: 470px; width: 140px; height: 230px; border-radius: 10px; background: #2E5BDB"></div><div style="position: absolute; left: 1040px; top: 480px; width: 120px; height: 50px; border-radius: 6px; background: #3E6BE8"></div>
+
+        <div class="note" style="left: 136px; top: 600px">2</div>
+        <div class="note" style="left: 380px; top: 396px">1</div>
+        <div class="note" style="left: 330px; top: 166px">1</div>
+
+        <div class="tok" style="left: 180px; top: 680px"><span class="tc" style="background: #2F9E6E; color: #fff">J</span><span class="tn">Jana</span></div>
+        <div class="tok" style="left: 232px; top: 692px"><span class="tc" style="width: 40px; height: 40px; background: #8C5A3C; color: #fff; box-shadow: 0 0 0 4px rgba(46,91,219,0.4)">You</span></div>
+        <div style="position: absolute; left: 120px; top: 726px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 6px 16px rgba(28,36,48,0.18); font-size: 14px"><span style="padding: 2px 8px; border-radius: 6px; background: #1C2430; color: #fff; font-weight: 700">E</span>Talk to Jana</div>
+        <div class="tok" style="left: 352px; top: 470px"><span class="tc" style="background: #CFE0FF; color: #1E40A8">W</span><span class="tn">Wei</span></div>
+        <div class="tok" style="left: 500px; top: 180px"><span class="tc" style="background: #EADFFF; color: #5B3BB0">K</span><span class="tn">Kasper</span></div>
+        <div class="tok" style="left: 196px; top: 128px"><span class="tc" style="background: #FFD7C2; color: #7A3A12">S</span><span class="tn">Sofie</span></div>
+
+        <span style="position: absolute; right: 16px; bottom: 12px; padding: 6px 12px; border-radius: 10px; background: #1C2430; color: #fff; font-size: 13px">Arrow keys or WASD to walk · or click a spot</span>
+      </main>
+
+      <aside aria-label="Progress" style="width: 400px; flex-shrink: 0; padding: 22px; background: #FFFFFF; border-left: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Rooms to visit</strong>
+          <div class="ck"><span class="box done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>Webshop team</div>
+          <div class="ck"><span class="box done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>Server cupboard</div>
+          <div class="ck"><span class="box done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>Packing station</div>
+          <div class="ck"><span class="box"></span>Warehouse</div>
+          <div class="ck"><span class="box"></span>Loading dock</div>
+          <div class="ck"><span class="box"></span>Accounting</div>
+          <div class="ck"><span class="box"></span>Reception</div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <div style="padding: 14px; border-radius: 14px; background: #FFF4C7; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #7A5B0A">My notes</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px">2</strong><span style="font-size: 12px; color: #7A5B0A">private until shared</span></div>
+          <div style="padding: 14px; border-radius: 14px; background: #F2F4F7; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #5A6574">Team notes</span><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px">7</strong><span style="font-size: 12px; color: #5A6574">on the map</span></div>
+        </div>
+        <div style="margin-top: auto; padding: 14px 16px; border-radius: 14px; background: #EEF2FC; display: flex; gap: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E5BDB" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v5h1"></path></svg><span style="font-size: 14px; line-height: 1.45; color: #1E40A8">Walk up to people and things. When a prompt appears, talk or look closer.</span></div>
+      </aside>
+    </div>
+  </div>
+</div></div></div></section>
+<section class="board" id="b11" aria-label="Mockup – close-up and sticky note"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 40px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: baseline">
+    <div style="display: flex; align-items: baseline; gap: 20px"><span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">OPEN DOOR · CONCEPT BOOK</span><h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">Look closer — talk, inspect, write a note</h1></div>
+    <span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">11 / 15</span>
+  </div>
+
+  <div style="flex-grow: 1; position: relative; border-radius: 18px; border: 10px solid #1C2430; background: #9AA4B2; overflow: hidden">
+    <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #C9CFD8 0 2px, #D5DBE4 2px 80px)"></div>
+    <div style="position: absolute; inset: 0; background: rgba(28,36,48,0.45)"></div>
+
+    <div style="position: absolute; left: 40px; top: 36px; right: 40px; bottom: 36px; border-radius: 24px; background: #FFFFFF; box-shadow: 0 30px 80px rgba(0,0,0,0.35); display: flex; overflow: hidden">
+      <section style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+        <div style="position: relative; flex-grow: 1; background: #FBE9DA; overflow: hidden">
+          <svg width="1100" height="560" viewBox="0 0 1100 560" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+            <rect x="0" y="400" width="1100" height="160" fill="#EBCDB0"></rect>
+            <rect x="40" y="80" width="250" height="320" rx="8" fill="#F6D7BE"></rect>
+            <rect x="62" y="110" width="96" height="30" rx="10" fill="#4FA88B"></rect><rect x="166" y="110" width="102" height="30" rx="10" fill="#F28C6B"></rect>
+            <rect x="62" y="146" width="102" height="30" rx="10" fill="#F5B83D"></rect><rect x="172" y="146" width="96" height="30" rx="10" fill="#6B8BD6"></rect>
+            <rect x="62" y="230" width="96" height="30" rx="10" fill="#E9A4C0"></rect><rect x="166" y="230" width="102" height="30" rx="10" fill="#4FA88B"></rect>
+            <rect x="62" y="266" width="102" height="30" rx="10" fill="#6B8BD6"></rect><rect x="172" y="266" width="96" height="30" rx="10" fill="#F5B83D"></rect>
+            <rect x="330" y="330" width="420" height="24" rx="12" fill="#C98E5B"></rect>
+            <rect x="350" y="354" width="18" height="120" fill="#B07A4A"></rect><rect x="712" y="354" width="18" height="120" fill="#B07A4A"></rect>
+            <rect x="380" y="240" width="150" height="90" rx="18" fill="#3A4558"></rect>
+            <rect x="398" y="218" width="114" height="30" rx="6" fill="#FFFFFF"></rect>
+            <rect x="398" y="268" width="80" height="22" rx="4" fill="#E8573F"></rect>
+            <rect x="570" y="260" width="140" height="70" rx="6" fill="#2B3445"></rect><rect x="580" y="268" width="120" height="54" rx="4" fill="#CFE0FF"></rect>
+            <path d="M780 560 C780 430 816 386 880 376 C944 386 980 430 980 560 Z" fill="#4FA88B"></path>
+            <rect x="842" y="376" width="76" height="60" rx="10" fill="#3D8C72"></rect>
+            <circle cx="880" cy="290" r="66" fill="#8C5A3C"></circle>
+            <path d="M812 286 C812 214 948 214 948 286 C934 256 826 256 812 286 Z" fill="#2B1B12"></path>
+            <circle cx="858" cy="296" r="6" fill="#2B1B12"></circle><circle cx="902" cy="296" r="6" fill="#2B1B12"></circle>
+            <path d="M862 324 Q880 334 898 324" fill="none" stroke="#2B1B12" stroke-width="4" stroke-linecap="round"></path>
+          </svg>
+          <div style="position: absolute; left: 392px; top: 176px; padding: 6px 12px; border-radius: 999px; background: #1C2430; color: #fff; font-size: 14px; font-weight: 600">Label printer · click to inspect</div>
+          <span style="position: absolute; left: 24px; top: 20px; padding: 6px 12px; border-radius: 999px; background: #FFFFFF; font-size: 14px; font-weight: 600">Packing station</span>
+          <button type="button" aria-label="Back to the map" style="position: absolute; right: 20px; top: 16px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: none; background: #FFFFFF; color: #1C2430; font-size: 15px; font-weight: 600">Back to the map</button>
+        </div>
+        <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; border-top: 1px solid #F0E0D2">
+          <div style="display: flex; gap: 14px; align-items: flex-start"><span style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: #8C5A3C"></span><div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 14px; color: #5A6574"><strong style="color: #1C2430">Jana</strong> · Packing lead</span><span style="font-size: 19px; line-height: 1.45">The printer gets labels straight from the webshop. IT put it on the guest Wi-Fi — it was easier for the drivers to print too.</span></div></div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; padding-left: 58px">
+            <button type="button" class="c">Who uses the guest Wi-Fi?</button>
+            <button type="button" class="c">What if it stops on Black Friday?</button>
+            <button type="button" class="c" style="border: none; color: #2E5BDB; text-decoration: underline">Look closer (technical)</button>
+          </div>
+        </div>
+      </section>
+
+      <aside aria-label="New sticky note" style="width: 470px; flex-shrink: 0; padding: 24px; background: #FFFBEA; border-left: 1px solid #F3E3A0; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Your sticky note</strong><span style="font-size: 13px; color: #7A5B0A">private until you share</span></div>
+        <span style="font-size: 14px; color: #5A6574">On: <strong style="color: #1C2430">Label printer</strong></span>
+        <label style="display: flex; flex-direction: column; gap: 6px" class="q">What could go wrong?
+          <textarea rows="3" style="font: inherit; font-weight: 400; font-size: 16px; padding: 12px; border-radius: 12px; border: 1px solid #E1CF7A; background: #FFFFFF; resize: none">A driver on the guest Wi-Fi could change or stop the printer.</textarea>
+        </label>
+        <div style="display: flex; flex-direction: column; gap: 8px"><span class="q">It would…</span><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="c">Leak information</button><button type="button" class="c on">Change something</button><button type="button" class="c on">Stop the work</button></div></div>
+        <div style="display: flex; flex-direction: column; gap: 8px"><span class="q">Who might cause it?</span><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="c">Someone online</button><button type="button" class="c on">A visitor or driver</button><button type="button" class="c">An employee</button><button type="button" class="c">An accident</button></div></div>
+        <div style="display: flex; flex-direction: column; gap: 8px"><span class="q">How likely?</span>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <button type="button" class="c" style="text-align: left">1 · In theory only</button>
+            <button type="button" class="c" style="text-align: left">2 · Heard of it elsewhere</button>
+            <button type="button" class="c on" style="text-align: left">3 · Seen at firms like us</button>
+            <button type="button" class="c" style="text-align: left">4 · Happened here</button>
+          </div>
+        </div>
+        <button type="button" style="margin-top: auto; min-height: 54px; border-radius: 14px; border: none; background: #2E5BDB; color: #fff; font-size: 17px; font-weight: 700">Stick it on the printer</button>
+      </aside>
+    </div>
+  </div>
+</div></div></div></section>
+<section class="board" id="b12" aria-label="Mockup – the day happens"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 40px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: baseline">
+    <div style="display: flex; align-items: baseline; gap: 20px"><span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">OPEN DOOR · CONCEPT BOOK</span><h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">The day happens — follow the clues, make the call</h1></div>
+    <span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">12 / 15</span>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; gap: 28px; min-height: 0">
+    <div class="frame" style="flex-grow: 1; display: flex; flex-direction: column">
+      <div style="height: 60px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 20px; background: #E8573F; color: #fff">
+        <strong style="font-size: 18px">Friday 08:04 · Black Friday</strong><span style="font-size: 17px">Orders have stopped printing</span>
+        <span style="margin-left: auto; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.2); font-weight: 600">Clues 2 / 4</span>
+        <span style="padding: 4px 12px; border-radius: 999px; background: #1C2430; font-weight: 600">Truck leaves 10:00</span>
+      </div>
+      <div style="flex-grow: 1; position: relative; background: #D5DBE4">
+        <div class="rm" style="left: 14px; top: 14px; width: 300px; height: 200px; background: #E7EEFF"></div><span class="rl" style="left: 30px; top: 28px">WEBSHOP TEAM</span>
+        <div class="rm" style="left: 322px; top: 14px; width: 200px; height: 200px; background: #F3EDFF"></div><span class="rl" style="left: 338px; top: 28px">ACCOUNTING</span>
+        <div class="rm" style="left: 530px; top: 14px; width: 160px; height: 200px; background: #FFF1E8"></div><span class="rl" style="left: 546px; top: 28px">CEO</span>
+        <div class="rm" style="left: 698px; top: 14px; width: 330px; height: 200px; background: #EAF6F0"></div><span class="rl" style="left: 714px; top: 28px">MEETING ROOM</span>
+        <div class="rm" style="left: 14px; top: 230px; width: 220px; height: 180px; background: #FFF8DF"></div><span class="rl" style="left: 30px; top: 244px">RECEPTION</span>
+        <div class="rm" style="left: 242px; top: 230px; width: 120px; height: 180px; background: #E3E7EE"></div><span class="rl" style="left: 256px; top: 244px">SERVER</span>
+        <div class="rm" style="left: 14px; top: 418px; width: 348px; height: 210px; background: #EADBC8; box-shadow: 0 0 0 4px #E8573F"></div><span class="rl" style="left: 30px; top: 432px; color: #B93A25">PACKING STATION</span>
+        <div class="rm" style="left: 370px; top: 230px; width: 460px; height: 398px; background: #EDF1F6"></div><span class="rl" style="left: 386px; top: 244px">WAREHOUSE</span>
+        <div class="rm" style="left: 838px; top: 230px; width: 190px; height: 398px; background: #E6F3EC"></div><span class="rl" style="left: 854px; top: 244px">LOADING DOCK</span>
+        <div style="position: absolute; left: 120px; top: 480px; width: 120px; height: 120px; border-radius: 50%; border: 4px solid #E8573F; opacity: 0.5"></div>
+        <div style="position: absolute; left: 140px; top: 500px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid #E8573F"></div>
+        <div class="clue" style="left: 140px; top: 110px; background: #2F9E6E; color: #fff">✓</div>
+        <div class="clue" style="left: 160px; top: 520px; background: #2F9E6E; color: #fff">✓</div>
+        <div class="clue" style="left: 288px; top: 300px; background: #FFFFFF; color: #2E5BDB; box-shadow: 0 0 0 3px #2E5BDB">?</div>
+        <div class="clue" style="left: 100px; top: 320px; background: #FFFFFF; color: #2E5BDB; box-shadow: 0 0 0 3px #2E5BDB">?</div>
+        <div style="position: absolute; left: 196px; top: 560px; width: 40px; height: 40px; border-radius: 50%; background: #8C5A3C; border: 4px solid #fff; box-shadow: 0 0 0 4px rgba(46,91,219,0.4)"></div>
+        <div style="position: absolute; left: 276px; top: 340px; width: 32px; height: 32px; border-radius: 50%; background: #CFE0FF; border: 3px solid #fff"></div>
+        <div style="position: absolute; left: 160px; top: 150px; width: 32px; height: 32px; border-radius: 50%; background: #FFD7C2; border: 3px solid #fff"></div>
+        <div style="position: absolute; right: 16px; top: 16px; width: 380px; display: flex; flex-direction: column; gap: 10px">
+          <div style="padding: 12px 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 6px 16px rgba(28,36,48,0.15); font-size: 14px; line-height: 1.4"><strong>Mei, webshop:</strong> 2,300 orders waiting. German customers are writing to support.</div>
+          <div style="padding: 12px 14px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 6px 16px rgba(28,36,48,0.15); font-size: 14px; line-height: 1.4"><strong>Wei (team):</strong> Router log — new device on guest Wi-Fi at 07:48.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width: 640px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px">
+      <div class="frame" style="flex: 1 1 0; padding: 24px; display: flex; flex-direction: column; gap: 12px; background: #FFFFFF">
+        <span style="font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #5A6574">FINAL CALL · TEAM VOTE</span>
+        <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; line-height: 1.2">Karin asks: what do we do right now?</strong>
+        <button type="button" class="opt">Restart the printer and get back to packing.</button>
+        <button type="button" class="opt" style="border: 2px solid #2E5BDB; background: #EEF2FC">Take the printer off the guest Wi-Fi, change its password, then check the visitor book. <span style="display: block; margin-top: 4px; font-size: 13px; color: #1E40A8; font-weight: 600">3 of 4 teammates chose this</span></button>
+        <button type="button" class="opt">Close the webshop until IT has checked everything.</button>
+      </div>
+      <div class="frame" style="flex: 1 1 0; padding: 24px; display: flex; flex-direction: column; gap: 12px; background: #FFFFFF; border-color: #1C2430">
+        <span style="font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #1E6B4E">DAY OVER · 09:41</span>
+        <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px">Parcels made the 10:00 truck</strong>
+        <div style="display: flex; gap: 14px; align-items: center">
+          <div style="width: 170px; padding: 12px; background: #FFE27A; transform: rotate(-3deg); font-size: 13px; line-height: 1.35; box-shadow: 0 6px 14px rgba(28,36,48,0.15)">Label printer is on the guest Wi-Fi<strong style="display: block; margin-top: 4px">— Laura, Tuesday</strong></div>
+          <span style="font-size: 17px; line-height: 1.45">Your team saw this coming on Tuesday. <strong>2 of 3</strong> of today’s problems were on your notes.</span>
+        </div>
+        <span style="margin-top: auto; font-size: 15px; color: #5A6574">Wait for your teacher — the big screen opens next.</span>
+      </div>
+    </div>
+  </div>
+</div></div></div></section>
+<section class="board" id="b13" aria-label="Mockup – debrief on the projector"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 40px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: baseline">
+    <div style="display: flex; align-items: baseline; gap: 20px"><span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">OPEN DOOR · CONCEPT BOOK</span><h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">Talk it through — the debrief on the projector</h1></div>
+    <span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">13 / 15</span>
+  </div>
+
+  <div style="flex-grow: 1; border-radius: 18px; border: 10px solid #1C2430; background: #F2F4F7; padding: 36px 44px; display: flex; gap: 36px; min-height: 0">
+    <section style="flex-grow: 1; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #2E5BDB">BLACK FRIDAY · WHO SAW IT COMING?</span>
+      <div style="padding: 10px 20px 4px; border-radius: 20px; background: #FFFFFF">
+        <table style="border-collapse: collapse; width: 100%">
+          <thead><tr><th style="text-align: left">What happened</th><th>Blue</th><th>Green</th><th>Yellow</th><th>Lilac</th><th>Red</th></tr></thead>
+          <tbody>
+            <tr><td class="l">Printer stopped via guest Wi-Fi</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="p">½</span></td><td><span class="n">–</span></td><td><span class="y">✓</span></td></tr>
+            <tr><td class="l">Fake “printer service” at reception</td><td><span class="n">–</span></td><td><span class="y">✓</span></td><td><span class="n">–</span></td><td><span class="n">–</span></td><td><span class="p">½</span></td></tr>
+            <tr><td class="l">Webshop slow under 10× traffic</td><td><span class="y">✓</span></td><td><span class="p">½</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">–</span></td></tr>
+          </tbody>
+        </table>
+        <div style="display: flex; gap: 20px; padding: 12px 8px; font-size: 14px; color: #5A6574"><span><span class="y" style="width: 22px; height: 22px; font-size: 12px">✓</span> on a note</span><span><span class="p" style="width: 22px; height: 22px; font-size: 12px">½</span> close, wrong place or person</span><span><span class="n" style="width: 22px; height: 22px; font-size: 12px">–</span> missed</span></div>
+      </div>
+      <div style="padding: 22px 26px; border-radius: 20px; background: #FFF4C7; display: flex; gap: 18px; align-items: flex-start">
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 44px; line-height: 1; color: #7A5B0A">?</span>
+        <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 15px; font-weight: 700; color: #7A5B0A">QUESTION FOR THE CLASS</span><span style="font-size: 24px; line-height: 1.35; font-weight: 600">Green door spotted the fake technician. What made you look at the visitor book?</span></div>
+      </div>
+    </section>
+
+    <section style="width: 620px; flex-shrink: 0; padding: 28px; border-radius: 20px; background: #FFFFFF; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #2E5BDB">NOW YOU KNOW THE NAMES</span>
+      <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; line-height: 1.2">What you did has a name in the CyPro method</strong>
+      <div class="map"><span>Rooms you walked</span><span style="color: #9AA4B2">→</span><strong>System model</strong></div>
+      <div class="map"><span>Things worth protecting</span><span style="color: #9AA4B2">→</span><strong>Assets</strong></div>
+      <div class="map"><span>Where data left the building</span><span style="color: #9AA4B2">→</span><strong>Trust boundaries</strong></div>
+      <div class="map"><span>Your sticky notes</span><span style="color: #9AA4B2">→</span><strong>Threats</strong></div>
+      <div class="map"><span>Leak · change · stop</span><span style="color: #9AA4B2">→</span><strong>C · I · A</strong></div>
+      <div class="map"><span>Who might cause it</span><span style="color: #9AA4B2">→</span><strong>Threat actors</strong></div>
+      <div class="map"><span>1–4 how likely</span><span style="color: #9AA4B2">→</span><strong>Likelihood</strong></div>
+      <div style="margin-top: auto; padding: 14px 16px; border-radius: 14px; background: #EEF2FC; font-size: 16px; line-height: 1.45; color: #1E2A55">Next class: <strong>risk management</strong> — which of your notes would you fix first, and what would it cost?</div>
+    </section>
+  </div>
+</div></div></div></section>
+<section class="board" id="b14" aria-label="Teacher kit"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 40px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: baseline">
+    <div style="display: flex; align-items: baseline; gap: 20px"><span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">OPEN DOOR · CONCEPT BOOK</span><h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">Teacher kit — control view and teaching material</h1></div>
+    <span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">14 / 15</span>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; gap: 32px; min-height: 0">
+    <div style="flex-grow: 1; border-radius: 18px; border: 10px solid #1C2430; background: #F2F4F7; display: flex; flex-direction: column; overflow: hidden">
+      <header style="padding: 16px 20px; background: #FFFFFF; border-bottom: 1px solid #DDE2E9; display: flex; align-items: center; gap: 14px">
+        <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px">Teacher view</strong>
+        <span style="padding: 4px 10px; border-radius: 8px; background: #F2F4F7; font-size: 14px">Code <strong>HXQ4</strong> · 24 students · 5 teams</span>
+        <div style="margin-left: auto; display: flex; gap: 6px; align-items: center">
+          <span style="padding: 6px 10px; border-radius: 999px; background: #E2F3EC; font-size: 13px; color: #1E6B4E">Story ✓</span>
+          <span style="padding: 6px 10px; border-radius: 999px; background: #FFF4C7; font-size: 13px; font-weight: 700; color: #7A5B0A">Walk and spot · 14:20</span>
+          <span style="padding: 6px 10px; border-radius: 999px; background: #F2F4F7; font-size: 13px; color: #5A6574">The day</span>
+          <span style="padding: 6px 10px; border-radius: 999px; background: #F2F4F7; font-size: 13px; color: #5A6574">Debrief</span>
+        </div>
+      </header>
+      <div style="padding: 14px 20px; display: flex; gap: 10px; background: #FFFFFF; border-bottom: 1px solid #DDE2E9">
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid #C9CFD8; background: #fff; font-size: 15px; font-weight: 600">Pause all</button>
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid #C9CFD8; background: #fff; font-size: 15px">+5 minutes</button>
+        <button type="button" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid #C9CFD8; background: #fff; font-size: 15px">Show a team on the projector</button>
+        <button type="button" style="margin-left: auto; min-height: 44px; padding: 0 18px; border-radius: 12px; border: none; background: #E8573F; color: #fff; font-size: 15px; font-weight: 700">Start the day</button>
+      </div>
+      <div style="flex-grow: 1; padding: 18px 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-content: start">
+        <div class="tc"><div style="display: flex; justify-content: space-between"><strong>Blue door</strong><span style="font-size: 13px; color: #5A6574">3 players</span></div><span style="font-size: 14px">Notes 7 · rooms 5 / 7</span><div class="bar"><div style="width: 71%; height: 100%; background: #2E5BDB"></div></div></div>
+        <div class="tc"><div style="display: flex; justify-content: space-between"><strong>Green door</strong><span style="font-size: 13px; color: #5A6574">4 players</span></div><span style="font-size: 14px">Notes 9 · rooms 6 / 7</span><div class="bar"><div style="width: 86%; height: 100%; background: #2E5BDB"></div></div></div>
+        <div class="tc" style="border: 2px solid #E8573F"><div style="display: flex; justify-content: space-between"><strong>Yellow door</strong><span style="font-size: 13px; color: #B93A25; font-weight: 700">Stuck?</span></div><span style="font-size: 14px">Notes 1 · rooms 2 / 7 · no moves 3 min</span><div class="bar"><div style="width: 28%; height: 100%; background: #E8573F"></div></div><button type="button" style="min-height: 40px; border-radius: 10px; border: none; background: #1C2430; color: #fff; font-size: 14px; font-weight: 600">Send a hint</button></div>
+        <div class="tc"><div style="display: flex; justify-content: space-between"><strong>Lilac door</strong><span style="font-size: 13px; color: #5A6574">5 players</span></div><span style="font-size: 14px">Notes 5 · rooms 4 / 7</span><div class="bar"><div style="width: 57%; height: 100%; background: #2E5BDB"></div></div><span style="font-size: 13px; color: #5A6574">Only 2 of 5 have written a note</span></div>
+        <div class="tc"><div style="display: flex; justify-content: space-between"><strong>Red door</strong><span style="font-size: 13px; color: #5A6574">4 players</span></div><span style="font-size: 14px">Notes 6 · rooms 5 / 7</span><div class="bar"><div style="width: 71%; height: 100%; background: #2E5BDB"></div></div></div>
+        <div class="tc" style="background: #EEF2FC; border-color: #C9D6F2"><strong>Ready prompts</strong><span style="font-size: 14px; line-height: 1.4">“Which room have you not visited yet, and why?”</span><span style="font-size: 14px; line-height: 1.4">“Who outside the company touches your data?”</span></div>
+      </div>
+    </div>
+
+    <section style="width: 660px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Material in the kit</h2>
+      <div class="mat"><div class="th"><div class="ln" style="background: #2E5BDB; width: 60%"></div><div class="ln"></div><div class="ln"></div><div class="ln" style="width: 70%"></div></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="mt">Facilitator guide</span><span class="md">Minute-by-minute run sheet for 45 and 90 minutes, with what to say at each step.</span></div></div>
+      <div class="mat"><div class="th" style="width: 90px; height: 56px"><div class="ln" style="background: #1C2430; width: 50%"></div><div class="ln"></div></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="mt">Slide deck</span><span class="md">Intro, CyPro recap and debrief slides that match the game words to the method.</span></div></div>
+      <div class="mat"><div class="th"><div class="ln" style="background: #FFE27A; height: 10px"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="mt">CyPro threat worksheet</span><span class="md">Printable table, also filled automatically from each team’s notes after the game.</span></div></div>
+      <div class="mat"><div class="th"><div class="ln" style="background: #E8573F; width: 40%"></div><div class="ln"></div><div class="ln" style="width: 50%"></div></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="mt">Paper backup</span><span class="md">Printable floor plan and character cards, so the class can still run if the network fails.</span></div></div>
+      <div class="mat"><div class="th"><div class="ln" style="background: #2F9E6E; width: 70%"></div><div class="ln"></div><div class="ln"></div></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="mt">Reflection questions</span><span class="md">Short individual questions to link the game to the exam project.</span></div></div>
+      <div class="mat"><div class="th"><div class="ln" style="background: #8C6AD9; width: 50%"></div><div class="ln"></div><div class="ln" style="width: 80%"></div></div><div style="display: flex; flex-direction: column; gap: 4px"><span class="mt">Scenario writing guide</span><span class="md">Template for adding a new company or a new bad day — text only, no coding.</span></div></div>
+    </section>
+  </div>
+</div></div></div></section>
+<section class="board" id="b15" aria-label="Roadmap and architecture"><div class="frame"><div class="inner"><div style="width: 1920px; height: 1080px; box-sizing: border-box; padding: 40px 72px; background: #FFFFFF; color: #1C2430; font-family: 'Figtree', sans-serif; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+  <div style="display: flex; justify-content: space-between; align-items: baseline">
+    <div style="display: flex; align-items: baseline; gap: 20px"><span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">OPEN DOOR · CONCEPT BOOK</span><h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700">Roadmap and architecture</h1></div>
+    <span style="font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #5A6574">15 / 15</span>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <div style="display: grid; grid-template-columns: 250px repeat(12, minmax(0, 1fr)); column-gap: 6px; row-gap: 8px">
+      <span></span>
+      <span class="wk">W1</span><span class="wk">W2</span><span class="wk">W3</span><span class="wk">W4</span><span class="wk">W5</span><span class="wk">W6</span><span class="wk">W7</span><span class="wk">W8</span><span class="wk">W9</span><span class="wk">W10</span><span class="wk">W11</span><span class="wk">W12</span>
+
+      <span class="ph">0 · Set up repo</span><div class="b" style="grid-column: 2 / span 1; background: #DCE5FA">Local + GitHub</div>
+      <span class="ph">1 · Plan features</span><div class="b" style="grid-column: 2 / span 2; background: #DCE5FA">Backlog, scenario format</div>
+      <span class="ph">2 · Design and architecture</span><div class="b" style="grid-column: 3 / span 2; background: #EADFFF">This book · eduroam spike</div>
+      <span class="ph">3 · Build the first version</span><div class="b" style="grid-column: 4 / span 5; background: #FFF4C7">Join, walk, close-ups, notes, day, teacher view, 1 scenario</div>
+      <span class="ph">4 · Test</span><div class="b" style="grid-column: 6 / span 5; background: #E2F3EC">Automated tests every change · student hallway tests W7–W8</div>
+      <span class="ph">5 · Pilot and refine</span><div class="b" style="grid-column: 9 / span 3; background: #FDE3DD">Pilot class W10 · fix what hurt</div>
+      <span class="ph">6 · Deploy and CI/CD</span><div class="b" style="grid-column: 2 / span 12; background: #F2F4F7">Pipeline from week 1: every merge tested and deployed to a preview</div>
+      <span class="ph">7 · Documentation</span><div class="b" style="grid-column: 10 / span 3; background: #DCE5FA">README, teacher kit, scenario guide</div>
+
+      <span class="ph" style="color: #B93A25">Milestones</span>
+      <span class="wk" style="grid-column: 3; color: #B93A25; font-weight: 700">◆ Works on eduroam</span>
+      <span class="wk" style="grid-column: 8; color: #B93A25; font-weight: 700">◆ Playable</span>
+      <span class="wk" style="grid-column: 11; color: #B93A25; font-weight: 700">◆ Pilot class</span>
+      <span class="wk" style="grid-column: 13; color: #B93A25; font-weight: 700">◆ v1</span>
+    </div>
+  </section>
+
+  <section style="flex-grow: 1; display: flex; gap: 28px; min-height: 0">
+    <div style="flex-grow: 1; padding: 22px; border-radius: 20px; background: #F2F4F7; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Architecture</h2>
+      <div style="display: grid; grid-template-columns: 1fr 70px 1.1fr 70px 1fr; align-items: center; row-gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div class="ab"><span class="at">Student browser</span><span class="as">Laptop or phone</span></div>
+          <div class="ab"><span class="at">Projector browser</span><span class="as">Lobby, story, debrief</span></div>
+          <div class="ab"><span class="at">Teacher browser</span><span class="as">Control view</span></div>
+        </div>
+        <div class="arr"><svg width="60" height="40" viewBox="0 0 60 40" aria-hidden="true"><path d="M4 14h48M44 6l8 8-8 8M56 28H8M16 20l-8 8 8 8" fill="none" stroke="#2E5BDB" stroke-width="2.5"></path></svg><span style="font-size: 11px; color: #2E5BDB; font-weight: 700">HTTPS · 443</span></div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div class="ab" style="border: 2px solid #2E5BDB"><span class="at">Session room</span><span class="as">One live room per class: positions, notes, clock. Deleted after the session. Cloudflare Durable Object via PartyServer, free tier.</span></div>
+          <div class="ab"><span class="at">Static game app</span><span class="as">TypeScript, Svelte for screens, PixiJS for the walkable map. Served for free.</span></div>
+        </div>
+        <div class="arr"><svg width="60" height="20" viewBox="0 0 60 20" aria-hidden="true"><path d="M56 10H8M16 3l-8 7 8 7" fill="none" stroke="#9AA4B2" stroke-width="2.5"></path></svg><span style="font-size: 11px; color: #5A6574; font-weight: 700">deploys</span></div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div class="ab"><span class="at">GitHub repo</span><span class="as">Code (MIT) · scenarios as text files and art (CC BY-SA)</span></div>
+          <div class="ab"><span class="at">GitHub Actions</span><span class="as">Tests, accessibility check, readability check, deploy</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width: 600px; flex-shrink: 0; padding: 22px; border-radius: 20px; border: 1px solid #DDE2E9; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px">Quality gates on every change</h2>
+      <div style="display: grid; grid-template-columns: 1fr auto; row-gap: 10px; column-gap: 16px; font-size: 15px">
+        <span>Unit tests for game rules</span><strong>Vitest</strong>
+        <span>Full class played by robots (40 players)</span><strong>Playwright</strong>
+        <span>Accessibility, WCAG 2.2 AA</span><strong>axe</strong>
+        <span>Scenario text readable (Flesch 60+)</span><strong>own check</strong>
+        <span>Page loads fast on eduroam</span><strong>Lighthouse</strong>
+      </div>
+      <div style="margin-top: auto; padding: 14px 16px; border-radius: 14px; background: #EEF2FC; font-size: 15px; line-height: 1.5; color: #1E2A55">All tools are open source or free. Only the live session room uses a hosted service, and the game logic stays portable to an AU server.</div>
+    </div>
+  </section>
+</div></div></div></section>
+</main>
+<footer>Open Door · content licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, building on the CyPro material from the Digital Business Development toolbox (Aarhus University and partners). Companies and people in the scenarios are fictional.</footer>
+<script>
+function fit(){document.querySelectorAll('.frame').forEach(function(f){var s=f.clientWidth/1920;f.querySelector('.inner').style.transform='scale('+s+')';});}
+window.addEventListener('resize',fit);window.addEventListener('load',fit);fit();
+</script>
+</body>
+</html>

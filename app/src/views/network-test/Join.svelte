@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cleanName, NAME_MAX } from "@open-door/shared";
-  import { readStored, writeStored } from "../lib/room.svelte";
+  import { readStored, writeStored } from "../../lib/room.svelte";
 
   let { onjoin }: { onjoin: (name: string) => void } = $props();
 

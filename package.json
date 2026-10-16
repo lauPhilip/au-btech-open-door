@@ -1,0 +1,28 @@
+{
+  "name": "open-door",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Walk the office, spot the risks: an open-source classroom game for interactive learning of threat modelling.",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "room",
+    "app"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "npm run build -w app && concurrently -n room,app -c blue,green \"npm run dev -w room\" \"npm run dev -w app\"",
+    "build": "npm run build -w app",
+    "check": "npm run check --workspaces --if-present",
+    "test": "vitest run",
+    "deploy": "npm run build && npm run deploy -w room"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

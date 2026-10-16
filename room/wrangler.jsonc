@@ -1,0 +1,18 @@
+// Cloudflare Worker that serves the app and hosts the live session rooms.
+// Free plan: rooms are SQLite-backed Durable Objects (see docs/decisions/0001-tech-stack.md).
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "open-door",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "../app/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/parties/*"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "HelloRoom", "class_name": "HelloRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["HelloRoom"] }],
+  "observability": { "enabled": true }
+}

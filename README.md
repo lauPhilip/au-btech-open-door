@@ -6,7 +6,7 @@ Open Door is a browser game for teams of three to five students. Each team walks
 
 Behind the play sits the CyPro method from the [Digital Business Development toolbox](https://dbd.au.dk/p/toolbox) at Aarhus University: context establishment, system modelling, assets, threat identification and threat analysis. Students practise the method first and learn its names in the debrief. The game is being designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning, and runs in any browser on the university network (eduroam) without accounts or logins.
 
-> **Status:** planning (roadmap phase 1). The design is captured in the concept book, the first scenario is written, and the backlog is ready. Development has not started yet.
+> **Status:** milestone M1. The concept book, first scenario and backlog are done. The first running piece is the *hello room*, a live network test for the classroom — see [the M1 test plan](docs/testing/m1-eduroam-test.md).
 
 ## What is in this repository
 
@@ -17,10 +17,34 @@ Behind the play sits the CyPro method from the [Digital Business Development too
 | [`docs/backlog.md`](docs/backlog.md) | 45 work items in four milestones; [`scripts/`](scripts/) turns them into GitHub issues |
 | [`scenarios/`](scenarios/) | Game content as text files: the first scenario, *Nordknit · Black Friday*, and the file format’s schema |
 | [`docs/scenario-format.md`](docs/scenario-format.md) | How to write a new scenario, with no coding needed |
+| [`docs/testing/`](docs/testing/) | Test plans, starting with the M1 classroom test on eduroam |
+| `app/`, `room/`, `shared/` | The code: browser app, Cloudflare Worker with live rooms, and shared message format |
 | [`docs/decisions/`](docs/decisions/) | Short records of the main decisions and why they were made |
 | [`docs/README.md`](docs/README.md) | An index of all documentation |
 
 To read the concept book, open `docs/concept-book/index.html` in a browser, or visit the published version once GitHub Pages is turned on: `https://lauphilip.github.io/au-btech-open-door/`.
+
+## Run it
+
+Open Door is written in TypeScript. The app is built with Svelte and Vite, and the live session rooms run on Cloudflare Workers with Durable Objects through PartyServer. You need [Node.js 22](https://nodejs.org) or newer.
+
+```
+npm install
+npm run dev
+```
+
+This builds the app and starts two local servers: the rooms on port 8787 and the app on port 5173. Open `http://localhost:5173` to join the hello room, and `http://localhost:5173/?view=projector` for the projector view. Other devices on the same network can join through your computer’s address on port 5173.
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Runs the app and the rooms locally |
+| `npm run check` | Type-checks all three parts |
+| `npm test` | Runs the unit tests |
+| `npm run build` | Builds the app into `app/dist` |
+| `npm run deploy` | Builds and deploys everything to Cloudflare (run `npx wrangler login` once first) |
+| `node scripts/simulate-class.mjs` | Simulates a class of 40 players joining a room |
+
+The code is split into three parts: `shared/` holds the message format and game rules used everywhere, `room/` is the Cloudflare Worker that serves the app and hosts the rooms, and `app/` is what students and teachers see in the browser.
 
 ## How a class plays
 

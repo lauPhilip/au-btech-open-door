@@ -2,8 +2,8 @@
   import { onDestroy } from "svelte";
   import QRCode from "qrcode";
   import { summarise } from "@open-door/shared";
-  import { RoomConnection } from "../lib/room.svelte";
-  import DeviceIcon from "../lib/DeviceIcon.svelte";
+  import { RoomConnection } from "../../lib/room.svelte";
+  import DeviceIcon from "../../lib/DeviceIcon.svelte";
 
   let { room }: { room: string } = $props();
 
@@ -11,7 +11,7 @@
   const connection = new RoomConnection(room, null);
   onDestroy(() => connection.close());
 
-  const joinUrl = $derived(`${window.location.origin}/?room=${encodeURIComponent(room)}`);
+  const joinUrl = $derived(`${window.location.origin}/network-test?room=${encodeURIComponent(room)}`);
   const shortUrl = $derived(joinUrl.replace(/^https?:\/\//, ""));
   let qrSvg = $state("");
   $effect(() => {

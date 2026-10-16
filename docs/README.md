@@ -8,8 +8,9 @@ This folder holds everything written about Open Door so far. The concept book is
 | [Roadmap](roadmap.md) | Phases, milestones and quality gates for the first twelve weeks |
 | [Backlog](backlog.md) | All 45 work items as user stories, grouped by part of the game and milestone |
 | [Writing a scenario](scenario-format.md) | The scenario file format, the plain words used in the answer key, and writing rules |
-| [Decision 0001 · Tech stack](decisions/0001-tech-stack.md) | Why TypeScript, Svelte, PixiJS and a small live “session room” |
+| [Decision 0001 · Tech stack](decisions/0001-tech-stack.md) | Why TypeScript, Svelte and a small live “session room” (the drawing part is changed by 0003) |
 | [Decision 0002 · Licensing](decisions/0002-licensing.md) | Why the code is MIT and the content is CC BY-SA 4.0 |
+| [Decision 0003 · SVG office map](decisions/0003-svg-office-map.md) | Why the walkable office is drawn with SVG in Svelte instead of PixiJS |
 
 The concept book is a single HTML file. Open it directly in a browser, or read the published version on GitHub Pages once it is turned on. It was designed at 1920 × 1080 per board and scales to any screen width.
 

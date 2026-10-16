@@ -1,6 +1,6 @@
 # 0001 · Tech stack
 
-**Status:** proposed · **Date:** 2026-10-16
+**Status:** proposed · **Date:** 2026-10-16 · **Changed by:** [0003](0003-svg-office-map.md) — the office is drawn with SVG instead of PixiJS
 
 ## Context
 

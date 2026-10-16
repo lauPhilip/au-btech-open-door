@@ -6,7 +6,7 @@ Open Door is a browser game for teams of three to five students. Each team walks
 
 Behind the play sits the CyPro method from the [Digital Business Development toolbox](https://dbd.au.dk/p/toolbox) at Aarhus University: context establishment, system modelling, assets, threat identification and threat analysis. Students practise the method first and learn its names in the debrief. The game is being designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning, and runs in any browser on the university network (eduroam) without accounts or logins.
 
-> **Status:** milestone M2 – Playable is in progress. The hello room network test works; the eduroam classroom test is planned for later. See [next steps](docs/dev-notes/next-steps.md).
+> **Status:** milestone M2 – Playable is in progress. A class can join, hear the story and walk the office together; close-ups, sticky notes and the day of the incident come next. The eduroam classroom test is planned for later. See [next steps](docs/dev-notes/next-steps.md).
 
 ## What is in this repository
 
@@ -33,7 +33,14 @@ npm install
 npm run dev
 ```
 
-This builds the app and starts two local servers: the rooms on port 8787 and the app on port 5173. Open `http://localhost:5173` to join the hello room, and `http://localhost:5173/?view=projector` for the projector view. Other devices on the same network can join through your computer’s address on port 5173.
+This builds the app and starts two local servers: the rooms on port 8787 and the app on port 5173. Other devices on the same network can join through your computer’s address on port 5173.
+
+| Address | Who uses it |
+|---|---|
+| `/teacher` | The teacher: create a session, then start the story and the walk |
+| `/screen/CODE` | The projector: QR code and teams, then the story, then the live office map |
+| `/` or `/j/CODE` | Students: type the code (or scan the QR code), pick a name, a face and a team |
+| `/network-test` | The hello room from milestone M1; add `?view=projector` for its projector view |
 
 | Command | What it does |
 |---|---|
@@ -41,9 +48,11 @@ This builds the app and starts two local servers: the rooms on port 8787 and the
 | `npm run scenarios` | Checks the scenario files and turns them into code for the game |
 | `npm run check` | Type-checks all three parts |
 | `npm test` | Runs the unit tests |
+| `npm run test:e2e` | Plays a whole session in real browser pages with Playwright (run `npm run build` and `npx playwright install chromium` first) |
 | `npm run build` | Builds the app into `app/dist` |
 | `npm run deploy` | Builds and deploys everything to Cloudflare (run `npx wrangler login` once first) |
-| `node scripts/simulate-class.mjs` | Simulates a class of 40 players joining a room |
+| `node scripts/simulate-class.mjs` | Simulates a class of 40 players joining the network-test room |
+| `node scripts/simulate-class.mjs --mode game` | Simulates a whole game session: a teacher, a projector and 25 students who join, sit down and walk |
 
 The code is split into three parts: `shared/` holds the message format and game rules used everywhere, `room/` is the Cloudflare Worker that serves the app and hosts the rooms, and `app/` is what students and teachers see in the browser.
 

@@ -14,7 +14,7 @@ This test answers one question before any real game is built: can thirty or more
 
 ## How to run it
 
-The test takes about fifteen minutes of class time. Before class, deploy the latest version (see the README) and open the projector view on the classroom computer: `https://<your-worker-address>/?view=projector&room=herning-test`. Use a fresh room name for each test so earlier results do not mix in.
+The test takes about fifteen minutes of class time. Before class, deploy the latest version (see the README) and open the projector view on the classroom computer: `https://<your-worker-address>/network-test?view=projector&room=herning-test`. Use a fresh room name for each test so earlier results do not mix in.
 
 In class, ask everyone to connect to **eduroam**, not a phone hotspot, and to scan the QR code on the screen. Each student types a first name and presses Join. Note how long it takes until the count on the projector stops growing. Then ask everyone to keep the page open for five minutes — they can talk or work as normal. Halfway through, ask three volunteers to switch their Wi-Fi off for ten seconds and on again, to check that reconnecting works.
 

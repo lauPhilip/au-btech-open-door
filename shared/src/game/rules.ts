@@ -49,6 +49,10 @@ export interface Game {
   clues: Partial<Record<TeamId, number[]>>;
   /** The option each player voted for in the final choice, by player id (issue #27). */
   votes: Record<string, number>;
+  /** How each team's notes covered each threat, in scenario order. Filled in when the debrief starts (issue #29). */
+  results: Partial<Record<TeamId, Array<"hit" | "close" | "miss">>>;
+  /** Which debrief question the teacher is showing on the projector (issue #30). */
+  prompt: number;
 }
 
 export type GameError =
@@ -62,6 +66,7 @@ export type GameError =
   | "too-far"
   | "unknown-question"
   | "not-voting"
+  | "not-debrief"
   | "unknown-option"
   | "paused"
   | "bad-note"
@@ -80,6 +85,7 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "bad-face": "Pick a face.",
   "too-far": "Walk closer to talk to them.",
   "unknown-question": "That question is not in this scenario.",
+  "not-debrief": "The debrief has not started yet.",
   "not-voting": "The vote has not started yet.",
   "unknown-option": "That choice is not on the list.",
   "paused": "The teacher paused the game. Wait a moment.",
@@ -104,7 +110,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {} };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0 };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {
@@ -276,4 +282,11 @@ export function ask(game: Game, scenario: Scenario, id: string, personId: string
 /** Asset ids the team has found so far. */
 export function teamRevealed(game: Game, team: TeamId): readonly string[] {
   return game.revealed?.[team] ?? [];
+}
+
+/** The teacher moves to another debrief question. */
+export function setPrompt(game: Game, scenario: Scenario, index: number): Result<Game> {
+  if (game.phase !== "debrief") return fail("not-debrief");
+  const last = scenario.debrief.prompts.length - 1;
+  return ok({ ...game, prompt: Math.max(0, Math.min(last, Math.trunc(index))) });
 }

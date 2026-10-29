@@ -80,6 +80,11 @@ export class GameConnection {
     this.send({ t: "unnote", id });
   }
 
+  /** Show another debrief question on the projector (teacher only). */
+  prompt(index: number): void {
+    this.send({ t: "prompt", index });
+  }
+
   /** Vote for an option of the final choice. */
   vote(option: number): void {
     this.send({ t: "vote", option });

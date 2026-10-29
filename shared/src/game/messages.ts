@@ -20,6 +20,7 @@ export type GameClientMessage =
   | { t: "merge"; keep: string; drop: string }
   | { t: "phase"; phase: Phase }
   | { t: "vote"; option: number }
+  | { t: "prompt"; index: number }
   | { t: "timer"; action: TimerAction };
 
 /** One player's new position: id, x, y and room (or null in a corridor). */
@@ -74,6 +75,8 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return isNoteId(m.id) && typeof m.shared === "boolean" ? { t: "share", id: m.id, shared: m.shared } : null;
     case "merge":
       return isNoteId(m.keep) && isNoteId(m.drop) ? { t: "merge", keep: m.keep, drop: m.drop } : null;
+    case "prompt":
+      return typeof m.index === "number" && Number.isInteger(m.index) && m.index >= 0 && m.index < 20 ? { t: "prompt", index: m.index } : null;
     case "vote":
       return typeof m.option === "number" && Number.isInteger(m.option) && m.option >= 0 && m.option < 10 ? { t: "vote", option: m.option } : null;
     case "timer":
@@ -89,9 +92,9 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
 export function mayRoleSend(role: Role, message: GameClientMessage): boolean {
   switch (role) {
     case "player":
-      return message.t !== "phase" && message.t !== "timer";
+      return message.t !== "phase" && message.t !== "timer" && message.t !== "prompt";
     case "teacher":
-      return message.t === "phase" || message.t === "timer";
+      return message.t === "phase" || message.t === "timer" || message.t === "prompt";
     case "screen":
       return false;
   }

@@ -36,7 +36,7 @@
     { phase: "walk", label: "Walk", action: "Start walking", help: "Teams walk around the office together, talk to people and write notes. Notes are private until a student shares them." },
     { phase: "day", label: "Day", action: "Start the day", help: "The incident begins: a clock, messages and an alert. Everyone's notes are shared with their team, and teams follow clues to the answer." },
     { phase: "vote", label: "Vote", action: "Start the vote", help: "Each team decides what Karin should do. Notes are shared with the team again, so nothing is lost." },
-    { phase: "debrief", label: "Debrief", action: "Show the result", help: "Teams see their decision and which problems their notes predicted." },
+    { phase: "debrief", label: "Debrief", action: "Show the result", help: "Teams see their decision. The big screen shows which team saw which problem coming, the CyPro names and your questions." },
   ];
   const nextStep = $derived(STEPS.find((s) => s.phase === next));
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
@@ -90,10 +90,15 @@
           {/if}
         </div>
         <button class="primary" onclick={() => connection.setPhase(nextStep.phase)}>{nextStep.action}</button>
-      {:else if game}
+      {:else if game && scenario}
         <div>
-          <h2>The result is showing</h2>
-          <p>Teams can see their decision and which problems their notes predicted. The class debrief table comes in the next version of Open Door.</p>
+          <h2>Debrief: question {game.prompt + 1} of {scenario.debrief.prompts.length}</h2>
+          <p class="prompt">{scenario.debrief.prompts[game.prompt]}</p>
+          <p>The big screen shows the table and this question. Teams see their own result on their phones.</p>
+        </div>
+        <div class="prompts">
+          <button class="secondary" disabled={game.prompt === 0} onclick={() => connection.prompt(game.prompt - 1)}>Previous question</button>
+          <button class="primary" disabled={game.prompt >= scenario.debrief.prompts.length - 1} onclick={() => connection.prompt(game.prompt + 1)}>Next question</button>
         </div>
       {/if}
     </section>
@@ -299,4 +304,6 @@
     color: var(--alert-dark);
     margin: 0;
   }
+  .prompt { font-size: 20px; font-weight: 600; }
+  .prompts { display: flex; gap: 8px; flex-wrap: wrap; }
 </style>

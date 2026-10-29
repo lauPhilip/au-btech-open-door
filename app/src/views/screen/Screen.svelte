@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import QRCode from "qrcode";
+  import DebriefTable from "../../lib/DebriefTable.svelte";
+  import CyProNames from "../../lib/CyProNames.svelte";
   import { allVotes, dayMinute, teamById, eventsBy, formatLeft, isPaused, leftMs, scenarios, TEAMS, teamClues, teamVisited } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
@@ -78,7 +80,26 @@
     <section class="story-wrap">
       <Story {scenario} large autoplayMs={9000} />
     </section>
-  {:else if game.phase === "vote" || game.phase === "debrief"}
+  {:else if game.phase === "debrief"}
+    <section class="debrief-screen">
+      <div class="left">
+        <ul class="decisions" aria-label="What each team decided">
+          {#each votes as v (v.team)}
+            {@const t = teamById(v.team)}
+            {@const win = v.winner !== null ? scenario.day.final_choice.options[v.winner] : null}
+            <li style="--team: {t.color}"><strong>{t.name}</strong> {#if win}<span>{win.best ? "★ " : ""}{win.text} <em>{win.result}</em></span>{:else}<span>– No decision: the votes were split</span>{/if}</li>
+          {/each}
+        </ul>
+        <h1>Who saw it coming?</h1>
+        <DebriefTable {game} {scenario} />
+      </div>
+      <aside class="right">
+        <p class="question" aria-live="polite"><span class="eyebrow">Question for the class</span>{scenario.debrief.prompts[game.prompt] ?? ""}</p>
+        <CyProNames />
+        {#if scenario.debrief.next_class}<p class="next"><strong>Next class:</strong> {scenario.debrief.next_class}</p>{/if}
+      </aside>
+    </section>
+  {:else if game.phase === "vote"}
     <section class="decide">
       <h1>{scenario.day.final_choice.question}</h1>
       <ul class="teams">
@@ -318,5 +339,63 @@
   .teams .result {
     color: var(--slate);
     font-size: 22px;
+  }
+  .debrief-screen {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .debrief-screen h1 {
+    font-size: 34px;
+    margin: 0 0 4px;
+  }
+  .question {
+    background: #ffe27a;
+    color: var(--ink);
+    border-radius: var(--radius-l);
+    padding: 16px 22px;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .question .eyebrow {
+    display: block;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .decisions {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    font-size: 20px;
+  }
+  .decisions li {
+    background: var(--paper);
+    border-left: 10px solid var(--team);
+    border-radius: 10px;
+    padding: 8px 16px;
+  }
+  .decisions em {
+    color: var(--slate);
+    font-style: normal;
+  }
+  .right {
+    display: grid;
+    gap: 16px;
+  }
+  .next {
+    margin: 0;
+    font-size: 22px;
+  }
+  @media (max-width: 1100px) {
+    .debrief-screen {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

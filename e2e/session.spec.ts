@@ -315,4 +315,11 @@ test("the class votes on what the CEO should do and sees what their notes predic
   await expect(ana.getByRole("heading", { name: /You saw it coming: 0 of 6/ })).toBeVisible();
   await expect(chen.getByText("Labels print again at 09:10. At 09:25 the printer is paused again.")).toBeVisible();
   await expect(projector.getByText("Labels print from 09:05. The truck leaves full at 10:00.")).toBeVisible();
+
+  // The projector shows the class table, the CyPro names and the first question; the teacher steps through them.
+  await expect(projector.getByRole("table", { name: "Which team saw which problem coming" })).toBeVisible();
+  await expect(projector.getByText("What you did has a name in the CyPro method")).toBeVisible();
+  await expect(projector.getByText(/Which team spotted the printer on the guest Wi-Fi/)).toBeVisible();
+  await teacher.getByRole("button", { name: "Next question" }).click();
+  await expect(projector.getByText(/The fake visitor came in before reception opened/)).toBeVisible();
 });

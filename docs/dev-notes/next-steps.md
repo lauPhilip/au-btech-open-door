@@ -47,6 +47,10 @@ A short note on where development stands, so a new work session can pick up stra
   - **Result and "you saw it coming":** `match.ts` counts a note as a hit when it is about the threat's thing (or stands in its room) and shares a harm. The finish screen shows the table's decision, the scenario result and every problem in the answer key, with the matching note.
   - **Known limit:** the browser bundle contains the whole scenario, answer key included, so a curious student could read it in dev tools. Fine for a classroom game; worth knowing.
 
+- **The debrief** (#29, #30). Built 29 October 2026:
+  - **Class table:** when the teacher shows the result, the server grades every team's shared notes against the answer key once (`gradeAll` in `match.ts`) and keeps the grades in the game. The projector shows teams against problems with ✓ on a note, ½ close and – missed, using symbols, words for screen readers and colour together. At 1920×1080 and 1280×720 the table, the question and the names all fit without scrolling.
+  - **CyPro names and questions:** a panel maps game words to CyPro terms (system model, assets, trust boundaries, threats, C·I·A, threat actors, likelihood), and the prompts come from `debrief.prompts` in the scenario file. The teacher steps through the questions with Previous and Next, and the projector follows.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

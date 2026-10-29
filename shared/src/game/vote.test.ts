@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { scenarios } from "../scenarios.generated";
-import { matchNotes } from "./match";
+import { gradeAll, gradeThreat, matchNotes } from "./match";
 import type { Note } from "./notes";
 import { chooseTeam, join, newGame, setPhase, type Game } from "./rules";
 import { allVotes, castVote, everyoneVoted, teamVote } from "./vote";
@@ -72,6 +72,15 @@ describe("matching notes with the answer key", () => {
     expect(matchNotes(scenario, [note({ about: "label-printer", harm: ["leak"] })], "blue")[0]?.note).toBeNull();
     expect(matchNotes(scenario, [note({ about: "label-printer", shared: false })], "blue")[0]?.note).toBeNull();
     expect(matchNotes(scenario, [note({ about: "label-printer", team: "green" })], "blue")[0]?.note).toBeNull();
+  });
+
+  it("grades a hit, a close note and a miss", () => {
+    const printer = scenario.threats.find((t) => t.id === "printer-guest-wifi")!;
+    expect(gradeThreat(scenario, [note({ about: "label-printer" })], "blue", printer)).toBe("hit");
+    // Right thing, wrong harm: close.
+    expect(gradeThreat(scenario, [note({ about: "label-printer", harm: ["leak"] })], "blue", printer)).toBe("close");
+    expect(gradeThreat(scenario, [], "blue", printer)).toBe("miss");
+    expect(gradeAll(scenario, [], "blue")).toHaveLength(scenario.threats.length);
   });
 
   it("falls back to the room when the note is not about a thing", () => {

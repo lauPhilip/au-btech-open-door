@@ -27,3 +27,24 @@ export function matchNotes(scenario: Scenario, notes: readonly Note[], team: Tea
   const mine = notes.filter((n) => n.team === team && n.shared);
   return scenario.threats.map((threat) => ({ threat, note: mine.find((n) => noteMatches(scenario, n, threat)) ?? null }));
 }
+
+/** How well a team's notes covered one threat: seen, close but in the wrong place, or missed. */
+export type Grade = "hit" | "close" | "miss";
+
+/** Same wording as the concept book: ✓ on a note, ½ close (wrong place or person), – missed. */
+export function gradeThreat(scenario: Scenario, notes: readonly Note[], team: TeamId, threat: Threat): Grade {
+  const mine = notes.filter((n) => n.team === team && n.shared);
+  if (mine.some((n) => noteMatches(scenario, n, threat))) return "hit";
+  const room = thingRoom(scenario, threat.target);
+  const close = mine.some(
+    (n) =>
+      n.about === threat.target ||
+      (room !== null && n.room === room) ||
+      (n.harm.some((h) => threat.harm.includes(h)) && n.actor.some((a) => threat.actor.includes(a))),
+  );
+  return close ? "close" : "miss";
+}
+
+export function gradeAll(scenario: Scenario, notes: readonly Note[], team: TeamId): Grade[] {
+  return scenario.threats.map((t) => gradeThreat(scenario, notes, team, t));
+}

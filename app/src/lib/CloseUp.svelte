@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import Bust from "./Bust.svelte";
   import type { PersonInScenario, Scenario, Spot } from "@open-door/shared";
 
   let {
@@ -54,7 +55,7 @@
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="closeup-title" bind:this={dialog}>
     <header>
       <div class="portrait" class:object={spot.kind === "thing"} aria-hidden="true">
-        {#if person}<span class="initial">{person.name.charAt(0)}</span>{:else}<span class="box"></span>{/if}
+        {#if person}<Bust id={person.id} size={58} />{:else}<span class="box"></span>{/if}
       </div>
       <div class="title">
         <h2 id="closeup-title">{spot.name}</h2>
@@ -140,12 +141,6 @@
     border-radius: 16px;
     background: #e3ecf8;
     border-color: #7f9cc7;
-  }
-  .initial {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 30px;
-    color: #7a4a26;
   }
   .box {
     width: 26px;

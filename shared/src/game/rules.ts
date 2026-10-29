@@ -50,6 +50,9 @@ export type GameError =
   | "bad-face"
   | "too-far"
   | "unknown-question"
+  | "bad-note"
+  | "too-many-notes"
+  | "unknown-note"
   | "not-allowed";
 
 /** Plain-language text for each error, shown to the player. */
@@ -63,6 +66,9 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "bad-face": "Pick a face.",
   "too-far": "Walk closer to talk to them.",
   "unknown-question": "That question is not in this scenario.",
+  "bad-note": "A note needs a few words, at least one harm and at least one who.",
+  "too-many-notes": "You have a lot of notes already. Delete one first.",
+  "unknown-note": "That note is gone.",
   "not-allowed": "Only the teacher can do that.",
 };
 

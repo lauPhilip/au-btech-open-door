@@ -69,6 +69,18 @@
     ]);
   }
 
+  const joinLink = $derived(`${window.location.origin}/j/${code}`);
+  let copied = $state(false);
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(joinLink);
+      copied = true;
+      setTimeout(() => (copied = false), 2500);
+    } catch {
+      window.prompt("Copy this link", joinLink);
+    }
+  }
+
   function openScreen() {
     window.open(`/screen/${code}`, `open-door-screen-${code}`);
   }
@@ -94,6 +106,8 @@
       <div class="actions">
         <button class="secondary" onclick={openScreen}>Open the big screen</button>
         <p class="hint">Show it on the projector. Students join from there.</p>
+        <button class="secondary" onclick={copyLink}>{copied ? "Link copied" : "Copy the join link"}</button>
+        <p class="hint link">No projector? Send students <strong>{joinLink.replace(/^https?:\/\//, "")}</strong></p>
       </div>
     </section>
 
@@ -140,13 +154,13 @@
       </section>
     {/if}
     {#if game}
-      <section class="panel end">
-        <div>
-          <h2>Finished with this session?</h2>
+      <details class="panel close">
+        <summary>Finished with this session?</summary>
+        <div class="end">
           <p>Close it for everyone and delete all notes and names. Download the tables first, because they cannot be brought back.</p>
+          <button class="secondary" onclick={() => confirm("Close the session for everyone and delete all data? This cannot be undone.") && connection.closeSession()}>Close the session</button>
         </div>
-        <button class="secondary" onclick={() => confirm("Close the session for everyone and delete all data? This cannot be undone.") && connection.closeSession()}>Close the session</button>
-      </section>
+      </details>
     {/if}
     {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
 
@@ -303,6 +317,34 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+  }
+  .close summary {
+    cursor: pointer;
+    font-weight: 700;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .close .end {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .hint.link {
+    word-break: break-all;
+  }
+  @media (max-width: 760px) {
+    .actions {
+      align-items: flex-start;
+    }
+    .next {
+      position: sticky;
+      bottom: 12px;
+      z-index: 5;
+      box-shadow: 0 8px 30px rgb(28 36 48 / 0.25);
+    }
   }
   .next > div {
     flex: 1 1 320px;

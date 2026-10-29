@@ -359,6 +359,7 @@ test("the teacher moves a student, sees a stuck team and sends a hint", async ({
 
   // Finished for good: closing the session ends it on every screen and deletes the data.
   page.once("dialog", (d) => d.accept());
+  await teacher.getByText("Finished with this session?").click();
   await teacher.getByRole("button", { name: "Close the session" }).click();
   await expect(teacher.getByRole("heading", { name: "This session has ended" })).toBeVisible();
   await expect(ana.getByRole("heading", { name: "This session has ended" })).toBeVisible();

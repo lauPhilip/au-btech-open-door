@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { TEAM_MAX, TEAMS, type Player } from "@open-door/shared";
+  import { TEAM_MAX, TEAMS, type Player, type TeamId } from "@open-door/shared";
   import Face from "./Face.svelte";
 
-  let { players, large = false }: { players: Player[]; large?: boolean } = $props();
+  let { players, large = false, onmove }: { players: Player[]; large?: boolean; onmove?: (id: string, team: TeamId) => void } = $props();
+  const full = (id: string) => (players.filter((p) => p.team === id).length >= TEAM_MAX);
 
   const byTeam = $derived(TEAMS.map((team) => ({ team, members: players.filter((p) => p.team === team.id) })));
 </script>
@@ -20,6 +21,11 @@
               <Face face={p.face} size={large ? 40 : 28} />
               <span>{p.name}</span>
               {#if !p.online}<small>offline</small>{/if}
+              {#if onmove}
+                <select aria-label="Move {p.name} to another table" value={p.team ?? ""} onchange={(e) => onmove(p.id, e.currentTarget.value as TeamId)}>
+                  {#each TEAMS as t (t.id)}<option value={t.id} disabled={t.id !== p.team && full(t.id)}>{t.name}{t.id !== p.team && full(t.id) ? " (full)" : ""}</option>{/each}
+                </select>
+              {/if}
             </li>
           {/each}
         </ul>
@@ -95,4 +101,5 @@
   .large .empty {
     font-size: 20px;
   }
+  select { margin-left: auto; min-height: 44px; font: inherit; max-width: 130px; }
 </style>

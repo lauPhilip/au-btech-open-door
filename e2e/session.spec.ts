@@ -18,7 +18,9 @@ async function student(browser: Browser, code: string, name: string, face: numbe
 
 /** Click a point on the office map, given in map units. */
 async function tapMap(page: Page, x: number, y: number) {
-  const box = await page.getByRole("img", { name: /Top-down map/ }).boundingBox();
+  const map = page.getByRole("img", { name: /Top-down map/ });
+  await map.scrollIntoViewIfNeeded();
+  const box = await map.boundingBox();
   if (!box) throw new Error("No map on the page");
   await page.mouse.click(box.x + (x / MAP_WIDTH) * box.width, box.y + (y / MAP_HEIGHT) * box.height);
 }
@@ -85,25 +87,67 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(laura.getByText("1 of 7 found by your team")).toBeVisible();
   await expect(wei.getByText("1 of 7 found by your team")).toBeVisible();
   await expect(linh.getByText("0 of 7 found by your team")).toBeVisible();
-  // Laura writes a sticky note about Mei; only she can see it.
+  // Laura writes a sticky note about Mei. It is private until she shares it.
   await laura.getByRole("button", { name: "Sticky note" }).click();
-  const form = laura.getByRole("dialog", { name: /Sticky note/ });
-  await form.getByRole("button", { name: "Stick it on" }).click();
+  const form = laura.getByRole("dialog", { name: /sticky note/i });
+  await expect(form.getByText("On: Mei")).toBeVisible();
+  await form.getByRole("button", { name: "Stick it on Mei" }).click();
   await expect(form.getByRole("alert")).toBeVisible(); // incomplete notes are refused
   await form.getByLabel("What could go wrong?").fill("Shared password on a note");
-  await form.getByRole("checkbox", { name: /Leak/ }).check();
-  await form.getByRole("checkbox", { name: /A visitor/ }).check();
-  await form.getByRole("radio", { name: /Seen at companies/ }).check();
-  await form.getByRole("button", { name: "Stick it on" }).click();
+  await form.getByRole("checkbox", { name: /Leak information/ }).check();
+  await form.getByRole("checkbox", { name: /A visitor or driver/ }).check();
+  await form.getByRole("radio", { name: /Seen at firms like us/ }).check();
+  await form.getByRole("button", { name: "Stick it on Mei" }).click();
   await expect(form).toBeHidden();
-  await expect(laura.getByText("1 written, only you can see them")).toBeVisible();
-  await expect(laura.getByText("Shared password on a note")).toBeVisible();
-  await expect(wei.getByText("0 written, only you can see them")).toBeVisible();
+  await expect(laura.getByText("1 · private until shared")).toBeVisible();
+  await expect(laura.getByText("Shared password on a note", { exact: true })).toBeVisible();
+  await expect(wei.getByText("0 · private until shared")).toBeVisible();
+  await expect(wei.getByText("0 · on the map")).toBeVisible(); // Wei cannot see it yet
+  // She shares it: the team sees it on the list and the map, the other team does not.
+  await laura.getByRole("button", { name: "Share with team" }).click();
+  await expect(laura.getByText("0 · private until shared")).toBeVisible();
+  await expect(laura.getByText("1 · on the map")).toBeVisible();
+  await expect(wei.getByText("1 · on the map")).toBeVisible();
+  await expect(wei.getByText("Shared password on a note", { exact: true })).toBeVisible();
+  await expect(wei.locator("g.pin")).toHaveCount(1);
+  await expect(linh.getByText("0 · on the map")).toBeVisible();
+  await expect(linh.locator("g.pin")).toHaveCount(0);
+  // Wei adds a similar note and shares it; Laura merges the two.
+  await wei.getByRole("button", { name: "Sticky note" }).click();
+  const weiForm = wei.getByRole("dialog", { name: /sticky note/i });
+  await weiForm.getByLabel("What could go wrong?").fill("Admin login is shared by four people");
+  await weiForm.getByRole("checkbox", { name: /Change something/ }).check();
+  await weiForm.getByRole("checkbox", { name: /An employee/ }).check();
+  await weiForm.getByRole("radio", { name: /Happened here/ }).check();
+  await weiForm.getByRole("button", { name: "Stick it on" }).click();
+  await wei.getByRole("button", { name: "Share with team" }).click();
+  await expect(laura.getByText("2 · on the map")).toBeVisible();
+  await laura.getByRole("checkbox", { name: /Shared password on a note/ }).check();
+  await laura.getByRole("checkbox", { name: /Admin login is shared/ }).check();
+  await laura.getByRole("button", { name: "Merge the two ticked notes" }).click();
+  await expect(laura.getByText("1 · on the map")).toBeVisible();
+  await expect(wei.getByText("1 · on the map")).toBeVisible();
+  await expect(wei.getByText("Laura + 1")).toBeVisible(); // Laura's note absorbed Wei's
+  await expect(wei.getByText("Shared password on a note", { exact: true })).toBeVisible();
+  // Laura takes it back and deletes it.
+  await laura.getByRole("button", { name: "Take back" }).click();
+  await expect(laura.getByText("1 · private until shared")).toBeVisible();
   await laura.getByRole("button", { name: /Delete note/ }).click();
-  await expect(laura.getByText("0 written, only you can see them")).toBeVisible();
+  await expect(laura.getByText("0 · private until shared")).toBeVisible();
+
+  // A thing has a close-up too, with the technical layer hidden until asked for.
+  await tapMap(laura, 206, 160);
+  await laura.getByRole("button", { name: /Look at Live order screen/ }).click({ timeout: 10_000 });
+  const thing = laura.getByRole("dialog", { name: "Live order screen" });
+  await expect(thing.getByText("Shows orders from all nine shops")).toBeVisible();
+  await expect(thing.getByText(/over the internet/)).toBeHidden();
+  await thing.getByRole("button", { name: "Look closer (technical)" }).click();
+  await expect(thing.getByText(/over the internet/)).toBeVisible();
+  await thing.getByRole("button", { name: "Back to the map" }).click();
+  await expect(thing).toBeHidden();
 
   // Too far away to talk: no prompt appears for a person across the building.
-  await tapMap(laura, 200, 100);
+  await tapMap(laura, 60, 60);
   await expect(laura.getByRole("button", { name: /Talk to Mei/ })).toBeHidden({ timeout: 10_000 });
 
   // Wei walks with the keyboard.

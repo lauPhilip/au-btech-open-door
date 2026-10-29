@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { scenarios } from "../scenarios.generated";
-import { roomAt, startRoom } from "../scenario";
+import { roomAt, spots, startRoom } from "../scenario";
 import { CODE_ALPHABET, isCode, makeCode, normaliseCode } from "./code";
 import { FACE_COUNT, faceLook, HAIR_STYLES, SKIN_TONES } from "./faces";
 import { mayRoleSend, parseGameMessage } from "./messages";
 import {
+  ask,
   AVATAR_RADIUS,
   chooseTeam,
   clampToMap,
@@ -16,6 +17,7 @@ import {
   setPhase,
   spawnPoint,
   teamCounts,
+  teamRevealed,
   teamVisited,
   type Game,
   type Result,
@@ -222,5 +224,63 @@ describe("messages", () => {
     expect(mayRoleSend("player", moveMsg)).toBe(true);
     expect(mayRoleSend("screen", moveMsg)).toBe(false);
     expect(mayRoleSend("screen", phase)).toBe(false);
+  });
+});
+
+describe("asking questions", () => {
+  const mei = spots(scenario).find((s) => s.id === "mei")!;
+
+  /** One player on the blue team, walking, standing at (x, y). */
+  function standingAt(x: number, y: number): Game {
+    const game = walking(value(chooseTeam(withPlayers(1), "p0", "blue")));
+    return value(move(game, scenario, "p0", x, y)).game;
+  }
+
+  it("records the assets the answer points to for the asking team", () => {
+    const game = value(ask(standingAt(mei.x, mei.y), scenario, "p0", "mei", 1));
+    expect(teamRevealed(game, "blue")).toEqual(["admin-login"]);
+    expect(teamRevealed(game, "green")).toEqual([]);
+  });
+
+  it("adds each asset once, even if several answers point to it", () => {
+    let game = standingAt(mei.x, mei.y);
+    game = value(ask(game, scenario, "p0", "mei", 0)); // orders, admin-login
+    game = value(ask(game, scenario, "p0", "mei", 1)); // admin-login again
+    game = value(ask(game, scenario, "p0", "mei", 2)); // orders again
+    expect(teamRevealed(game, "blue")).toEqual(["orders", "admin-login"]);
+  });
+
+  it("returns the same game when nothing new was learned", () => {
+    const game = value(ask(standingAt(mei.x, mei.y), scenario, "p0", "mei", 1));
+    expect(value(ask(game, scenario, "p0", "mei", 1))).toBe(game);
+  });
+
+  it("refuses when the player is too far away", () => {
+    const far = standingAt(1100, 700);
+    expect(ask(far, scenario, "p0", "mei", 0)).toEqual({ ok: false, error: "too-far" });
+  });
+
+  it("refuses unknown people and questions", () => {
+    const game = standingAt(mei.x, mei.y);
+    expect(ask(game, scenario, "p0", "nobody", 0)).toEqual({ ok: false, error: "unknown-question" });
+    expect(ask(game, scenario, "p0", "mei", 7)).toEqual({ ok: false, error: "unknown-question" });
+  });
+
+  it("refuses before the walk, without a team, and for strangers", () => {
+    const lobby = value(chooseTeam(withPlayers(1), "p0", "blue"));
+    expect(ask(lobby, scenario, "p0", "mei", 0)).toEqual({ ok: false, error: "not-walking" });
+    expect(ask(withPlayers(1), scenario, "p0", "mei", 0)).toEqual({ ok: false, error: "not-walking" });
+    expect(ask(standingAt(mei.x, mei.y), scenario, "nobody", "mei", 0)).toEqual({ ok: false, error: "not-joined" });
+  });
+
+  it("parses the ask message and lets only players send it", () => {
+    expect(parseGameMessage('{"t":"ask","person":"mei","topic":1}')).toEqual({ t: "ask", person: "mei", topic: 1 });
+    for (const raw of ['{"t":"ask","person":"Mei!","topic":1}', '{"t":"ask","person":"mei","topic":1.5}', '{"t":"ask","person":"mei","topic":-1}', '{"t":"ask","person":1,"topic":0}']) {
+      expect(parseGameMessage(raw)).toBeNull();
+    }
+    const msg = { t: "ask", person: "mei", topic: 0 } as const;
+    expect(mayRoleSend("player", msg)).toBe(true);
+    expect(mayRoleSend("teacher", msg)).toBe(false);
+    expect(mayRoleSend("screen", msg)).toBe(false);
   });
 });

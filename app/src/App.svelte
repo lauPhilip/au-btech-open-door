@@ -4,6 +4,7 @@
   import Teacher from "./views/teacher/Teacher.svelte";
   import Screen from "./views/screen/Screen.svelte";
   import NetworkTest from "./views/network-test/NetworkTest.svelte";
+  import Dev from "./views/dev/Dev.svelte";
   import Brand from "./lib/Brand.svelte";
 
   const TITLES: Record<string, string> = {
@@ -11,6 +12,7 @@
     teacher: "Teacher",
     screen: "Big screen",
     "network-test": "Network test",
+    dev: "Simulator",
     "not-found": "Page not found",
   };
 
@@ -25,6 +27,8 @@
   {#key router.route.code}<Teacher code={router.route.code} />{/key}
 {:else if router.route.view === "screen"}
   {#key router.route.code}<Screen code={router.route.code} />{/key}
+{:else if router.route.view === "dev"}
+  <Dev code={router.route.code} />
 {:else if router.route.view === "network-test"}
   <NetworkTest />
 {:else}

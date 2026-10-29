@@ -71,6 +71,41 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(linh.getByText("1 of 9 visited by your team")).toBeVisible();
   await expect(screen.getByText(/[2-9] of 9 rooms/)).toBeVisible();
 
+  // Laura walks up to Mei, talks to her, and her team learns what the company depends on.
+  await tapMap(laura, 340, 215);
+  await laura.getByRole("button", { name: /Talk to Mei/ }).click({ timeout: 10_000 });
+  const talk = laura.getByRole("dialog", { name: "Mei" });
+  await expect(talk.getByText("Nine shops, one system.")).toBeVisible();
+  await talk.getByRole("button", { name: "Who can log in as admin?" }).click();
+  await expect(talk.getByText(/note under my keyboard/)).toBeVisible();
+  await expect(talk.getByRole("button", { name: "Who can log in as admin?" })).toBeHidden(); // asked once
+  await laura.keyboard.press("Escape");
+  await expect(talk).toBeHidden();
+  // Her teammate sees the find; the other team does not.
+  await expect(laura.getByText("1 of 7 found by your team")).toBeVisible();
+  await expect(wei.getByText("1 of 7 found by your team")).toBeVisible();
+  await expect(linh.getByText("0 of 7 found by your team")).toBeVisible();
+  // Laura writes a sticky note about Mei; only she can see it.
+  await laura.getByRole("button", { name: "Sticky note" }).click();
+  const form = laura.getByRole("dialog", { name: /Sticky note/ });
+  await form.getByRole("button", { name: "Stick it on" }).click();
+  await expect(form.getByRole("alert")).toBeVisible(); // incomplete notes are refused
+  await form.getByLabel("What could go wrong?").fill("Shared password on a note");
+  await form.getByRole("checkbox", { name: /Leak/ }).check();
+  await form.getByRole("checkbox", { name: /A visitor/ }).check();
+  await form.getByRole("radio", { name: /Seen at companies/ }).check();
+  await form.getByRole("button", { name: "Stick it on" }).click();
+  await expect(form).toBeHidden();
+  await expect(laura.getByText("1 written, only you can see them")).toBeVisible();
+  await expect(laura.getByText("Shared password on a note")).toBeVisible();
+  await expect(wei.getByText("0 written, only you can see them")).toBeVisible();
+  await laura.getByRole("button", { name: /Delete note/ }).click();
+  await expect(laura.getByText("0 written, only you can see them")).toBeVisible();
+
+  // Too far away to talk: no prompt appears for a person across the building.
+  await tapMap(laura, 200, 100);
+  await expect(laura.getByRole("button", { name: /Talk to Mei/ })).toBeHidden({ timeout: 10_000 });
+
   // Wei walks with the keyboard.
   await wei.keyboard.down("ArrowDown");
   await wei.waitForTimeout(1200);
@@ -105,4 +140,22 @@ test("the network test still works at its new address", async ({ page }) => {
   await page.getByLabel("Your first name or a nickname").fill("Tester");
   await page.getByRole("button", { name: "Join" }).click();
   await expect(page.getByText("Connected")).toBeVisible();
+});
+
+test("the simulator runs a teacher, a projector and students in one window", async ({ page }) => {
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  await expect(page).toHaveURL(/\/dev\?code=[A-Z2-9]{4}$/);
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const ana = page.frameLocator('iframe[title="Student Ana"]');
+  const chen = page.frameLocator('iframe[title="Student Chen"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 }); // students sat down on their own
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await ana.getByRole("button", { name: "Next" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await expect(ana.getByText("You are in: Meeting room")).toBeVisible();
+  await expect(chen.getByText("0 of 7 found by your team")).toBeVisible();
+  // Reloading the whole simulator keeps every role.
+  await page.reload();
+  await expect(page.frameLocator('iframe[title="Student Ana"]').getByText("You are in: Meeting room")).toBeVisible();
 });

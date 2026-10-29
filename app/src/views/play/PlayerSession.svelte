@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { scenarios, teamById } from "@open-door/shared";
+  import { isTeamId, scenarios, teamById } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import type { SavedPlayer } from "../../lib/saved";
   import Face from "../../lib/Face.svelte";
@@ -22,6 +22,13 @@
   const me = $derived(game?.players.find((p) => p.id === player.id));
   const team = $derived(me?.team ? teamById(me.team) : null);
   const teammates = $derived(game && me?.team ? game.players.filter((p) => p.team === me.team) : []);
+
+  // Developer simulator only (/dev): `?as=NAME&team=blue` sits down at that table without a click.
+  const url = new URL(window.location.href);
+  const autoTeam = url.searchParams.has("as") ? url.searchParams.get("team") : null;
+  $effect(() => {
+    if (me && !me.team && isTeamId(autoTeam)) connection.chooseTeam(autoTeam);
+  });
 
   /** In the lobby a player can go back and pick another table. */
   let changingTeam = $state(false);

@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { clampToMap, roomAt, teamById, teamVisited, type Game, type Player, type Scenario } from "@open-door/shared";
+  import { clampToMap, roomAt, spotsNear, teamById, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
+  import CloseUp from "../../lib/CloseUp.svelte";
+  import NoteForm from "../../lib/NoteForm.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
 
@@ -26,6 +28,12 @@
   const visited = $derived(teamVisited(game, me.team!));
   const here = $derived(roomAt(scenario, position.x, position.y));
   const teammates = $derived(game.players.filter((p) => p.team === me.team && p.id !== me.id));
+  const nearby = $derived(spotsNear(scenario, position.x, position.y));
+  const found = $derived(teamRevealed(game, me.team!));
+  /** The person or thing whose close-up is open, or null while walking. */
+  let open = $state<Spot | null>(null);
+  /** The note form is open; `about` is who or what it is about. */
+  let noting = $state<{ about: Spot | null } | null>(null);
   const roomName = (id: string | null) => scenario.map.rooms.find((r) => r.id === id)?.name ?? "Corridor";
 
   function tick(now: number) {
@@ -57,8 +65,32 @@
     wake();
   }
 
+  function openCloseUp(spot: Spot) {
+    // Stop walking while the window is open, so the avatar does not drift away.
+    held.clear();
+    target = null;
+    open = spot;
+  }
+
+  function closeCloseUp() {
+    open = null;
+  }
+
+  function startNote(about: Spot | null) {
+    held.clear();
+    target = null;
+    open = null;
+    noting = { about };
+  }
+
   function keydown(event: KeyboardEvent) {
+    if (open || noting) return;
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    if (event.key.toLowerCase() === "e" && !event.metaKey && !event.ctrlKey && !event.altKey && nearby[0]) {
+      event.preventDefault();
+      openCloseUp(nearby[0]);
+      return;
+    }
     if (!keyDirection(event.key) || event.metaKey || event.ctrlKey || event.altKey) return;
     event.preventDefault();
     held.add(event.key.length === 1 ? event.key.toLowerCase() : event.key);
@@ -87,8 +119,21 @@
   </header>
 
   <section class="map">
-    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} onpoint={walkTo} />
-    <p class="help">Tap or click where you want to go. On a keyboard: arrow keys or W A S D.</p>
+    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} near={nearby.map((n) => n.id)} onpoint={walkTo} />
+    <div class="prompt" aria-live="polite">
+      {#if nearby.length > 0}
+        {#each nearby as spot (spot.kind + spot.id)}
+          <button class="action" onclick={() => openCloseUp(spot)}>
+            {spot.kind === "person" ? "Talk to" : "Look at"} {spot.name}
+            {#if spot === nearby[0]}<kbd>E</kbd>{/if}
+          </button>
+        {/each}
+      {:else}
+        <span class="quiet">Walk up to a person or a thing to talk or look closer.</span>
+      {/if}
+      <button class="action sticky" onclick={() => startNote(nearby[0] ?? null)}>Sticky note</button>
+    </div>
+    <p class="help">Tap or click where you want to go. On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
   </section>
 
   <aside>
@@ -111,6 +156,35 @@
       </ul>
     </section>
 
+    <section>
+      <h2>Your notes <small>{connection.notes.length} written, only you can see them</small></h2>
+      {#if connection.notes.length > 0}
+        <ul class="notes">
+          {#each connection.notes as note (note.id)}
+            <li>
+              <span>{note.text}</span>
+              <button class="del" onclick={() => connection.removeNote(note.id)} aria-label="Delete note: {note.text}">✕</button>
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="empty">Spot something that could go wrong? Press “Sticky note”.</p>
+      {/if}
+    </section>
+
+    <section>
+      <h2>Worth protecting <small>{found.length} of {scenario.assets.length} found by your team</small></h2>
+      {#if found.length > 0}
+        <ul class="found">
+          {#each found as id (id)}
+            <li>{scenario.assets.find((a) => a.id === id)?.name ?? id}</li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="empty">Ask people questions to find out what data this company depends on.</p>
+      {/if}
+    </section>
+
     {#if teammates.length > 0}
       <section>
         <h2>Your team</h2>
@@ -124,6 +198,13 @@
     {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
   </aside>
 </main>
+
+{#if open}
+  <CloseUp {scenario} spot={open} onask={(person, topic) => connection.ask(person, topic)} onnote={startNote} onclose={closeCloseUp} />
+{/if}
+{#if noting}
+  <NoteForm about={noting.about?.id ?? null} aboutName={noting.about?.name ?? null} onsubmit={(input) => connection.addNote(input)} onclose={() => (noting = null)} />
+{/if}
 
 <style>
   .walk {
@@ -164,6 +245,74 @@
   }
   .map {
     min-width: 0;
+  }
+  .prompt {
+    margin-top: 10px;
+    min-height: 52px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiet,
+  .empty {
+    color: var(--slate);
+    font-size: 14px;
+    margin: 6px 0 0;
+  }
+  .action {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: var(--radius-m);
+    background: var(--blue);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .action.sticky {
+    background: var(--sticky);
+    color: var(--ink);
+  }
+  .action.sticky:hover {
+    background: #f5d450;
+  }
+  .notes li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    background: #fff9d6;
+    border-left: 4px solid var(--sticky);
+    padding: 6px 8px;
+    border-radius: 6px;
+  }
+  .del {
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--slate);
+    min-width: 32px;
+  }
+  .action:hover {
+    background: var(--blue-dark);
+  }
+  kbd {
+    font: inherit;
+    font-size: 13px;
+    padding: 0 7px;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.25);
+  }
+  .found {
+    margin-top: 8px;
+  }
+  .found li::before {
+    content: "✓ ";
+    color: var(--safe);
+    font-weight: 700;
   }
   .help {
     margin: 8px 0 0;

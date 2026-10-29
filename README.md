@@ -6,7 +6,7 @@ Open Door is a browser game for teams of three to five students. Each team walks
 
 Behind the play sits the CyPro method from the [Digital Business Development toolbox](https://dbd.au.dk/p/toolbox) at Aarhus University: context establishment, system modelling, assets, threat identification and threat analysis. Students practise the method first and learn its names in the debrief. The game is being designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning, and runs in any browser on the university network (eduroam) without accounts or logins.
 
-> **Status:** milestone M2 – Playable is in progress. A class can join, hear the story and walk the office together; close-ups, sticky notes and the day of the incident come next. The eduroam classroom test is planned for later. See [next steps](docs/dev-notes/next-steps.md).
+> **Status:** milestone M2 – Playable is in progress. A class can join, hear the story, walk the office, talk to people and write private sticky notes; sharing notes, the day of the incident and the debrief come next. The eduroam classroom test is planned for later. See [next steps](docs/dev-notes/next-steps.md).
 
 ## What is in this repository
 
@@ -40,6 +40,7 @@ This builds the app and starts two local servers: the rooms on port 8787 and the
 | `/teacher` | The teacher: create a session, then start the story and the walk |
 | `/screen/CODE` | The projector: QR code and teams, then the story, then the live office map |
 | `/` or `/j/CODE` | Students: type the code (or scan the QR code), pick a name, a face and a team |
+| `/dev` | For developers: creates a session and opens the teacher view, the projector and three students side by side in one window, so you can play every role yourself. Add students by name and team; each frame keeps its own identity |
 | `/network-test` | The hello room from milestone M1; add `?view=projector` for its projector view |
 
 | Command | What it does |

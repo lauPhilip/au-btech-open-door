@@ -71,6 +71,24 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(linh.getByText("1 of 9 visited by your team")).toBeVisible();
   await expect(screen.getByText(/[2-9] of 9 rooms/)).toBeVisible();
 
+  // Laura walks up to Mei, talks to her, and her team learns what the company depends on.
+  await tapMap(laura, 340, 215);
+  await laura.getByRole("button", { name: /Talk to Mei/ }).click({ timeout: 10_000 });
+  const talk = laura.getByRole("dialog", { name: "Mei" });
+  await expect(talk.getByText("Nine shops, one system.")).toBeVisible();
+  await talk.getByRole("button", { name: "Who can log in as admin?" }).click();
+  await expect(talk.getByText(/note under my keyboard/)).toBeVisible();
+  await expect(talk.getByRole("button", { name: "Who can log in as admin?" })).toBeHidden(); // asked once
+  await laura.keyboard.press("Escape");
+  await expect(talk).toBeHidden();
+  // Her teammate sees the find; the other team does not.
+  await expect(laura.getByText("1 of 7 found by your team")).toBeVisible();
+  await expect(wei.getByText("1 of 7 found by your team")).toBeVisible();
+  await expect(linh.getByText("0 of 7 found by your team")).toBeVisible();
+  // Too far away to talk: no prompt appears for a person across the building.
+  await tapMap(laura, 200, 100);
+  await expect(laura.getByRole("button", { name: /Talk to Mei/ })).toBeHidden({ timeout: 10_000 });
+
   // Wei walks with the keyboard.
   await wei.keyboard.down("ArrowDown");
   await wei.waitForTimeout(1200);

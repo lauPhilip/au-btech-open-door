@@ -44,6 +44,9 @@
   const clueRooms = $derived(cluesFound.map((i) => scenario.day.clues[i]?.room).filter((r): r is string => !!r));
 
   const team = $derived(teamById(me.team!));
+  /** The teacher's latest hint for this team, until the student closes it. */
+  const hint = $derived(game.hints?.[me.team!]);
+  let closedHint = $state(0);
   const visited = $derived(teamVisited(game, me.team!));
   const here = $derived(roomAt(scenario, position.x, position.y));
   const teammates = $derived(game.players.filter((p) => p.team === me.team && p.id !== me.id));
@@ -162,6 +165,12 @@
     </header>
     {#if isDay}
       <DayBar {scenario} {minute} found={cluesFound.length} total={scenario.day.clues.length} latest={messages.at(-1) ? { from: scenario.people.find((p) => p.id === messages.at(-1)!.from)?.name ?? "", text: messages.at(-1)!.text } : undefined} />
+    {/if}
+    {#if hint && hint.at !== closedHint}
+      <div class="hint" role="status">
+        <span><strong>Hint from your teacher:</strong> {hint.text}</span>
+        <button class="close" aria-label="Close the hint" onclick={() => (closedHint = hint.at)}>×</button>
+      </div>
     {/if}
     {#if game.phase === "walk" && left === 0 && !paused}
       <p class="timeup" role="status">Time is up. Finish your note and wait for your teacher to start the day.</p>
@@ -536,5 +545,25 @@
     .walk {
       grid-template-columns: 1fr;
     }
+  }
+  .hint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #ffe27a;
+    color: var(--ink);
+    border-radius: var(--radius-m);
+    padding: 10px 14px;
+    font-size: 18px;
+  }
+  .hint .close {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 26px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--ink);
   }
 </style>

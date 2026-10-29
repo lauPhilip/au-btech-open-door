@@ -279,3 +279,40 @@ test("the teacher runs the walk and the day: pause, start, clues and messages", 
   await expect(ana.getByText(/The shop is up and orders come in/).first()).toBeVisible({ timeout: 10_000 });
   await expect(chen.getByText(/The shop is up and orders come in/).first()).toBeVisible();
 });
+
+test("the class votes on what the CEO should do and sees what their notes predicted", async ({ page }) => {
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const projector = page.frameLocator('iframe[title="Projector"]');
+  const ana = page.frameLocator('iframe[title="Student Ana"]');
+  const ben = page.frameLocator('iframe[title="Student Ben"]');
+  const chen = page.frameLocator('iframe[title="Student Chen"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await teacher.getByRole("button", { name: "Start the vote" }).click();
+
+  // Everyone sees the question with three choices.
+  await expect(ana.getByRole("heading", { name: /what do we do right now/ })).toBeVisible();
+  await expect(ana.getByRole("radio")).toHaveCount(3);
+  await expect(projector.getByText("0 of 2 voted").first()).toBeVisible();
+
+  // Ana and Ben (same table) choose the best answer; Chen (another table) chooses the first.
+  await ana.getByRole("radio", { name: /Take the printer off/ }).click();
+  await expect(ana.getByRole("radio", { name: /Take the printer off/ })).toBeChecked();
+  await expect(ana.getByText("1 of 2 at your table has voted.")).toBeVisible();
+  await ben.getByRole("radio", { name: /Take the printer off/ }).click();
+  await chen.getByRole("radio", { name: /Restart the printer/ }).click();
+  await expect(projector.getByText("✓ All voted").first()).toBeVisible();
+  await expect(teacher.getByText("3 of 3 students have voted.")).toBeVisible();
+
+  // The result: the table's decision and the answer key.
+  await teacher.getByRole("button", { name: "Show the result" }).click();
+  await expect(ana.getByText("Labels print from 09:05. The truck leaves full at 10:00.")).toBeVisible();
+  await expect(ana.getByText(/the best choice/)).toBeVisible();
+  await expect(ana.getByRole("heading", { name: /You saw it coming: 0 of 6/ })).toBeVisible();
+  await expect(chen.getByText("Labels print again at 09:10. At 09:25 the printer is paused again.")).toBeVisible();
+  await expect(projector.getByText("Labels print from 09:05. The truck leaves full at 10:00.")).toBeVisible();
+});

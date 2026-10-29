@@ -41,6 +41,12 @@ A short note on where development stands, so a new work session can pick up stra
   - **Teacher controls:** pause all, resume all, and plus five minutes during the walk. Everything that moves players is blocked while paused.
   - **Checked at:** phone 390 wide, laptop 1366 and large 1920, plus the projector, with the white-on-alert-red pair added to `contrast.test.ts`.
 
+- **The vote and the answer key** (#27, #28). Built 29 October 2026:
+  - **Phases:** the teacher can now go from the day to "Start the vote" and then "Show the result". Notes are shared with the team again when the vote starts.
+  - **Vote:** each student picks one of the three options, can change their mind, and sees how many at their table have voted. Rules are in `shared/src/game/vote.ts`: the majority at a table decides and a tie is "no decision".
+  - **Result and "you saw it coming":** `match.ts` counts a note as a hit when it is about the threat's thing (or stands in its room) and shares a harm. The finish screen shows the table's decision, the scenario result and every problem in the answer key, with the matching note.
+  - **Known limit:** the browser bundle contains the whole scenario, answer key included, so a curious student could read it in dev tools. Fine for a classroom game; worth knowing.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

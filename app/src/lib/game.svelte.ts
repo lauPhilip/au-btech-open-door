@@ -16,7 +16,7 @@ export class GameConnection {
   you = $state<string | null>(null);
   /** The last error from the room, in plain language. Cleared after a few seconds. */
   error = $state<string | null>(null);
-  /** Your own sticky notes, as the room last sent them. */
+  /** Your own sticky notes plus the notes your team shared, as the room last sent them. */
   notes = $state<Note[]>([]);
   /** True when the room closed the connection for good (no session, or it ended). */
   ended = $state(false);
@@ -62,6 +62,16 @@ export class GameConnection {
 
   addNote(input: NoteInput): void {
     this.send({ t: "note", ...input });
+  }
+
+  /** Show your note to your team (or take it back). */
+  shareNote(id: string, shared: boolean): void {
+    this.send({ t: "share", id, shared });
+  }
+
+  /** Merge two shared team notes into the first one. */
+  mergeNotes(keep: string, drop: string): void {
+    this.send({ t: "merge", keep, drop });
   }
 
   removeNote(id: string): void {

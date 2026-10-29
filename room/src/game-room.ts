@@ -2,8 +2,10 @@ import { Server, type Connection, type ConnectionContext } from "partyserver";
 import {
   addNote,
   ask,
-  notesBy,
+  mergeNotes,
   removeNote,
+  setShared,
+  visibleNotes,
   type Note,
   ERROR_TEXT,
   findPlayer,
@@ -108,7 +110,7 @@ export class GameRoom extends Server {
     }
     connection.setState({ role });
     this.send(connection, { t: "you", id: connection.id, role });
-    if (role === "player") this.send(connection, { t: "notes", notes: notesBy(this.notes, connection.id) });
+    if (role === "player") this.send(connection, { t: "notes", notes: visibleNotes(this.notes, this.game, connection.id) });
     // A player who comes back is online again straight away; new players appear when they send "join".
     if (role === "player" && findPlayer(this.game, connection.id)) {
       this.game = setOnline(this.game, connection.id, true);
@@ -149,6 +151,12 @@ export class GameRoom extends Server {
       }
       case "unnote":
         await this.applyNotes(connection, removeNote(this.notes, connection.id, message.id));
+        break;
+      case "share":
+        await this.applyNotes(connection, setShared(this.notes, connection.id, message.id, message.shared));
+        break;
+      case "merge":
+        await this.applyNotes(connection, mergeNotes(this.notes, game, connection.id, message.keep, message.drop));
         break;
       case "phase":
         await this.apply(connection, setPhase(game, message.phase));
@@ -218,7 +226,7 @@ export class GameRoom extends Server {
     this.lastPositionSave = Date.now();
   }
 
-  /** Keep the new notes, save them and show the author their list; or tell the sender what went wrong. */
+  /** Keep the new notes, save them and show each player their own and their team's shared notes. */
   private async applyNotes(connection: Connection, result: { ok: true; value: Note[] } | { ok: false; error: GameError }): Promise<void> {
     if (!result.ok) {
       this.sendError(connection, result.error);
@@ -226,8 +234,14 @@ export class GameRoom extends Server {
     }
     this.notes = result.value;
     await this.ctx.storage.put("notes", this.notes);
-    const mine = notesBy(this.notes, connection.id);
-    for (const c of this.getConnections()) if (c.id === connection.id) this.send(c, { t: "notes", notes: mine });
+    this.sendNotesToPlayers();
+  }
+
+  private sendNotesToPlayers(): void {
+    if (!this.game) return;
+    for (const c of this.getConnections<ConnState>()) {
+      if (c.state?.role === "player") this.send(c, { t: "notes", notes: visibleNotes(this.notes, this.game, c.id) });
+    }
   }
 
   private scheduleFlush(): void {

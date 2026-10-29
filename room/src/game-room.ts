@@ -185,7 +185,7 @@ export class GameRoom extends Server {
         }
         await this.apply(connection, result);
         // Everything written so far becomes the team's, when the day starts (concept book, board 04).
-        if (result.ok && (message.phase === "day" || message.phase === "vote")) {
+        if (result.ok && (message.phase === "day" || message.phase === "vote" || message.phase === "debrief")) {
           this.notes = shareAll(this.notes);
           await this.ctx.storage.put("notes", this.notes);
           this.sendNotesToPlayers();
@@ -194,6 +194,10 @@ export class GameRoom extends Server {
       }
       case "summary":
         this.send(connection, { t: "summary", notes: this.notes });
+        break;
+      case "close":
+        // The teacher ends the session now: delete everything and tell every screen.
+        await this.onAlarm();
         break;
       case "assign":
         await this.apply(connection, assignTeam(game, message.player, message.team));

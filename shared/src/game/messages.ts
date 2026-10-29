@@ -22,6 +22,7 @@ export type GameClientMessage =
   | { t: "vote"; option: number }
   | { t: "prompt"; index: number }
   | { t: "summary" }
+  | { t: "close" }
   | { t: "assign"; player: string; team: TeamId }
   | { t: "hint"; team: TeamId; text: string }
   | { t: "timer"; action: TimerAction };
@@ -86,6 +87,8 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return isTeamId(m.team) && typeof m.text === "string" && m.text.length <= 200 ? { t: "hint", team: m.team, text: m.text } : null;
     case "summary":
       return { t: "summary" };
+    case "close":
+      return { t: "close" };
     case "prompt":
       return typeof m.index === "number" && Number.isInteger(m.index) && m.index >= 0 && m.index < 20 ? { t: "prompt", index: m.index } : null;
     case "vote":
@@ -99,7 +102,7 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
   }
 }
 
-const TEACHER_ONLY: ReadonlyArray<GameClientMessage["t"]> = ["phase", "timer", "prompt", "assign", "hint", "summary"];
+const TEACHER_ONLY: ReadonlyArray<GameClientMessage["t"]> = ["phase", "timer", "prompt", "assign", "hint", "summary", "close"];
 
 /** Which messages each role may send. The projector only watches. */
 export function mayRoleSend(role: Role, message: GameClientMessage): boolean {

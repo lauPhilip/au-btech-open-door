@@ -72,6 +72,15 @@ A short note on where development stands, so a new work session can pick up stra
   - **Class summary:** from the vote on, the teacher can download every team's notes (CSV), the debrief table (CSV) and a printable summary. The page reminds the teacher that sessions are deleted six hours after they start.
   - **Safety:** cells that start with `=`, `+`, `-` or `@` get a leading quote so a student cannot plant a spreadsheet formula. This is tested.
 
+- **Walking, close-ups and layout checks.** Built 29 October 2026:
+  - **Second scenario** (#38): `scenarios/nordknit/new-bank-details.yaml`, a fake e-mail changes the factory's bank details. The teacher picker lists both scenarios.
+  - **Room view as a walk:** `RoomScene.svelte` now shows your own character (your face with a ring in your team colour) at the place that matches your map position, and your teammates. Doors to the nearest room in each direction sit at the edges and the view slides into the next room as you cross (`prefers-reduced-motion` turns the slide off). Tapping the floor walks you there. The full room list is under "Go to any room". Phones start in the room view, larger screens in the map.
+  - **Close-ups:** `Prop.svelte` has a large illustration for each thing (visitor book, label printer, order screen, inbox, router, invoice tray, with a plain fallback). `CloseUp.svelte` shows it beside the text, or a big portrait for a person.
+  - **Map zones:** rooms are tinted by network zone and labelled, so the trust boundaries are visible.
+  - **Layout check:** `e2e/responsive.spec.ts` walks a class through every phase at 320, 390, 768, 1280, 1440 and 1920 pixels wide and fails on sideways scrolling, parts sticking out of the screen, clipped text and phone buttons under 44 px. Screenshots land in `test-results/responsive/`.
+  - **Teacher flow:** copyable join link, a sticky next-step button on phones, "End now and show summary" during the walk, day and vote, and a close button that deletes the session's data.
+  - **Teaching material:** `docs/teaching/` has the facilitator guide, the pilot plan with consent text and SUS form, and `npm run paper-kit` builds printable kits into `docs/teaching/paper-kit/`. The debrief deck exists as a Slides artifact.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

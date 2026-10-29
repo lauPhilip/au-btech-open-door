@@ -108,8 +108,9 @@
   {#each rooms as room (room.id)}
     {@const [x, y, w, h] = room.rect}
     {@const t = title(room.name, w)}
-    <g class="room" class:seen={visited.has(room.id)}>
+    <g class="room zone-{room.zone}" class:seen={visited.has(room.id)}>
       <rect {x} {y} width={w} height={h} rx="10" />
+      <text x={x + 16} y={y + h - 12} class="zone-name">{scenario.map.zones.find((z) => z.id === room.zone)?.name ?? ""}</text>
       <text x={x + 16} y={y + 32} class="room-name" style="font-size: {t.size}px">
         {#each t.lines as line, i (i)}<tspan x={x + 16} dy={i === 0 ? 0 : t.size + 2}>{line}</tspan>{/each}
       </text>
@@ -192,8 +193,23 @@
     stroke: #cdb89c;
     stroke-width: 2;
   }
+  .room.zone-warehouse rect {
+    fill: #dde3e8;
+    stroke: #a9b5c0;
+  }
+  .room.zone-guest rect {
+    fill: #e1eedb;
+    stroke: #a4c295;
+  }
+  .zone-name {
+    font-size: 15px;
+    font-weight: 700;
+    fill: #5b4a36;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   .room.seen rect {
-    fill: #f1e6d8;
+    fill-opacity: 0.7;
   }
   .room-name {
     font-family: var(--font-display);

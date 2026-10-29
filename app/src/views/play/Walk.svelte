@@ -56,7 +56,7 @@
   /** The person or thing whose close-up is open, or null while walking. */
   let open = $state<Spot | null>(null);
   /** Top-down map, or the inside of the room you stand in. Both show the same people and things. */
-  let view = $state<"map" | "room">("map");
+  let view = $state<"map" | "room">(typeof matchMedia !== "undefined" && matchMedia("(max-width: 700px)").matches ? "room" : "map");
   /** A person or thing the player tapped in the room view; the close-up opens when the avatar gets there. */
   let pendingOpen: Spot | null = null;
   const teammatesHere = $derived(game.players.filter((p) => p.team === me.team && p.id !== me.id && p.room === here?.id));

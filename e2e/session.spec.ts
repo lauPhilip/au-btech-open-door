@@ -58,7 +58,9 @@ test("a class joins, hears the story and walks the office together", async ({ br
 
   // Walk: the map appears for students and on the projector.
   await teacher.getByRole("button", { name: "Start walking" }).click();
-  for (const page of [laura, wei, linh, screen]) await expect(page.getByRole("img", { name: /Top-down map/ })).toBeVisible();
+  for (const page of [laura, wei, screen]) await expect(page.getByRole("img", { name: /Top-down map/ })).toBeVisible();
+  await expect(linh.getByRole("img", { name: /Illustration of the Meeting room/ })).toBeVisible(); // phones start in the room view
+  await linh.getByRole("button", { name: "Map" }).click();
   await expect(laura.getByText("You are in: Meeting room")).toBeVisible();
   await expect(wei.getByText("You are in: Meeting room")).toBeVisible();
 

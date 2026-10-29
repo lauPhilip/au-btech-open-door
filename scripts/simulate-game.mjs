@@ -49,6 +49,7 @@ export async function simulateGame({ base, players, seconds }) {
     const id = `sim-${code}-${String(i).padStart(3, "0")}`;
     const me = { id, x: 0, y: 0, target: null, sentAt: new Map() };
     me.socket = await open("", id, (m) => {
+      if (m.t === "state") me.phase = m.game.phase;
       if (m.t !== "moves") return;
       for (const [pid, x, y] of m.m) {
         if (pid !== id) continue;
@@ -73,6 +74,7 @@ export async function simulateGame({ base, players, seconds }) {
 
   for (const s of students) {
     const p = screenState.players.find((q) => q.id === s.id);
+    if (!p) continue; // the session holds 30 players; later ones are turned away
     s.x = p.x;
     s.y = p.y;
   }
@@ -111,12 +113,46 @@ export async function simulateGame({ base, players, seconds }) {
   console.log(`Projector traffic while walking: ${perSecond.toFixed(1)} messages/s, ${kbPerSecond.toFixed(1)} KB/s`);
   console.log(`Rooms visited by the class: ${visited.size} · errors: ${errors.length}${errors.length ? ` (${[...new Set(errors)].join(", ")})` : ""}`);
 
+  // The rest of the class: notes during the walk, then the day, the vote and the debrief.
+  const seatedStudents = students.slice(0, TEAMS.length * 5);
+  for (const s of seatedStudents) {
+    for (let n = 0; n < 2; n++) {
+      s.socket.send(JSON.stringify({ t: "note", text: `Note ${n + 1} from ${s.id.slice(-3)}: the printer is open`, harm: ["change"], actor: ["visitor"], likelihood: 3, about: "label-printer" }));
+    }
+  }
+  await wait(500);
+  const everyone = async (phase) => {
+    const t0 = performance.now();
+    while (performance.now() - t0 < 10_000) {
+      if (seatedStudents.every((s) => s.phase === phase)) return performance.now() - t0;
+      await wait(20);
+    }
+    return null;
+  };
+  const phaseTimes = {};
+  for (const phase of ["day", "vote"]) {
+    teacher.send(JSON.stringify({ t: "phase", phase }));
+    phaseTimes[phase] = await everyone(phase);
+    if (phase === "vote") {
+      for (const s of seatedStudents) s.socket.send(JSON.stringify({ t: "vote", option: seatedStudents.indexOf(s) % 3 }));
+      await wait(800);
+    }
+  }
+  teacher.send(JSON.stringify({ t: "phase", phase: "debrief" }));
+  phaseTimes.debrief = await everyone("debrief");
+  const slow = Object.entries(phaseTimes).filter(([, ms]) => ms === null || ms > 400);
+  for (const [phase, ms] of Object.entries(phaseTimes)) console.log(`Every phone showed "${phase}" ${ms === null ? "never (timed out)" : `after ${Math.round(ms)} ms`}`);
+  console.log(`Debrief reached with ${screenState.phase === "debrief" ? "results for " + Object.keys(screenState.results ?? {}).length + " teams" : "no debrief"} · errors so far: ${errors.length}`);
+
   for (const s of students) s.socket.close();
   await wait(1500);
   const stillOnline = screenState.players.filter((p) => p.online).length;
   console.log(`After everyone left: ${stillOnline} online on the projector`);
   screen.close();
   teacher.close();
-  // Players beyond 25 have no table, so their moves are refused silently; any error message is a failure.
-  return stillOnline === 0 && errors.length === 0 && screenState.phase === "walk" && seated === Math.min(players, 25);
+  // Players beyond 25 have no table, so their moves are refused silently; any other error is a failure.
+  const medianOk = pct(50) < 400 && pct(95) < 400;
+  if (!medianOk) console.log("✗ Moves took 400 ms or more at the 95th percentile");
+  if (slow.length) console.log(`✗ Phase changes slower than 400 ms: ${slow.map(([p]) => p).join(", ")}`);
+  return stillOnline === 0 && errors.length === 0 && screenState.phase === "debrief" && seated === Math.min(players, 25) && medianOk && slow.length === 0;
 }

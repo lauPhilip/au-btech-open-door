@@ -1,5 +1,5 @@
 import { PartySocket } from "partysocket";
-import type { Game, GameClientMessage, GameServerMessage, Phase, Role, TeamId } from "@open-door/shared";
+import type { Game, GameClientMessage, Note, NoteInput, GameServerMessage, Phase, Role, TeamId } from "@open-door/shared";
 import type { Status } from "./room.svelte";
 
 /** How the connection identifies itself: a player with a stable id, the teacher with a key, or the projector. */
@@ -16,6 +16,8 @@ export class GameConnection {
   you = $state<string | null>(null);
   /** The last error from the room, in plain language. Cleared after a few seconds. */
   error = $state<string | null>(null);
+  /** Your own sticky notes, as the room last sent them. */
+  notes = $state<Note[]>([]);
   /** True when the room closed the connection for good (no session, or it ended). */
   ended = $state(false);
 
@@ -58,6 +60,14 @@ export class GameConnection {
     this.send({ t: "ask", person, topic });
   }
 
+  addNote(input: NoteInput): void {
+    this.send({ t: "note", ...input });
+  }
+
+  removeNote(id: string): void {
+    this.send({ t: "unnote", id });
+  }
+
   setPhase(phase: Phase): void {
     this.send({ t: "phase", phase });
   }
@@ -97,6 +107,9 @@ export class GameConnection {
         break;
       case "state":
         this.game = message.game;
+        break;
+      case "notes":
+        this.notes = message.notes;
         break;
       case "moves": {
         if (!this.game) return;

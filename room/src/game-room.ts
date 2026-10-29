@@ -1,6 +1,10 @@
 import { Server, type Connection, type ConnectionContext } from "partyserver";
 import {
+  addNote,
   ask,
+  notesBy,
+  removeNote,
+  type Note,
   ERROR_TEXT,
   findPlayer,
   isCode,
@@ -54,6 +58,8 @@ export class GameRoom extends Server {
   static options = { hibernate: true };
 
   private game: Game | null = null;
+  /** All sticky notes. Each goes only to its author's connections until sharing exists (issue #23). */
+  private notes: Note[] = [];
   private teacherKey: string | null = null;
   private pending = new Map<string, MoveEntry>();
   private flushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -65,6 +71,7 @@ export class GameRoom extends Server {
     this.teacherKey = (await this.ctx.storage.get<string>("teacherKey")) ?? null;
     // Sessions saved before milestone M2 slice 2 have no revealed list.
     if (this.game) this.game.revealed ??= {};
+    this.notes = (await this.ctx.storage.get<Note[]>("notes")) ?? [];
   }
 
   /** Called by the Worker when a teacher creates a session. False if the code is taken. */
@@ -101,6 +108,7 @@ export class GameRoom extends Server {
     }
     connection.setState({ role });
     this.send(connection, { t: "you", id: connection.id, role });
+    if (role === "player") this.send(connection, { t: "notes", notes: notesBy(this.notes, connection.id) });
     // A player who comes back is online again straight away; new players appear when they send "join".
     if (role === "player" && findPlayer(this.game, connection.id)) {
       this.game = setOnline(this.game, connection.id, true);
@@ -132,6 +140,15 @@ export class GameRoom extends Server {
         break;
       case "ask":
         await this.apply(connection, ask(game, scenario, connection.id, message.person, message.topic));
+        break;
+      case "note": {
+        const { t: _t, ...input } = message;
+        const result = addNote(this.notes, game, scenario, connection.id, input, crypto.randomUUID().slice(0, 8), Date.now());
+        await this.applyNotes(connection, result);
+        break;
+      }
+      case "unnote":
+        await this.applyNotes(connection, removeNote(this.notes, connection.id, message.id));
         break;
       case "phase":
         await this.apply(connection, setPhase(game, message.phase));
@@ -170,6 +187,7 @@ export class GameRoom extends Server {
     this.game = null;
     this.teacherKey = null;
     this.pending.clear();
+    this.notes = [];
     await this.ctx.storage.deleteAlarm();
     await this.ctx.storage.deleteAll();
   }
@@ -198,6 +216,18 @@ export class GameRoom extends Server {
     await this.ctx.storage.put("game", this.game);
     this.positionsDirty = false;
     this.lastPositionSave = Date.now();
+  }
+
+  /** Keep the new notes, save them and show the author their list; or tell the sender what went wrong. */
+  private async applyNotes(connection: Connection, result: { ok: true; value: Note[] } | { ok: false; error: GameError }): Promise<void> {
+    if (!result.ok) {
+      this.sendError(connection, result.error);
+      return;
+    }
+    this.notes = result.value;
+    await this.ctx.storage.put("notes", this.notes);
+    const mine = notesBy(this.notes, connection.id);
+    for (const c of this.getConnections()) if (c.id === connection.id) this.send(c, { t: "notes", notes: mine });
   }
 
   private scheduleFlush(): void {

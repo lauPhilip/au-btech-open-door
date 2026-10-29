@@ -54,6 +54,10 @@ test("every main screen has no serious or critical accessibility problems", asyn
   await expect(phone.getByText(/You are in:/)).toBeVisible();
   await expectNoSeriousProblems(phone, "walk");
   await expectNoSeriousProblems(teacher, "teacher walk");
+  await phone.getByRole("button", { name: "Room view" }).click();
+  await expect(phone.getByRole("img", { name: /Illustration of the/ })).toBeVisible();
+  await expectNoSeriousProblems(phone, "walk, room view");
+  await phone.getByRole("button", { name: "Map" }).click();
   await expectNoSeriousProblems(screen, "projector walk");
 
   await teacher.getByRole("button", { name: "Start the day" }).click();

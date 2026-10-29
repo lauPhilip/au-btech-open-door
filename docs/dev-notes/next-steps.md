@@ -62,6 +62,11 @@ A short note on where development stands, so a new work session can pick up stra
   - **Reconnect (#6):** an end-to-end test cuts a student's connection, sees "Reconnecting…" then "Connected", and checks that name, team, place and notes survive both the drop and a reload.
   - **CI (#2):** the workflow now also runs the browser tests. Scenario schema and reference checks (#36) already run as part of `npm run check`.
 
+- **Illustrations and the room view** (#21). Built 29 October 2026:
+  - **Busts:** `Bust.svelte` draws a warm round portrait for each person from a few choices (skin, hair, shirt, glasses and so on), so Karin, Mei, Ahmed, Jana, Elena and Tomas look different and a new scenario can add people without new artwork. Close-ups now use them.
+  - **Room view:** next to the map there is a "Room view" toggle. It draws the inside of the room you stand in, with its people and things as buttons, and a row of doors that walk you to any other room. The map and the room view share the same position, so teammates, clues and notes stay in step. Tapping a person or thing walks there and opens the same close-up.
+  - **About Spline:** Spline is now connected to the project. The room scenes are plain SVG, so they work offline and in the axe checks. A 3D version of the factory for the projector could be built in Spline later; it would need a published link or exported asset.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

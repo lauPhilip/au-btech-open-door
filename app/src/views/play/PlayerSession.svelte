@@ -8,6 +8,8 @@
   import Story from "../../lib/Story.svelte";
   import TeamPick from "./TeamPick.svelte";
   import Walk from "./Walk.svelte";
+  import Vote from "./Vote.svelte";
+  import Finish from "./Finish.svelte";
 
   let { code, player, onleave }: { code: string; player: SavedPlayer; onleave: () => void } = $props();
 
@@ -42,6 +44,10 @@
   <TeamPick {game} {me} error={connection.error} onpick={(t) => { connection.chooseTeam(t); changingTeam = false; }} />
 {:else if game.phase === "walk" || game.phase === "day"}
   <Walk {connection} {game} {scenario} {me} />
+{:else if game.phase === "vote"}
+  <Vote {connection} {game} {scenario} {me} />
+{:else if game.phase === "debrief"}
+  <Finish {connection} {game} {scenario} {me} />
 {:else}
   <main class="page">
     <div class="card wide">

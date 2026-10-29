@@ -399,3 +399,33 @@ test("a student who loses the network or reloads keeps their name, team, place a
   await expect(page.getByText("You are in: Packing station")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("1 · private until shared").first()).toBeVisible();
 });
+
+test("a student can swap the map for the room view and walk door to door", async ({ browser }) => {
+  const teacher = await (await browser.newContext()).newPage();
+  await teacher.goto("/teacher");
+  await teacher.getByRole("button", { name: "Create session" }).click();
+  await expect(teacher).toHaveURL(/code=/);
+  const code = new URL(teacher.url()).searchParams.get("code")!;
+  const page = await student(browser, code, "Ada", 2, "Blue door");
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await expect(page.getByText(/You are in:/)).toBeVisible();
+
+  // The map is the default; the room view shows the inside of the room and its doors.
+  await expect(page.getByRole("img", { name: /Top-down map/ })).toBeVisible();
+  await page.getByRole("button", { name: "Room view" }).click();
+  await expect(page.getByRole("img", { name: /Illustration of the Meeting room/ })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Doors to other rooms" })).toBeVisible();
+
+  // A door walks you to the next room, and its people and things are in the scene.
+  await page.getByRole("navigation", { name: "Doors to other rooms" }).getByRole("button", { name: "Packing station" }).click();
+  await expect(page.getByText("You are in: Packing station")).toBeVisible({ timeout: 25_000 });
+  await expect(page.getByRole("img", { name: /Illustration of the Packing station/ })).toBeVisible();
+
+  // Tapping a person opens the same close-up as on the map.
+  await page.getByRole("button", { name: "Talk to Jana" }).click();
+  await expect(page.getByRole("dialog")).toContainText("Packing lead", { timeout: 15_000 });
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Map" }).click();
+  await expect(page.getByRole("img", { name: /Top-down map/ })).toBeVisible();
+});

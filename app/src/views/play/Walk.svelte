@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { clampToMap, roomAt, spotsNear, teamById, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
+  import { clampToMap, roomAt, spots, spotsNear, teamById, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
   import CloseUp from "../../lib/CloseUp.svelte";
@@ -59,6 +59,26 @@
 
   function wake() {
     if (!frame) frame = requestAnimationFrame(tick);
+  }
+
+  /** Where each room's people and things are, for the room list. */
+  const spotsByRoom = $derived.by(() => {
+    const byRoom = new Map<string, Spot[]>();
+    for (const spot of spots(scenario)) byRoom.set(spot.room, [...(byRoom.get(spot.room) ?? []), spot]);
+    return byRoom;
+  });
+
+  /** The keyboard and screen-reader route: walk to the middle of a room. */
+  function walkToRoom(roomId: string) {
+    const room = scenario.map.rooms.find((r) => r.id === roomId);
+    if (!room) return;
+    const [x, y, w, h] = room.rect;
+    walkTo(x + w / 2, y + h / 2);
+  }
+
+  /** Walk to just below a person or thing, close enough to talk or look. */
+  function walkToSpot(spot: Spot) {
+    walkTo(spot.x, spot.y + 40);
   }
 
   function walkTo(x: number, y: number) {
@@ -148,10 +168,18 @@
       <ul class="rooms">
         {#each scenario.map.rooms as room (room.id)}
           <li class:done={visited.has(room.id)} class:here={here?.id === room.id}>
-            <span class="box" aria-hidden="true">{visited.has(room.id) ? "✓" : ""}</span>
-            {room.name}
-            {#if here?.id === room.id}<small>you are here</small>{/if}
-            <span class="visually-hidden">{visited.has(room.id) ? "visited" : "not visited yet"}</span>
+            <button class="room" onclick={() => walkToRoom(room.id)} aria-label="Walk to {room.name}, {visited.has(room.id) ? 'visited' : 'not visited yet'}{here?.id === room.id ? ', you are here' : ''}">
+              <span class="box" aria-hidden="true">{visited.has(room.id) ? "✓" : ""}</span>
+              {room.name}
+              {#if here?.id === room.id}<small aria-hidden="true">you are here</small>{/if}
+            </button>
+            {#if spotsByRoom.get(room.id)}
+              <ul class="in-room">
+                {#each spotsByRoom.get(room.id) ?? [] as spot (spot.kind + spot.id)}
+                  <li><button class="spot" onclick={() => walkToSpot(spot)} aria-label="Walk to {spot.name}">{spot.name}</button></li>
+                {/each}
+              </ul>
+            {/if}
           </li>
         {/each}
       </ul>
@@ -341,10 +369,49 @@
     flex-direction: column;
     gap: 6px;
   }
-  .rooms li {
+  .rooms > li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .room {
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 4px 6px;
+    border: 0;
+    border-radius: var(--radius-s);
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .room:hover,
+  .spot:hover {
+    background: var(--blue-soft);
+  }
+  .here .room {
+    font-weight: 700;
+  }
+  .in-room {
+    margin: 0 0 4px 38px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .spot {
+    min-height: 44px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--blue-dark);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
   }
   .rooms small {
     margin-left: auto;

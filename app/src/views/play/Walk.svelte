@@ -5,6 +5,7 @@
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
   import CloseUp from "../../lib/CloseUp.svelte";
   import NoteForm from "../../lib/NoteForm.svelte";
+  import NotesPanel from "../../lib/NotesPanel.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
 
@@ -119,7 +120,7 @@
   </header>
 
   <section class="map">
-    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} near={nearby.map((n) => n.id)} onpoint={walkTo} />
+    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
     <div class="prompt" aria-live="polite">
       {#if nearby.length > 0}
         {#each nearby as spot (spot.kind + spot.id)}
@@ -156,21 +157,14 @@
       </ul>
     </section>
 
-    <section>
-      <h2>Your notes <small>{connection.notes.length} written, only you can see them</small></h2>
-      {#if connection.notes.length > 0}
-        <ul class="notes">
-          {#each connection.notes as note (note.id)}
-            <li>
-              <span>{note.text}</span>
-              <button class="del" onclick={() => connection.removeNote(note.id)} aria-label="Delete note: {note.text}">✕</button>
-            </li>
-          {/each}
-        </ul>
-      {:else}
-        <p class="empty">Spot something that could go wrong? Press “Sticky note”.</p>
-      {/if}
-    </section>
+    <NotesPanel
+      notes={connection.notes}
+      players={game.players}
+      me={me.id}
+      onshare={(id, shared) => connection.shareNote(id, shared)}
+      onmerge={(keep, drop) => connection.mergeNotes(keep, drop)}
+      ondelete={(id) => connection.removeNote(id)}
+    />
 
     <section>
       <h2>Worth protecting <small>{found.length} of {scenario.assets.length} found by your team</small></h2>
@@ -279,22 +273,6 @@
   }
   .action.sticky:hover {
     background: #f5d450;
-  }
-  .notes li {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    background: #fff9d6;
-    border-left: 4px solid var(--sticky);
-    padding: 6px 8px;
-    border-radius: 6px;
-  }
-  .del {
-    border: 0;
-    background: none;
-    cursor: pointer;
-    color: var(--slate);
-    min-width: 32px;
   }
   .action:hover {
     background: var(--blue-dark);

@@ -2,7 +2,7 @@
 // The room server holds one Game and changes it only through these functions,
 // so every rule can be tested without a network.
 
-import { roomAt, startRoom, type Scenario } from "../scenario";
+import { INTERACT_RANGE, roomAt, startRoom, spots, type Scenario } from "../scenario";
 import { cleanName } from "../protocol";
 import { isFace } from "./faces";
 import { TEAM_MAX, TEAMS, type TeamId } from "./teams";
@@ -36,6 +36,8 @@ export interface Game {
   createdAt: number;
   /** In the order they joined. */
   players: Player[];
+  /** Asset ids each team has found out about by asking questions (issue #19). */
+  revealed: Partial<Record<TeamId, string[]>>;
 }
 
 export type GameError =
@@ -46,6 +48,8 @@ export type GameError =
   | "not-walking"
   | "bad-phase"
   | "bad-face"
+  | "too-far"
+  | "unknown-question"
   | "not-allowed";
 
 /** Plain-language text for each error, shown to the player. */
@@ -57,6 +61,8 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "not-walking": "Wait until your teacher starts the walk.",
   "bad-phase": "The session cannot go to that step now.",
   "bad-face": "Pick a face.",
+  "too-far": "Walk closer to talk to them.",
+  "unknown-question": "That question is not in this scenario.",
   "not-allowed": "Only the teacher can do that.",
 };
 
@@ -75,7 +81,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [] };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {} };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {
@@ -187,4 +193,29 @@ export function teamVisited(game: Game, team: TeamId): Set<string> {
 
 function replacePlayer(game: Game, player: Player): Game {
   return { ...game, players: game.players.map((p) => (p.id === player.id ? player : p)) };
+}
+
+/**
+ * A player asks a person a question. The team learns which assets the answer points to.
+ * The player must stand near the person; the answer itself is shown from the scenario file.
+ */
+export function ask(game: Game, scenario: Scenario, id: string, personId: string, topic: number): Result<Game> {
+  const player = findPlayer(game, id);
+  if (!player) return fail("not-joined");
+  if (game.phase !== "walk") return fail("not-walking");
+  if (!player.team) return fail("no-team");
+  const question = scenario.people.find((p) => p.id === personId)?.topics[topic];
+  const spot = spots(scenario).find((s) => s.kind === "person" && s.id === personId);
+  if (!question || !spot) return fail("unknown-question");
+  // A little slack over the prompt range, because the server position can lag behind the screen.
+  if (Math.hypot(spot.x - player.x, spot.y - player.y) > INTERACT_RANGE * 1.5) return fail("too-far");
+  const known = game.revealed?.[player.team] ?? [];
+  const fresh = (question.reveals ?? []).filter((a) => !known.includes(a));
+  if (fresh.length === 0) return ok(game);
+  return ok({ ...game, revealed: { ...game.revealed, [player.team]: [...known, ...fresh] } });
+}
+
+/** Asset ids the team has found so far. */
+export function teamRevealed(game: Game, team: TeamId): readonly string[] {
+  return game.revealed?.[team] ?? [];
 }

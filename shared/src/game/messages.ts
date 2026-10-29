@@ -11,6 +11,7 @@ export type GameClientMessage =
   | { t: "join"; name: string; face: number }
   | { t: "team"; team: TeamId }
   | { t: "move"; x: number; y: number }
+  | { t: "ask"; person: string; topic: number }
   | { t: "phase"; phase: Phase };
 
 /** One player's new position: id, x, y and room (or null in a corridor). */
@@ -44,6 +45,10 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
     case "move":
       if (!finite(m.x) || !finite(m.y)) return null;
       return { t: "move", x: m.x, y: m.y };
+    case "ask":
+      if (typeof m.person !== "string" || !/^[a-z0-9-]{1,40}$/.test(m.person)) return null;
+      if (typeof m.topic !== "number" || !Number.isInteger(m.topic) || m.topic < 0 || m.topic > 9) return null;
+      return { t: "ask", person: m.person, topic: m.topic };
     case "phase":
       return PHASES.includes(m.phase as Phase) ? { t: "phase", phase: m.phase as Phase } : null;
     default:

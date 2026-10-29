@@ -71,6 +71,17 @@
     })),
   );
 
+  /** Fit a room's name beside its badges: smaller type first, then two lines. */
+  function title(name: string, width: number): { lines: string[]; size: number } {
+    const room = width - 16 - 40; // left padding and the tick badge
+    const fits = (text: string, size: number) => text.length * size * 0.56 <= room;
+    if (fits(name, 22)) return { lines: [name], size: 22 };
+    const cut = name.lastIndexOf(" ");
+    const lines = cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : [name];
+    const longest = Math.max(...lines.map((l) => l.length));
+    return { lines, size: Math.max(16, Math.min(22, Math.floor(room / (longest * 0.56)))) };
+  }
+
   function initial(name: string): string {
     return name.trim().charAt(0).toUpperCase() || "?";
   }
@@ -96,9 +107,12 @@
   <rect x="0" y="0" {width} {height} rx="18" class="corridor" />
   {#each rooms as room (room.id)}
     {@const [x, y, w, h] = room.rect}
+    {@const t = title(room.name, w)}
     <g class="room" class:seen={visited.has(room.id)}>
       <rect {x} {y} width={w} height={h} rx="10" />
-      <text x={x + 16} y={y + 32} class="room-name">{room.name}</text>
+      <text x={x + 16} y={y + 32} class="room-name" style="font-size: {t.size}px">
+        {#each t.lines as line, i (i)}<tspan x={x + 16} dy={i === 0 ? 0 : t.size + 2}>{line}</tspan>{/each}
+      </text>
       {#if clueRooms.includes(room.id)}
         <g transform="translate({x + w - 68} {y + 12})" aria-hidden="true">
           <circle cx="11" cy="11" r="11" class="clue-bg" />
@@ -184,7 +198,6 @@
   .room-name {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 22px;
     fill: #4a3b2a;
   }
   .clue-bg {

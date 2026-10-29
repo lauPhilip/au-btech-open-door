@@ -22,6 +22,13 @@ A short note on where development stands, so a new work session can pick up stra
   - **Developer simulator at `/dev`:** one window with the teacher, the projector and students in frames. Each frame keeps its own identity through `?as=NAME` (storage keys get a prefix), and `?team=blue` sits a simulated student down at a table.
   - **Tests:** 62 unit tests; the e2e run now covers talking, asset reveals, notes and the simulator.
 
+- **M2 slice 2 – look closer and write notes (part 2)** (#20, #23, #24). Built 29 October 2026, following concept-book boards 04, 06, 07 and 11:
+  - **Private first, then shared (#23):** a note starts private. "Share with team" (and "Take back") is the author's choice. The room sends each player their own notes plus their team's shared notes (`visibleNotes`), never other teams'. Any teammate can tick two shared notes and merge them: the first note stays, harms and who are combined, the higher likelihood wins, and the note shows "Laura + 1".
+  - **Pins on the map (#24):** each visible note is a small tilted sticky with the author's initial, drawn where the author stood. Private notes have a dashed outline. The tooltip carries the text.
+  - **Look closer (#20):** things with a `closer` text show a "Look closer (technical)" link in their close-up; the text stays hidden until asked for. Answer-key data (threats, STRIDE) is never sent.
+  - **Wording** now follows the concept book: "Stop the work", "A visitor or driver", numbered likelihood levels, "Back to the map", "My notes · private until shared" and "Team notes · on the map".
+  - **Not done yet from the board:** the projector's "notes per team" counts (belongs with #29), and "Stick it on" has no sticky-drop animation.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.
@@ -29,12 +36,11 @@ A short note on where development stands, so a new work session can pick up stra
 - **Playwright is not in CI yet.** Run `npm run build && npm run test:e2e` locally. Once it has passed on a GitHub runner, add a job to `.github/workflows/ci.yml` (`npx playwright install --with-deps chromium`, then build and test). Set `CHROMIUM_PATH` to use an already-installed Chromium.
 - **The teacher cannot move players** between tables or go back a step yet; both are in the concept book's teacher view.
 
-## Next: finish M2 slice 2 – share notes
+## Next: M2 slice 3 and the leftovers of slice 2
 
-Goal: a team writes notes together and sees them on the map.
+Goal: the day happens, and the team's notes meet the answer key.
 
-1. **Private notes, then share and merge** (#23): a "share with my team" step; notes with similar text can be merged. Notes already exist per author (`Note.author`, `Note.team`); sharing needs a `shared` flag and team-wide delivery in `game-room.ts` (`applyNotes` sends to the author only today).
-2. **Notes as pins on the map** (#24): `Note.x`, `y` and `room` are already stored.
-3. **"Look closer" technical layer** (#20): `closer` text on things, shown in the close-up.
-4. **Hint:** `Walk.svelte` is getting long; consider moving the sidebar into its own component when #23 lands.
+1. **Room list as a keyboard and screen-reader alternative** (#17) and **reduced motion and colour-safe states** (#40): the prompt row is the keyboard route to people and things; the map is still the only way to walk there.
+2. **Walls and doors** (see known limits below) before the day starts, so clues in rooms mean something.
+3. **First illustrated close-ups** (#21): replace the initial and the box in `CloseUp.svelte` with illustrations.
 5. Then **M2 slice 3 – the day happens** (#25–#28): clock, chat messages and the alert, clues in rooms, the final team vote, and matching notes with the answer key.

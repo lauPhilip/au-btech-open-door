@@ -16,6 +16,8 @@ export type GameClientMessage =
   | { t: "ask"; person: string; topic: number }
   | ({ t: "note" } & NoteInput)
   | { t: "unnote"; id: string }
+  | { t: "share"; id: string; shared: boolean }
+  | { t: "merge"; keep: string; drop: string }
   | { t: "phase"; phase: Phase };
 
 /** One player's new position: id, x, y and room (or null in a corridor). */
@@ -28,6 +30,7 @@ export type GameServerMessage =
   | { t: "notes"; notes: Note[] }
   | { t: "error"; code: GameError; text: string };
 
+const isNoteId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9_-]{4,32}$/.test(v);
 const finite = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 
 /** Parse and validate a message from a client. Anything malformed returns null. */
@@ -63,7 +66,11 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return { t: "note", text: m.text, harm, actor, likelihood: m.likelihood, about };
     }
     case "unnote":
-      return typeof m.id === "string" && /^[A-Za-z0-9_-]{4,32}$/.test(m.id) ? { t: "unnote", id: m.id } : null;
+      return isNoteId(m.id) ? { t: "unnote", id: m.id } : null;
+    case "share":
+      return isNoteId(m.id) && typeof m.shared === "boolean" ? { t: "share", id: m.id, shared: m.shared } : null;
+    case "merge":
+      return isNoteId(m.keep) && isNoteId(m.drop) ? { t: "merge", keep: m.keep, drop: m.drop } : null;
     case "phase":
       return PHASES.includes(m.phase as Phase) ? { t: "phase", phase: m.phase as Phase } : null;
     default:

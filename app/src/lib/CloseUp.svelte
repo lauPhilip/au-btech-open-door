@@ -24,6 +24,8 @@
 
   /** Questions already asked in this window, in order. Closing the window starts a fresh talk. */
   let asked = $state<number[]>([]);
+  /** The technical "look closer" layer is hidden until asked for (progressive disclosure). */
+  let technical = $state(false);
   let dialog: HTMLDivElement | undefined;
   let closeButton: HTMLButtonElement | undefined;
 
@@ -58,7 +60,7 @@
         <h2 id="closeup-title">{spot.name}</h2>
         <p>{person ? `${person.role} · ${roomName}` : roomName}</p>
       </div>
-      <button class="close" bind:this={closeButton} onclick={onclose} aria-label="Close and keep walking">Close</button>
+      <button class="close" bind:this={closeButton} onclick={onclose} >Back to the map</button>
     </header>
 
     {#if person}
@@ -85,6 +87,13 @@
     {:else if thing}
       <p class="thing-text">{thing.text}</p>
       <p class="hint">Think about it: what could go wrong here?</p>
+      {#if thing.closer}
+        {#if technical}
+          <p class="technical" aria-live="polite"><strong>Technical:</strong> {thing.closer}</p>
+        {:else}
+          <button class="link" onclick={() => (technical = true)}>Look closer (technical)</button>
+        {/if}
+      {/if}
     {/if}
     <button class="note" onclick={() => onnote(spot)}>Write a sticky note about {spot.name}</button>
   </div>
@@ -227,6 +236,24 @@
     color: var(--ink);
     font-weight: 700;
     cursor: pointer;
+  }
+  .link {
+    align-self: flex-start;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--blue);
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .technical {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: var(--radius-s);
+    background: var(--blue-soft);
+    border-left: 4px solid var(--blue);
   }
   .thing-text {
     margin: 0;

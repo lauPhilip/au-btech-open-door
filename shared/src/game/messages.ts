@@ -21,6 +21,8 @@ export type GameClientMessage =
   | { t: "phase"; phase: Phase }
   | { t: "vote"; option: number }
   | { t: "prompt"; index: number }
+  | { t: "assign"; player: string; team: TeamId }
+  | { t: "hint"; team: TeamId; text: string }
   | { t: "timer"; action: TimerAction };
 
 /** One player's new position: id, x, y and room (or null in a corridor). */
@@ -75,6 +77,10 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return isNoteId(m.id) && typeof m.shared === "boolean" ? { t: "share", id: m.id, shared: m.shared } : null;
     case "merge":
       return isNoteId(m.keep) && isNoteId(m.drop) ? { t: "merge", keep: m.keep, drop: m.drop } : null;
+    case "assign":
+      return isNoteId(m.player) && isTeamId(m.team) ? { t: "assign", player: m.player, team: m.team } : null;
+    case "hint":
+      return isTeamId(m.team) && typeof m.text === "string" && m.text.length <= 200 ? { t: "hint", team: m.team, text: m.text } : null;
     case "prompt":
       return typeof m.index === "number" && Number.isInteger(m.index) && m.index >= 0 && m.index < 20 ? { t: "prompt", index: m.index } : null;
     case "vote":
@@ -88,13 +94,16 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
   }
 }
 
+const TEACHER_ONLY: ReadonlyArray<GameClientMessage["t"]> = ["phase", "timer", "prompt", "assign", "hint"];
+
 /** Which messages each role may send. The projector only watches. */
 export function mayRoleSend(role: Role, message: GameClientMessage): boolean {
+  const teacherOnly = TEACHER_ONLY.includes(message.t);
   switch (role) {
     case "player":
-      return message.t !== "phase" && message.t !== "timer" && message.t !== "prompt";
+      return !teacherOnly;
     case "teacher":
-      return message.t === "phase" || message.t === "timer" || message.t === "prompt";
+      return teacherOnly;
     case "screen":
       return false;
   }

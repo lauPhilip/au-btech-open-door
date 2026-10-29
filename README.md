@@ -6,7 +6,7 @@ Open Door is a browser game for teams of three to five students. Each team walks
 
 Behind the play sits the CyPro method from the [Digital Business Development toolbox](https://dbd.au.dk/p/toolbox) at Aarhus University: context establishment, system modelling, assets, threat identification and threat analysis. Students practise the method first and learn its names in the debrief. The game is being designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning, and runs in any browser on the university network (eduroam) without accounts or logins.
 
-> **Status:** milestone M2 – Playable is in progress. A class can join, hear the story, walk the office, talk to people and write private sticky notes; sharing notes, the day of the incident and the debrief come next. The eduroam classroom test is planned for later. See [next steps](docs/dev-notes/next-steps.md).
+> **Status:** version 0.x, playable from start to finish. A class joins, hears the story, walks the company as a character (on a top-down map or inside the rooms), talks to people, looks closer at things and writes sticky notes. Then the day of the incident plays out with a clock, messages and clues, each team votes on what the CEO should do, and the debrief compares every team's notes with the answer key. The teacher can see which teams are stuck, send hints, end early and close the session, and every team can download its notes as a CyPro threat table. Two scenarios exist, *Black Friday* and *New bank details*. Still open: a classroom test on eduroam, a pilot class, and a hallway test with real users. See [next steps](docs/dev-notes/next-steps.md).
 
 ## What is in this repository
 
@@ -15,14 +15,15 @@ Behind the play sits the CyPro method from the [Digital Business Development too
 | [`docs/concept-book/`](docs/concept-book/index.html) | The concept book: target group, journey, core loop, UX rules, design system, assets, mockups, teacher kit and architecture — 15 boards in one HTML page |
 | [`docs/roadmap.md`](docs/roadmap.md) | The development roadmap, from repository setup to version 1 |
 | [`docs/backlog.md`](docs/backlog.md) | 45 work items in four milestones; [`scripts/`](scripts/) turns them into GitHub issues |
-| [`scenarios/`](scenarios/) | Game content as text files: the first scenario, *Nordknit · Black Friday*, and the file format’s schema |
+| [`scenarios/`](scenarios/) | Game content as text files: *Nordknit · Black Friday* and *Nordknit · New bank details*, and the file format’s schema |
+| [`docs/teaching/`](docs/teaching/) | For teachers: the [facilitator guide](docs/teaching/facilitator-guide.md) for 45 and 90 minute classes, the [pilot plan](docs/teaching/pilot-plan.md) with consent text and a usability survey, and [printable paper kits](docs/teaching/paper-kit/) for when the network fails |
 | [`docs/scenario-format.md`](docs/scenario-format.md) | How to write a new scenario, with no coding needed |
 | [`docs/testing/`](docs/testing/) | Test plans, starting with the M1 classroom test on eduroam |
 | `app/`, `room/`, `shared/` | The code: browser app, Cloudflare Worker with live rooms, and shared message format |
 | [`docs/decisions/`](docs/decisions/) | Short records of the main decisions and why they were made |
 | [`docs/README.md`](docs/README.md) | An index of all documentation |
 
-To read the concept book, open `docs/concept-book/index.html` in a browser, or visit the published version once GitHub Pages is turned on: `https://lauphilip.github.io/au-btech-open-door/`.
+To read the concept book, open `docs/concept-book/index.html` in a browser, or visit the published site at `https://lauphilip.github.io/au-btech-open-door/`, which also links the teaching material.
 
 ## Run it
 
@@ -37,9 +38,9 @@ This builds the app and starts two local servers: the rooms on port 8787 and the
 
 | Address | Who uses it |
 |---|---|
-| `/teacher` | The teacher: create a session, then start the story and the walk |
-| `/screen/CODE` | The projector: QR code and teams, then the story, then the live office map |
-| `/` or `/j/CODE` | Students: type the code (or scan the QR code), pick a name, a face and a team |
+| `/teacher` | The teacher: choose a scenario and length, create a session, then move the class through the story, walk, day, vote and debrief; copy the join link, watch which teams are stuck, send hints, download the class summary and close the session |
+| `/screen/CODE` | The projector: QR code and teams, then the story, the live office map, the day with its clock, the vote and the debrief table |
+| `/` or `/j/CODE` | Students: type the code (or scan the QR code), pick a name, a face and a team. Phones start in the room view, larger screens on the map |
 | `/dev` | For developers: creates a session and opens the teacher view, the projector and three students side by side in one window, so you can play every role yourself. Add students by name and team; each frame keeps its own identity |
 | `/network-test` | The hello room from milestone M1; add `?view=projector` for its projector view |
 
@@ -49,7 +50,8 @@ This builds the app and starts two local servers: the rooms on port 8787 and the
 | `npm run scenarios` | Checks the scenario files and turns them into code for the game |
 | `npm run check` | Type-checks all three parts |
 | `npm test` | Runs the unit tests |
-| `npm run test:e2e` | Plays a whole session in real browser pages with Playwright (run `npm run build` and `npx playwright install chromium` first) |
+| `npm run test:e2e` | Plays whole sessions in real browser pages with Playwright, checks accessibility with axe, and checks every screen at six sizes from 320 to 1920 pixels for overflow, clipped text and small buttons (run `npm run build` and `npx playwright install chromium` first) |
+| `npm run paper-kit` | Builds a printable paper version of every scenario into `docs/teaching/paper-kit/` |
 | `npm run build` | Builds the app into `app/dist` |
 | `npm run deploy` | Builds and deploys everything to Cloudflare (run `npx wrangler login` once first) |
 | `node scripts/simulate-class.mjs` | Simulates a class of 40 players joining the network-test room |
@@ -59,14 +61,15 @@ The code is split into three parts: `shared/` holds the message format and game 
 
 ## How a class plays
 
-| Step | Time | What happens |
-|---|---|---|
-| Join | 3 min | Students scan a QR code, choose a nickname and a face, and join a team |
-| The story | 3 min | A short illustrated story from the company’s CEO sets the goal |
-| Walk and spot | 25 min | Teams explore the office, open close-ups of people and things, and write sticky notes |
-| The day happens | 25 min | The scenario unfolds; teams follow clues room to room and make a final call |
-| Talk it through | 30 min | The projector compares all teams, and the CyPro terms are revealed |
-| Take it home | — | Each team downloads its notes as a filled-in CyPro threat table |
+| Step | 45 min | 90 min | What happens |
+|---|---|---|---|
+| Join | 5 | 5 | Students scan a QR code, choose a nickname and a face, and join a team |
+| The story | 3 | 5 | A short story from the company’s CEO sets the goal |
+| Walk and spot | 12 | 25 | Teams walk the company, open close-ups of people and things, and write sticky notes |
+| The day happens | 15 | 30 | The incident unfolds with a clock, messages and clues; teams merge notes and follow clues room to room |
+| The vote | 3 | 5 | Each team decides what the CEO should do right now |
+| Talk it through | 7 | 20 | The projector compares all teams and reveals the CyPro terms |
+| Take it home | | | Each team downloads its notes as a filled-in CyPro threat table; the teacher closes the session and everything is deleted |
 
 ## Licence
 

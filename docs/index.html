@@ -3,14 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Open Door</title>
-<meta http-equiv="refresh" content="0; url=concept-book/">
+<title>Open Door · a classroom game about threat modelling</title>
+<meta name="description" content="Open Door is an open-source browser game where student teams walk through a fictional company and find what could go wrong. Built on the CyPro method from Aarhus University.">
 <style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F2F4F7;color:#1C2430;font-family:system-ui,sans-serif;padding:16px}
-a{color:#2E5BDB}
+  :root { --ink:#1c2430; --slate:#5b6675; --paper:#fff; --cream:#fbf3e6; --line:#e6d3b8; --blue:#2e5bdb; --blue-dark:#1e40a8; --sticky:#ffe27a; --timber:#b88a58; --sedum:#6f9a4a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:18px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--cream); }
+  a { color:var(--blue-dark); }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 20px; }
+  header.hero { background:linear-gradient(180deg,#1e2a44,#2b3a5e); color:#fbf3e6; padding:56px 0 64px; position:relative; }
+  header.hero::after { content:""; position:absolute; left:0; right:0; bottom:0; height:14px; background:repeating-linear-gradient(90deg,#c9a06b 0 17px,#8a6538 17px 20px); }
+  .eyebrow { margin:0 0 8px; color:var(--sticky); font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:14px; }
+  h1 { font-size:clamp(36px,6vw,64px); line-height:1.05; margin:0 0 16px; }
+  .lead { font-size:clamp(18px,2.4vw,24px); max-width:44ch; color:#d9deea; margin:0 0 28px; }
+  .buttons { display:flex; flex-wrap:wrap; gap:12px; }
+  .btn { display:inline-flex; align-items:center; min-height:48px; padding:0 22px; border-radius:12px; font-weight:700; text-decoration:none; }
+  .btn.primary { background:var(--sticky); color:var(--ink); }
+  .btn.ghost { border:2px solid #fbf3e6; color:#fbf3e6; }
+  section { padding:44px 0 8px; }
+  h2 { font-size:28px; margin:0 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  .card { background:var(--paper); border:2px solid var(--line); border-radius:16px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:20px; } .card p { margin:0; color:var(--slate); }
+  .card a.more { display:inline-block; margin-top:10px; font-weight:700; min-height:44px; line-height:44px; }
+  table { width:100%; border-collapse:collapse; background:var(--paper); border-radius:12px; overflow:hidden; }
+  th,td { text-align:left; padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { background:#f3e7d3; }
+  .scroll { overflow-x:auto; }
+  footer { padding:32px 0 48px; color:var(--slate); font-size:16px; }
 </style>
 </head>
 <body>
-<p>Opening the <a href="concept-book/">Open Door concept book</a>…</p>
+<header class="hero"><div class="wrap">
+  <p class="eyebrow">Open source · CC BY-SA 4.0 content · MIT code</p>
+  <h1>Open Door</h1>
+  <p class="lead">Walk the company, spot the risks. A browser game where student teams find what could go wrong, then compare their view with what really happened.</p>
+  <div class="buttons">
+    <a class="btn primary" href="https://github.com/lauPhilip/au-btech-open-door">Source code on GitHub</a>
+    <a class="btn ghost" href="concept-book/">Read the concept book</a>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <section>
+    <h2>What it is</h2>
+    <p>Teams of three to five students walk through <strong>Nordknit</strong>, a fictional family-owned clothing company in Sunds, Denmark. They talk to the people who work there, look closer at the things on their desks and stick notes on whatever could go wrong. Then the bad day begins: a clock, messages, an alert and clues in the rooms. Each team votes on what the CEO should do, and the projector shows which team saw which problem coming. The CyPro words for what they found come last.</p>
+    <p>It runs in any browser, on phones and laptops, without accounts. The game was designed for the MSc in Engineering, Technology-Based Business Development, at Aarhus University in Herning.</p>
+  </section>
+
+  <section>
+    <h2>How a class plays</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Step</th><th>45 min</th><th>90 min</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>Join</td><td>5</td><td>5</td><td>Scan the code, pick a nickname and a face, sit at a team table</td></tr>
+        <tr><td>Story</td><td>3</td><td>5</td><td>The CEO explains what is at stake</td></tr>
+        <tr><td>Walk and spot</td><td>12</td><td>25</td><td>Walk as your character, ask questions, write sticky notes</td></tr>
+        <tr><td>The day</td><td>15</td><td>30</td><td>The incident unfolds; follow clues and merge notes</td></tr>
+        <tr><td>Vote</td><td>3</td><td>5</td><td>Decide what the CEO should do right now</td></tr>
+        <tr><td>Debrief</td><td>7</td><td>20</td><td>Compare teams, learn the CyPro names, download your threat table</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>For teachers</h2>
+    <div class="grid">
+      <div class="card"><h3>Facilitator guide</h3><p>What to say and do in every phase of a 45 or 90 minute class.</p><a class="more" href="https://github.com/lauPhilip/au-btech-open-door/blob/main/docs/teaching/facilitator-guide.md">Read the guide</a></div>
+      <div class="card"><h3>Paper kit</h3><p>Floor plan, character cards, note sheets and answer key to print if the network fails.</p><a class="more" href="teaching/paper-kit/nordknit-black-friday.html">Black Friday</a> · <a class="more" href="teaching/paper-kit/nordknit-new-bank-details.html">New bank details</a></div>
+      <div class="card"><h3>Pilot plan</h3><p>How to test the game with a class: observer checklist, consent text and a usability survey.</p><a class="more" href="https://github.com/lauPhilip/au-btech-open-door/blob/main/docs/teaching/pilot-plan.md">Read the plan</a></div>
+      <div class="card"><h3>Write a scenario</h3><p>Scenarios are plain text files. No coding needed.</p><a class="more" href="https://github.com/lauPhilip/au-btech-open-door/blob/main/docs/scenario-format.md">Scenario format</a></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Two scenarios so far</h2>
+    <div class="grid">
+      <div class="card"><h3>Black Friday</h3><p>Orders have stopped printing three days before the biggest sales day. A printer on the guest Wi-Fi, a stranger in reception and a shared admin password.</p></div>
+      <div class="card"><h3>New bank details</h3><p>The factory says it has not been paid. A fake e-mail changed the bank account and nobody checked the biggest payment of the autumn.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Built to be easy</h2>
+    <p>Everything is designed for phones first and checked at six screen sizes from 320 to 1920 pixels. Text is written in plain English, colours meet WCAG AA, buttons are at least 44 pixels, and the whole game can be played with a keyboard. Sessions delete themselves six hours after they start, or when the teacher closes them.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p>Learning content builds on the CyPro project, “Cybersecure manufacturing in Denmark”, by Aarhus University, the Alexandra Institute, DAMRC, UGLA Insights and FORCE Technology, funded by the Danish Industry Foundation. All companies, people and incidents are fictional.</p>
+  <p><a href="https://github.com/lauPhilip/au-btech-open-door">GitHub</a> · <a href="concept-book/">Concept book</a> · <a href="https://github.com/lauPhilip/au-btech-open-door/blob/main/CONTRIBUTING.md">Contribute</a></p>
+</div></footer>
 </body>
 </html>

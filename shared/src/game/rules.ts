@@ -210,9 +210,16 @@ export function playBlock(game: Game): GameError | null {
  * The teacher moves the class on. Only one step forward at a time.
  * With `ctx` the walk and the day get their countdowns, and teams standing in a clue room find the clue.
  */
+/** The next step is always allowed. From the walk onwards the teacher may also skip ahead, for example when the class is done early. */
+export function canGoTo(from: Phase, to: Phase): boolean {
+  if (nextPhase(from) === to) return true;
+  const i = PHASES.indexOf(from);
+  return i >= PHASES.indexOf("walk") && PHASES.indexOf(to) > i;
+}
+
 export function setPhase(game: Game, phase: Phase, ctx?: { scenario: Scenario; now: number }): Result<Game> {
   if (phase === game.phase) return ok(game);
-  if (nextPhase(game.phase) !== phase) return fail("bad-phase");
+  if (!canGoTo(game.phase, phase)) return fail("bad-phase");
   let next: Game = { ...game, phase, timer: ctx ? timerFor(phase, ctx.scenario, game.minutes, ctx.now) : null };
   if (ctx && phase === "day") next = findCluesInPlace(next, ctx.scenario);
   return ok(next);

@@ -112,6 +112,11 @@ export class GameConnection {
     this.send({ t: "vote", option });
   }
 
+  /** End the session for everyone and delete all of its data (teacher only). */
+  closeSession(): void {
+    this.send({ t: "close" });
+  }
+
   /** Pause or resume the whole class, or add five minutes to the walk (teacher only). */
   timer(action: TimerAction): void {
     this.send({ t: "timer", action });

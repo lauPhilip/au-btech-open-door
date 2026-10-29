@@ -143,7 +143,7 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(thing.getByText(/over the internet/)).toBeHidden();
   await thing.getByRole("button", { name: "Look closer (technical)" }).click();
   await expect(thing.getByText(/over the internet/)).toBeVisible();
-  await thing.getByRole("button", { name: "Back to the map" }).click();
+  await thing.getByRole("button", { name: "Back" }).click();
   await expect(thing).toBeHidden();
 
   // Too far away to talk: no prompt appears for a person across the building.
@@ -427,9 +427,11 @@ test("a student can swap the map for the room view and walk door to door", async
   await expect(page.getByRole("img", { name: /Top-down map/ })).toBeVisible();
   await page.getByRole("button", { name: "Room view" }).click();
   await expect(page.getByRole("img", { name: /Illustration of the Meeting room/ })).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Doors to other rooms" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Door to CEO office" })).toBeVisible();
+  await expect(page.getByText("You", { exact: true })).toBeVisible(); // your own character stands in the room
 
   // A door walks you to the next room, and its people and things are in the scene.
+  await page.getByText("Go to any room").click();
   await page.getByRole("navigation", { name: "Doors to other rooms" }).getByRole("button", { name: "Packing station" }).click();
   await expect(page.getByText("You are in: Packing station")).toBeVisible({ timeout: 25_000 });
   await expect(page.getByRole("img", { name: /Illustration of the Packing station/ })).toBeVisible();

@@ -153,7 +153,8 @@
   .link {
     background: none;
     border: none;
-    padding: 8px 0;
+    min-height: 44px;
+    padding: 0 4px;
     color: var(--blue);
     font-weight: 600;
     text-decoration: underline;

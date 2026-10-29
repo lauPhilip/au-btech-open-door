@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Bust from "./Bust.svelte";
+  import Prop from "./Prop.svelte";
   import type { PersonInScenario, Scenario, Spot } from "@open-door/shared";
 
   let {
@@ -54,16 +55,18 @@
 <div class="backdrop" role="presentation" onpointerdown={(e) => e.target === e.currentTarget && onclose()}>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="closeup-title" bind:this={dialog}>
     <header>
-      <div class="portrait" class:object={spot.kind === "thing"} aria-hidden="true">
-        {#if person}<Bust id={person.id} size={58} />{:else}<span class="box"></span>{/if}
-      </div>
       <div class="title">
         <h2 id="closeup-title">{spot.name}</h2>
-        <p>{person ? `${person.role} · ${roomName}` : roomName}</p>
+        <p>{person && person.role !== roomName ? `${person.role} · ${roomName}` : roomName}</p>
       </div>
-      <button class="close" bind:this={closeButton} onclick={onclose} >Back to the map</button>
+      <button class="close" bind:this={closeButton} onclick={onclose} >Back</button>
     </header>
 
+    <div class="body">
+      <div class="art" class:person={!!person} aria-hidden={person ? "true" : undefined}>
+        {#if person}<div class="big-bust"><Bust id={person.id} size={200} /></div>{:else}<Prop id={spot.id} name={spot.name} />{/if}
+      </div>
+      <div class="content">
     {#if person}
       <div class="talk" aria-live="polite">
         <p class="bubble them">{person.hello}</p>
@@ -97,6 +100,8 @@
       {/if}
     {/if}
     <button class="note" onclick={() => onnote(spot)}>Write a sticky note about {spot.name}</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -111,8 +116,8 @@
     background: rgb(28 36 48 / 0.55);
   }
   .card {
-    width: min(560px, 100%);
-    max-height: min(720px, 100%);
+    width: min(980px, 100%);
+    max-height: min(760px, 100%);
     overflow-y: auto;
     background: var(--paper);
     border-radius: var(--radius-l);
@@ -127,26 +132,40 @@
     align-items: center;
     gap: 14px;
   }
-  .portrait {
-    flex: none;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .art {
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: #f0ddbf;
     display: grid;
     place-items: center;
-    background: #fbe9da;
-    border: 3px solid #c98b5e;
+    min-height: 200px;
   }
-  .portrait.object {
-    border-radius: 16px;
-    background: #e3ecf8;
-    border-color: #7f9cc7;
+  .art.person {
+    padding: 24px;
+    background: linear-gradient(#fbe9da, #f0ddbf);
   }
-  .box {
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    border: 3px solid #4a6a9c;
+  .big-bust {
+    line-height: 0;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    box-shadow: 0 10px 28px rgb(28 36 48 / 0.25);
+    width: min(200px, 100%);
+  }
+  .big-bust :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
   }
   .title {
     flex: 1;
@@ -258,6 +277,24 @@
   .done {
     margin: 0;
     color: var(--slate);
+  }
+  @media (max-width: 760px) {
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .art {
+      max-height: 220px;
+    }
+    .art.person {
+      max-height: none;
+      padding: 14px;
+    }
+    .big-bust {
+      width: 130px;
+    }
+    .art :global(svg) {
+      max-height: 220px;
+    }
   }
   @media (max-width: 600px) {
     .backdrop {

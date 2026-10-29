@@ -52,7 +52,7 @@
 </div>
 
 <style>
-  .overview { display: grid; gap: 10px; }
+  .overview { display: grid; gap: 10px; container-type: inline-size; }
   .row {
     display: grid; grid-template-columns: minmax(150px, 1.3fr) repeat(3, minmax(90px, 1fr)) minmax(180px, 1.6fr) auto;
     align-items: center; gap: 12px; background: var(--paper); border-left: 8px solid var(--team);
@@ -75,8 +75,8 @@
   }
   .send:hover { background: var(--blue-soft); }
   .empty { color: var(--slate); margin: 0; }
-  @media (max-width: 760px) {
-    .row { grid-template-columns: 1fr 1fr; }
+  @container (max-width: 940px) {
+    .row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .name, .state { grid-column: 1 / -1; }
   }
 </style>

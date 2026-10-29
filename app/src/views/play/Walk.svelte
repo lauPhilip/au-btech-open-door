@@ -209,7 +209,7 @@
     {#if view === "map"}
       <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} {clueRooms} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
     {:else}
-      <RoomScene {scenario} roomId={here?.id ?? null} others={teammatesHere} onspot={goToSpot} onroom={walkToRoom} />
+      <RoomScene {scenario} roomId={here?.id ?? null} others={teammatesHere} you={{ face: me.face, color: teamById(me.team!).color, name: me.name }} {position} onspot={goToSpot} onroom={walkToRoom} onwalk={walkTo} />
     {/if}
     <div class="prompt" aria-live="polite">
       {#if nearby.length > 0}

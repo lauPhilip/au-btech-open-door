@@ -32,6 +32,7 @@
     router: { x: 330, y: 215 },
     "visitor-book": { x: 330, y: 300 },
     "invoice-tray": { x: 330, y: 295 },
+    "mail-screen": { x: 440, y: 205 },
   };
   const PERSON_AT = { x: 620, y: 290 };
 

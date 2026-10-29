@@ -3,7 +3,7 @@
 import type { Actor, Harm } from "../scenario";
 import { isFace } from "./faces";
 import { ACTOR_IDS, HARM_IDS, isLikelihood, type Note, type NoteInput } from "./notes";
-import { PHASES, type Game, type GameError, type Phase } from "./rules";
+import { PHASES, type Game, type GameError, type Phase, type TimerAction } from "./rules";
 import { isTeamId, type TeamId } from "./teams";
 
 /** Who is on the other end of a connection. */
@@ -18,14 +18,16 @@ export type GameClientMessage =
   | { t: "unnote"; id: string }
   | { t: "share"; id: string; shared: boolean }
   | { t: "merge"; keep: string; drop: string }
-  | { t: "phase"; phase: Phase };
+  | { t: "phase"; phase: Phase }
+  | { t: "timer"; action: TimerAction };
 
 /** One player's new position: id, x, y and room (or null in a corridor). */
 export type MoveEntry = [id: string, x: number, y: number, room: string | null];
 
 export type GameServerMessage =
   | { t: "you"; id: string; role: Role }
-  | { t: "state"; game: Game }
+  /** `now` is the room clock, so every device can show the same countdown. */
+  | { t: "state"; game: Game; now: number }
   | { t: "moves"; m: MoveEntry[] }
   | { t: "notes"; notes: Note[] }
   | { t: "error"; code: GameError; text: string };
@@ -71,6 +73,8 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return isNoteId(m.id) && typeof m.shared === "boolean" ? { t: "share", id: m.id, shared: m.shared } : null;
     case "merge":
       return isNoteId(m.keep) && isNoteId(m.drop) ? { t: "merge", keep: m.keep, drop: m.drop } : null;
+    case "timer":
+      return m.action === "pause" || m.action === "resume" || m.action === "add" ? { t: "timer", action: m.action } : null;
     case "phase":
       return PHASES.includes(m.phase as Phase) ? { t: "phase", phase: m.phase as Phase } : null;
     default:
@@ -82,9 +86,9 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
 export function mayRoleSend(role: Role, message: GameClientMessage): boolean {
   switch (role) {
     case "player":
-      return message.t !== "phase";
+      return message.t !== "phase" && message.t !== "timer";
     case "teacher":
-      return message.t === "phase";
+      return message.t === "phase" || message.t === "timer";
     case "screen":
       return false;
   }

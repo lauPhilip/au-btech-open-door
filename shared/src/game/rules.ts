@@ -4,12 +4,14 @@
 
 import { INTERACT_RANGE, roomAt, startRoom, spots, type Scenario } from "../scenario";
 import { cleanName } from "../protocol";
+import { findClues, findCluesInPlace, timerFor } from "./day";
 import { isFace } from "./faces";
+import { addTime, isPaused, pauseTimer, resumeTimer, type Timer } from "./timer";
 import { TEAM_MAX, TEAMS, type TeamId } from "./teams";
 
-/** Lobby: people join and pick teams. Story: the CEO's story plays. Walk: everyone explores. */
-export type Phase = "lobby" | "story" | "walk";
-export const PHASES: readonly Phase[] = ["lobby", "story", "walk"];
+/** Lobby: people join and pick teams. Story: the CEO's story plays. Walk: everyone explores. Day: the incident unfolds. */
+export type Phase = "lobby" | "story" | "walk" | "day";
+export const PHASES: readonly Phase[] = ["lobby", "story", "walk", "day"];
 
 export type Minutes = 45 | 90;
 
@@ -38,6 +40,10 @@ export interface Game {
   players: Player[];
   /** Asset ids each team has found out about by asking questions (issue #19). */
   revealed: Partial<Record<TeamId, string[]>>;
+  /** Countdown for the walk and for the day; null in the other phases. Pausing it pauses the class. */
+  timer: Timer | null;
+  /** Indexes into `scenario.day.clues` that each team has found (issue #26). */
+  clues: Partial<Record<TeamId, number[]>>;
 }
 
 export type GameError =
@@ -50,6 +56,7 @@ export type GameError =
   | "bad-face"
   | "too-far"
   | "unknown-question"
+  | "paused"
   | "bad-note"
   | "too-many-notes"
   | "unknown-note"
@@ -66,6 +73,7 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "bad-face": "Pick a face.",
   "too-far": "Walk closer to talk to them.",
   "unknown-question": "That question is not in this scenario.",
+  "paused": "The teacher paused the game. Wait a moment.",
   "bad-note": "A note needs a few words, at least one harm and at least one who.",
   "too-many-notes": "You have a lot of notes already. Delete one first.",
   "unknown-note": "That note is gone.",
@@ -87,7 +95,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {} };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {} };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {
@@ -163,11 +171,40 @@ export function nextPhase(phase: Phase): Phase | null {
   return PHASES[PHASES.indexOf(phase) + 1] ?? null;
 }
 
-/** The teacher moves the class on. Only one step forward at a time. */
-export function setPhase(game: Game, phase: Phase): Result<Game> {
+/** Phases in which students walk, talk and write notes. */
+export function isPlaying(game: Game): boolean {
+  return game.phase === "walk" || game.phase === "day";
+}
+
+/** Why a player cannot act right now, or null if they can. */
+export function playBlock(game: Game): GameError | null {
+  if (!isPlaying(game)) return "not-walking";
+  if (game.timer && isPaused(game.timer)) return "paused";
+  return null;
+}
+
+/**
+ * The teacher moves the class on. Only one step forward at a time.
+ * With `ctx` the walk and the day get their countdowns, and teams standing in a clue room find the clue.
+ */
+export function setPhase(game: Game, phase: Phase, ctx?: { scenario: Scenario; now: number }): Result<Game> {
   if (phase === game.phase) return ok(game);
   if (nextPhase(game.phase) !== phase) return fail("bad-phase");
-  return ok({ ...game, phase });
+  let next: Game = { ...game, phase, timer: ctx ? timerFor(phase, ctx.scenario, game.minutes, ctx.now) : null };
+  if (ctx && phase === "day") next = findCluesInPlace(next, ctx.scenario);
+  return ok(next);
+}
+
+export type TimerAction = "pause" | "resume" | "add";
+export const ADD_TIME_MS = 5 * 60_000;
+
+/** The teacher pauses or resumes the class, or adds five minutes to the walk. */
+export function adjustTimer(game: Game, action: TimerAction, now: number): Result<Game> {
+  if (!game.timer) return fail("bad-phase");
+  if (action === "pause") return ok({ ...game, timer: pauseTimer(game.timer, now) });
+  if (action === "resume") return ok({ ...game, timer: resumeTimer(game.timer, now) });
+  if (game.phase !== "walk") return fail("bad-phase");
+  return ok({ ...game, timer: addTime(game.timer, ADD_TIME_MS) });
 }
 
 export interface Moved {
@@ -175,19 +212,24 @@ export interface Moved {
   player: Player;
   /** True when the player entered a room for the first time. */
   firstVisit: boolean;
+  /** True when the team found a new clue by walking in. */
+  newClue: boolean;
 }
 
 /** Move a player to a point on the map. The point is clamped to the map. */
 export function move(game: Game, scenario: Scenario, id: string, x: number, y: number): Result<Moved> {
   const player = findPlayer(game, id);
   if (!player) return fail("not-joined");
-  if (game.phase !== "walk") return fail("not-walking");
+  const block = playBlock(game);
+  if (block) return fail(block);
   if (!player.team) return fail("no-team");
   const point = clampToMap(scenario, x, y);
   const room = roomAt(scenario, point.x, point.y)?.id ?? null;
   const firstVisit = room !== null && !player.visited.includes(room);
   const moved: Player = { ...player, ...point, room, visited: firstVisit && room ? [...player.visited, room] : player.visited };
-  return ok({ game: replacePlayer(game, moved), player: moved, firstVisit });
+  const updated = replacePlayer(game, moved);
+  const withClues = findClues(updated, scenario, player.team, room);
+  return ok({ game: withClues, player: moved, firstVisit, newClue: withClues !== updated });
 }
 
 /** Rooms that at least one member of the team has entered. */
@@ -208,7 +250,8 @@ function replacePlayer(game: Game, player: Player): Game {
 export function ask(game: Game, scenario: Scenario, id: string, personId: string, topic: number): Result<Game> {
   const player = findPlayer(game, id);
   if (!player) return fail("not-joined");
-  if (game.phase !== "walk") return fail("not-walking");
+  const block = playBlock(game);
+  if (block) return fail(block);
   if (!player.team) return fail("no-team");
   const question = scenario.people.find((p) => p.id === personId)?.topics[topic];
   const spot = spots(scenario).find((s) => s.kind === "person" && s.id === personId);

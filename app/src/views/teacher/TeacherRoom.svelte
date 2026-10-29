@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { nextPhase, scenarios, type Phase } from "@open-door/shared";
+  import { dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
+  import { Ticker } from "../../lib/ticker.svelte";
 
   let { code, teacherKey }: { code: string; teacherKey: string } = $props();
 
@@ -20,10 +21,20 @@
   const next = $derived(game ? nextPhase(game.phase) : null);
   const notTeacher = $derived(connection.role !== null && connection.role !== "teacher");
 
+  // svelte-ignore state_referenced_locally
+  const ticker = new Ticker(() => connection.now());
+  onDestroy(() => ticker.stop());
+  const timer = $derived(game?.timer ?? null);
+  const paused = $derived(timer ? isPaused(timer) : false);
+  const left = $derived(timer ? leftMs(timer, ticker.now) : 0);
+  const clock = $derived(scenario && game ? minutesToClock(dayMinute(scenario, game, ticker.now)) : "");
+  const messages = $derived(scenario && game?.phase === "day" ? eventsBy(scenario, dayMinute(scenario, game, ticker.now)).length : 0);
+
   const STEPS: Array<{ phase: Phase; label: string; action: string; help: string }> = [
     { phase: "lobby", label: "Join", action: "", help: "Students scan the code on the big screen, pick a face and sit at a team table." },
     { phase: "story", label: "Story", action: "Start the story", help: "Karin, the CEO, tells the class what is at stake. Students read along on their phones." },
-    { phase: "walk", label: "Walk", action: "Start walking", help: "Teams walk around the office together and visit every room." },
+    { phase: "walk", label: "Walk", action: "Start walking", help: "Teams walk around the office together, talk to people and write notes. Notes are private until a student shares them." },
+    { phase: "day", label: "Day", action: "Start the day", help: "The incident begins: a clock, messages and an alert. Everyone's notes are shared with their team, and teams follow clues to the answer." },
   ];
   const nextStep = $derived(STEPS.find((s) => s.phase === next));
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
@@ -76,12 +87,31 @@
         <button class="primary" onclick={() => connection.setPhase(nextStep.phase)}>{nextStep.action}</button>
       {:else if game}
         <div>
-          <h2>The class is walking</h2>
-          <p>Watch the big screen. The day of the incident, notes and the debrief come in the next versions of Open Door.</p>
+          <h2>The day is running</h2>
+          <p>Watch the big screen. The final choice and the debrief come in the next version of Open Door.</p>
         </div>
       {/if}
     </section>
     {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
+
+    {#if timer && game && scenario}
+      <section class="panel control" aria-label="Class controls">
+        <div class="readout">
+          {#if game.phase === "walk"}
+            <p class="label">Walk and spot</p>
+            <p class="value" role="timer">{left === 0 ? "Time is up" : `${formatLeft(left)} left`}</p>
+          {:else}
+            <p class="label">Game clock · {scenario.day.name}</p>
+            <p class="value" role="timer">{clock} <small>day ends {scenario.day.ends} · {messages} of {scenario.day.events.length} messages sent</small></p>
+          {/if}
+          {#if paused}<p class="paused-note" role="status">Paused: students cannot move or write.</p>{/if}
+        </div>
+        <div class="buttons">
+          <button class="secondary" onclick={() => connection.timer(paused ? "resume" : "pause")}>{paused ? "Resume all" : "Pause all"}</button>
+          {#if game.phase === "walk"}<button class="secondary" onclick={() => connection.timer("add")}>+5 minutes</button>{/if}
+        </div>
+      </section>
+    {/if}
 
     <section>
       <h2 class="section-title">Teams</h2>
@@ -196,6 +226,41 @@
   }
   .next > div {
     flex: 1 1 320px;
+  }
+  .control {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .control .label {
+    margin: 0;
+    color: var(--slate);
+    font-weight: 600;
+  }
+  .control .value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 40px;
+    font-variant-numeric: tabular-nums;
+  }
+  .control .value small {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--slate);
+  }
+  .buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .paused-note {
+    margin: 4px 0 0;
+    color: var(--alert-dark);
+    font-weight: 700;
   }
   .section-title {
     font-size: 22px;

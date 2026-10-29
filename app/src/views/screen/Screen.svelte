@@ -1,13 +1,16 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import QRCode from "qrcode";
-  import { scenarios, TEAMS, teamVisited } from "@open-door/shared";
+  import { dayMinute, eventsBy, formatLeft, isPaused, leftMs, scenarios, TEAMS, teamClues, teamVisited } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
   import Story from "../../lib/Story.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
+  import Chat from "../../lib/Chat.svelte";
+  import DayBar from "../../lib/DayBar.svelte";
+  import { Ticker } from "../../lib/ticker.svelte";
 
   let { code }: { code: string } = $props();
 
@@ -27,9 +30,19 @@
     QRCode.toString(joinUrl, { type: "svg", margin: 1, errorCorrectionLevel: "M" }).then((svg) => (qrSvg = svg));
   });
 
+  // svelte-ignore state_referenced_locally
+  const ticker = new Ticker(() => connection.now());
+  onDestroy(() => ticker.stop());
+  const isDay = $derived(game?.phase === "day");
+  const paused = $derived(game?.timer ? isPaused(game.timer) : false);
+  const left = $derived(game?.timer ? leftMs(game.timer, ticker.now) : 0);
+  const minute = $derived(scenario && game ? dayMinute(scenario, game, ticker.now) : 0);
+  /** Only the newest messages fit on the projector. */
+  const ticker3 = $derived(scenario && isDay ? eventsBy(scenario, minute).slice(-3) : []);
+
   const progress = $derived(
     scenario && game
-      ? TEAMS.map((team) => ({ team, rooms: teamVisited(game, team.id).size, members: players.filter((p) => p.team === team.id).length })).filter(
+      ? TEAMS.map((team) => ({ team, rooms: teamVisited(game, team.id).size, clues: teamClues(game, team.id).length, members: players.filter((p) => p.team === team.id).length })).filter(
           (t) => t.members > 0,
         )
       : [],
@@ -65,13 +78,24 @@
     </section>
   {:else}
     <section class="walk">
-      <div class="goal"><span class="eyebrow">Goal</span> {scenario.goal}</div>
-      <div class="map-wrap"><OfficeMap {scenario} {players} names="all" /></div>
+      {#if isDay}
+        <DayBar {scenario} {minute} found={null} total={scenario.day.clues.length} large />
+      {:else}
+        <div class="goal">
+          <span class="eyebrow">Goal</span> {scenario.goal}
+          {#if game.timer}<span class="walk-left" role="timer">{left === 0 ? "Time is up" : `${formatLeft(left)} left`}</span>{/if}
+        </div>
+      {/if}
+      <div class="stage" class:with-chat={isDay}>
+        <div class="map-wrap"><OfficeMap {scenario} {players} names="all" /></div>
+        {#if isDay}<div class="chat-wrap"><Chat {scenario} events={ticker3} large /></div>{/if}
+      </div>
       <ul class="legend">
-        {#each progress as { team, rooms } (team.id)}
-          <li style="--team: {team.color}"><span class="sw"></span>{team.name} <small>{rooms} of {scenario.map.rooms.length} rooms</small></li>
+        {#each progress as { team, rooms, clues } (team.id)}
+          <li style="--team: {team.color}"><span class="sw"></span>{team.name} <small>{rooms} of {scenario.map.rooms.length} rooms{isDay ? ` · ${clues} of ${scenario.day.clues.length} clues` : ""}</small></li>
         {/each}
       </ul>
+      {#if paused}<p class="paused" role="status">Paused by the teacher</p>{/if}
     </section>
   {/if}
 </main>
@@ -173,8 +197,36 @@
     font-size: 18px;
     vertical-align: middle;
   }
+  .walk-left {
+    float: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .stage {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 24px;
+  }
+  .chat-wrap {
+    flex: 0 0 34%;
+    background: var(--paper);
+    border-radius: var(--radius-l);
+    padding: 16px 20px;
+    overflow: hidden;
+  }
+  .paused {
+    margin: 0;
+    padding: 8px 20px;
+    border-radius: var(--radius-m);
+    background: var(--ink);
+    color: #fff;
+    font-weight: 700;
+    font-size: 28px;
+    text-align: center;
+  }
   .map-wrap {
     flex: 1;
+    min-width: 0;
     min-height: 0;
     display: flex;
     justify-content: center;

@@ -41,6 +41,7 @@ const pairs: Array<[string, string, string]> = [
   ["connected status", safeDark, "#e3f4ec"],
   ["problem text on a card", alertDark, paper],
   ["alert banner text", paper, alertDark],
+  ["small grey text on a story card", slate, "#fbe9da"],
   ["reconnecting status", alertDark, "#fdeae6"],
 ];
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AVATAR_RADIUS, spots, teamById, type Player, type Scenario, type TeamId } from "@open-door/shared";
+  import { AVATAR_RADIUS, spots, teamById, type Note, type Player, type Scenario, type TeamId } from "@open-door/shared";
 
   let {
     scenario,
@@ -10,6 +10,7 @@
     visited = new Set<string>(),
     names = "team",
     near = [],
+    notes = [],
     onpoint,
   }: {
     scenario: Scenario;
@@ -24,6 +25,8 @@
     visited?: Set<string>;
     /** Whose names to show: teammates only, or everyone (projector). */
     names?: "team" | "all";
+    /** Sticky notes to pin on the map: where the author stood, with the author's initial. */
+    notes?: Note[];
     /** Ids of people and things within reach of the viewer; they get a highlight ring. */
     near?: string[];
     /** Called with map coordinates when the viewer taps or clicks the map. */
@@ -49,6 +52,21 @@
     if (p.id === you) return 2;
     return p.team === myTeam ? 1 : 0;
   }
+
+  /** A slight, steady tilt for each pin, so the same note always leans the same way. */
+  function tilt(id: string): number {
+    let h = 0;
+    for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return (h % 13) - 6;
+  }
+
+  const pins = $derived(
+    notes.map((note) => ({
+      note,
+      tilt: tilt(note.id),
+      initial: initial(players.find((p) => p.id === note.author)?.name ?? "?"),
+    })),
+  );
 
   function initial(name: string): string {
     return name.trim().charAt(0).toUpperCase() || "?";
@@ -98,6 +116,14 @@
         <path d="M-8 -3 H8 M-8 5 H3" class="thing-lines" />
       {/if}
       <text y="38" class="npc-name">{spot.name}</text>
+    </g>
+  {/each}
+
+  {#each pins as pin (pin.note.id)}
+    <g class="pin" class:private={!pin.note.shared} transform="translate({pin.note.x + 12} {pin.note.y - 34}) rotate({pin.tilt})">
+      <title>{pin.note.shared ? "Team note" : "Your private note"}: {pin.note.text}</title>
+      <rect x="-13" y="-13" width="26" height="26" rx="3" />
+      <text y="5" class="pin-initial">{pin.initial}</text>
     </g>
   {/each}
 
@@ -176,6 +202,23 @@
     stroke: #4a6a9c;
     stroke-width: 2.5;
     stroke-linecap: round;
+  }
+  .pin rect {
+    fill: var(--sticky);
+    stroke: #c9a52b;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 1px 1px rgb(28 36 48 / 0.3));
+  }
+  .pin.private rect {
+    fill: #fff3b8;
+    stroke-dasharray: 4 3;
+  }
+  .pin-initial {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    text-anchor: middle;
+    fill: var(--ink);
   }
   .reach {
     fill: none;

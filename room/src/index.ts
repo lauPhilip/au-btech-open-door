@@ -20,8 +20,8 @@ export default {
     if (url.pathname.startsWith("/api/")) return handleApi(request, env);
 
     const routed = await routePartykitRequest(request, env as unknown as Record<string, unknown>, {
-      onBeforeConnect: (req, { party, name }) => {
-        if (party !== "game-room") return HELLO_ROOM_NAME.test(name) ? undefined : new Response("Unknown room", { status: 404 });
+      onBeforeConnect: (req, { className, name }) => {
+        if (className !== "GameRoom") return HELLO_ROOM_NAME.test(name) ? undefined : new Response("Unknown room", { status: 404 });
         // Game rooms only exist for real session codes; the room itself refuses codes nobody created.
         if (!isCode(name)) return new Response("Unknown room", { status: 404 });
         const params = new URL(req.url).searchParams;
@@ -31,7 +31,7 @@ export default {
         return undefined;
       },
       // Game rooms are only reached by WebSocket or by the Worker's own RPC calls.
-      onBeforeRequest: (_req, { party }) => (party === "game-room" ? new Response("Not found", { status: 404 }) : undefined),
+      onBeforeRequest: (_req, { className }) => (className === "GameRoom" ? new Response("Not found", { status: 404 }) : undefined),
     });
     return routed ?? new Response("Not found", { status: 404 });
   },

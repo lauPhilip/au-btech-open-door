@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import QRCode from "qrcode";
-  import { dayMinute, eventsBy, formatLeft, isPaused, leftMs, scenarios, TEAMS, teamClues, teamVisited } from "@open-door/shared";
+  import { allVotes, dayMinute, teamById, eventsBy, formatLeft, isPaused, leftMs, scenarios, TEAMS, teamClues, teamVisited } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
@@ -40,6 +40,8 @@
   /** Only the newest messages fit on the projector. */
   const ticker3 = $derived(scenario && isDay ? eventsBy(scenario, minute).slice(-3) : []);
 
+  const votes = $derived(scenario && game ? allVotes(game, scenario) : []);
+
   const progress = $derived(
     scenario && game
       ? TEAMS.map((team) => ({ team, rooms: teamVisited(game, team.id).size, clues: teamClues(game, team.id).length, members: players.filter((p) => p.team === team.id).length })).filter(
@@ -75,6 +77,27 @@
   {:else if game.phase === "story"}
     <section class="story-wrap">
       <Story {scenario} large autoplayMs={9000} />
+    </section>
+  {:else if game.phase === "vote" || game.phase === "debrief"}
+    <section class="decide">
+      <h1>{scenario.day.final_choice.question}</h1>
+      <ul class="teams">
+        {#each votes as v (v.team)}
+          {@const t = teamById(v.team)}
+          {@const win = v.winner !== null ? scenario.day.final_choice.options[v.winner] : null}
+          <li style="--team: {t.color}">
+            <span class="name"><span class="sw"></span>{t.name}</span>
+            {#if game.phase === "vote"}
+              <span class="state">{v.voted === v.members ? "✓ All voted" : `${v.voted} of ${v.members} voted`}</span>
+            {:else if win}
+              <span class="state"><strong>{String.fromCharCode(65 + (v.winner ?? 0))}</strong> {win.text}</span>
+              <span class="result">{win.result}</span>
+            {:else}
+              <span class="state">– No decision: the votes were split</span>
+            {/if}
+          </li>
+        {/each}
+      </ul>
     </section>
   {:else}
     <section class="walk">
@@ -259,5 +282,41 @@
     .lobby {
       grid-template-columns: 1fr;
     }
+  }
+  .decide {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .decide h1 {
+    font-size: 44px;
+    margin: 0;
+  }
+  .teams {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+  }
+  .teams li {
+    background: var(--paper);
+    border-radius: var(--radius-l);
+    border-left: 12px solid var(--team);
+    padding: 18px 24px;
+    display: grid;
+    gap: 6px;
+    font-size: 26px;
+  }
+  .teams .name {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .teams .result {
+    color: var(--slate);
+    font-size: 22px;
   }
 </style>

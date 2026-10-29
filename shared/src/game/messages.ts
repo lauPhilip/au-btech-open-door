@@ -19,6 +19,7 @@ export type GameClientMessage =
   | { t: "share"; id: string; shared: boolean }
   | { t: "merge"; keep: string; drop: string }
   | { t: "phase"; phase: Phase }
+  | { t: "vote"; option: number }
   | { t: "timer"; action: TimerAction };
 
 /** One player's new position: id, x, y and room (or null in a corridor). */
@@ -73,6 +74,8 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return isNoteId(m.id) && typeof m.shared === "boolean" ? { t: "share", id: m.id, shared: m.shared } : null;
     case "merge":
       return isNoteId(m.keep) && isNoteId(m.drop) ? { t: "merge", keep: m.keep, drop: m.drop } : null;
+    case "vote":
+      return typeof m.option === "number" && Number.isInteger(m.option) && m.option >= 0 && m.option < 10 ? { t: "vote", option: m.option } : null;
     case "timer":
       return m.action === "pause" || m.action === "resume" || m.action === "add" ? { t: "timer", action: m.action } : null;
     case "phase":

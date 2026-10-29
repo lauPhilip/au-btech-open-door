@@ -2,6 +2,7 @@ import { Server, type Connection, type ConnectionContext } from "partyserver";
 import {
   addNote,
   adjustTimer,
+  castVote,
   ask,
   mergeNotes,
   removeNote,
@@ -76,6 +77,7 @@ export class GameRoom extends Server {
     // Sessions saved before milestone M2 slice 2 have no revealed list.
     if (this.game) {
       this.game.revealed ??= {};
+      this.game.votes ??= {};
       this.game.clues ??= {};
       this.game.timer ??= null;
     }
@@ -168,13 +170,16 @@ export class GameRoom extends Server {
         const result = setPhase(game, message.phase, { scenario, now: Date.now() });
         await this.apply(connection, result);
         // Everything written so far becomes the team's, when the day starts (concept book, board 04).
-        if (result.ok && message.phase === "day") {
+        if (result.ok && (message.phase === "day" || message.phase === "vote")) {
           this.notes = shareAll(this.notes);
           await this.ctx.storage.put("notes", this.notes);
           this.sendNotesToPlayers();
         }
         break;
       }
+      case "vote":
+        await this.apply(connection, castVote(game, scenario, connection.id, message.option));
+        break;
       case "timer":
         await this.apply(connection, adjustTimer(game, message.action, Date.now()));
         break;

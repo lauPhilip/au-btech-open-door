@@ -35,6 +35,8 @@
     { phase: "story", label: "Story", action: "Start the story", help: "Karin, the CEO, tells the class what is at stake. Students read along on their phones." },
     { phase: "walk", label: "Walk", action: "Start walking", help: "Teams walk around the office together, talk to people and write notes. Notes are private until a student shares them." },
     { phase: "day", label: "Day", action: "Start the day", help: "The incident begins: a clock, messages and an alert. Everyone's notes are shared with their team, and teams follow clues to the answer." },
+    { phase: "vote", label: "Vote", action: "Start the vote", help: "Each team decides what Karin should do. Notes are shared with the team again, so nothing is lost." },
+    { phase: "debrief", label: "Debrief", action: "Show the result", help: "Teams see their decision and which problems their notes predicted." },
   ];
   const nextStep = $derived(STEPS.find((s) => s.phase === next));
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
@@ -80,6 +82,9 @@
         <div>
           <h2>Next: {nextStep.label.toLowerCase()}</h2>
           <p>{nextStep.help}</p>
+          {#if game.phase === "vote"}
+            <p>{Object.keys(game.votes).length} of {players.filter((p) => p.team).length} students have voted.</p>
+          {/if}
           {#if game.phase === "lobby" && withoutTeam.length > 0}
             <p class="warn">{withoutTeam.length} {withoutTeam.length === 1 ? "student has" : "students have"} not picked a team yet: {withoutTeam.map((p) => p.name).join(", ")}.</p>
           {/if}
@@ -87,8 +92,8 @@
         <button class="primary" onclick={() => connection.setPhase(nextStep.phase)}>{nextStep.action}</button>
       {:else if game}
         <div>
-          <h2>The day is running</h2>
-          <p>Watch the big screen. The final choice and the debrief come in the next version of Open Door.</p>
+          <h2>The result is showing</h2>
+          <p>Teams can see their decision and which problems their notes predicted. The class debrief table comes in the next version of Open Door.</p>
         </div>
       {/if}
     </section>

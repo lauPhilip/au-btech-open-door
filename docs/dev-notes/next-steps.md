@@ -67,6 +67,11 @@ A short note on where development stands, so a new work session can pick up stra
   - **Room view:** next to the map there is a "Room view" toggle. It draws the inside of the room you stand in, with its people and things as buttons, and a row of doors that walk you to any other room. The map and the room view share the same position, so teammates, clues and notes stay in step. Tapping a person or thing walks there and opens the same close-up.
   - **About Spline:** Spline is now connected to the project. The room scenes are plain SVG, so they work offline and in the axe checks. A 3D version of the factory for the projector could be built in Spline later; it would need a published link or exported asset.
 
+- **Export** (#34, #35). Built 29 October 2026:
+  - **Team table:** on the finish screen a team can download its shared notes as a CSV or print them to PDF as a CyPro threat table (threat, target, where, harm as C·I·A, threat actor, likelihood 1–4, impact, noted by). Impact is left empty on purpose for the class to fill in. The rules are in `shared/src/game/export.ts`.
+  - **Class summary:** from the vote on, the teacher can download every team's notes (CSV), the debrief table (CSV) and a printable summary. The page reminds the teacher that sessions are deleted six hours after they start.
+  - **Safety:** cells that start with `=`, `+`, `-` or `@` get a leading quote so a student cannot plant a spreadsheet formula. This is tested.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

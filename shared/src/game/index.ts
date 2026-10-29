@@ -5,4 +5,6 @@ export * from "./rules";
 export * from "./messages";
 export * from "./notes";
 export * from "./timer";
+export * from "./vote";
+export * from "./match";
 export * from "./day";

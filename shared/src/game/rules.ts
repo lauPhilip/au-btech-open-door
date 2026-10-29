@@ -9,9 +9,12 @@ import { isFace } from "./faces";
 import { addTime, isPaused, pauseTimer, resumeTimer, type Timer } from "./timer";
 import { TEAM_MAX, TEAMS, type TeamId } from "./teams";
 
-/** Lobby: people join and pick teams. Story: the CEO's story plays. Walk: everyone explores. Day: the incident unfolds. */
-export type Phase = "lobby" | "story" | "walk" | "day";
-export const PHASES: readonly Phase[] = ["lobby", "story", "walk", "day"];
+/**
+ * Lobby: people join and pick teams. Story: the CEO's story plays. Walk: everyone explores.
+ * Day: the incident unfolds. Vote: each team decides what the CEO should do. Debrief: the result and the answer key.
+ */
+export type Phase = "lobby" | "story" | "walk" | "day" | "vote" | "debrief";
+export const PHASES: readonly Phase[] = ["lobby", "story", "walk", "day", "vote", "debrief"];
 
 export type Minutes = 45 | 90;
 
@@ -44,6 +47,8 @@ export interface Game {
   timer: Timer | null;
   /** Indexes into `scenario.day.clues` that each team has found (issue #26). */
   clues: Partial<Record<TeamId, number[]>>;
+  /** The option each player voted for in the final choice, by player id (issue #27). */
+  votes: Record<string, number>;
 }
 
 export type GameError =
@@ -56,6 +61,8 @@ export type GameError =
   | "bad-face"
   | "too-far"
   | "unknown-question"
+  | "not-voting"
+  | "unknown-option"
   | "paused"
   | "bad-note"
   | "too-many-notes"
@@ -73,6 +80,8 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "bad-face": "Pick a face.",
   "too-far": "Walk closer to talk to them.",
   "unknown-question": "That question is not in this scenario.",
+  "not-voting": "The vote has not started yet.",
+  "unknown-option": "That choice is not on the list.",
   "paused": "The teacher paused the game. Wait a moment.",
   "bad-note": "A note needs a few words, at least one harm and at least one who.",
   "too-many-notes": "You have a lot of notes already. Delete one first.",
@@ -95,7 +104,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {} };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {} };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {

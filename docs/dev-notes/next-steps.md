@@ -51,6 +51,11 @@ A short note on where development stands, so a new work session can pick up stra
   - **Class table:** when the teacher shows the result, the server grades every team's shared notes against the answer key once (`gradeAll` in `match.ts`) and keeps the grades in the game. The projector shows teams against problems with ✓ on a note, ½ close and – missed, using symbols, words for screen readers and colour together. At 1920×1080 and 1280×720 the table, the question and the names all fit without scrolling.
   - **CyPro names and questions:** a panel maps game words to CyPro terms (system model, assets, trust boundaries, threats, C·I·A, threat actors, likelihood), and the prompts come from `debrief.prompts` in the scenario file. The teacher steps through the questions with Previous and Next, and the projector follows.
 
+- **The teacher's overview** (#33, #10). Built 29 October 2026:
+  - **Overview:** during the walk and the day the teacher sees each team's rooms, notes and clues. A team that nobody at the table has moved for three minutes gets a "May need help" flag with a warning symbol and words, not colour alone. Time spent paused never counts. The idle time is measured on the teacher's device from the moves it receives (`shared/src/game/overview.ts`).
+  - **Hints:** one tap sends a hint from three choices (the two next rooms the team has not entered, or "talk to everyone in the room"). It shows as a yellow banner on that team's phones until they close it.
+  - **Moving players:** before the walk the teacher can move a student to another table from a menu next to their name. Full tables are disabled in the menu.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

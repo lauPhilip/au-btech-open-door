@@ -93,9 +93,26 @@ export class RoomConnection {
 }
 
 /** Read a value from localStorage, which can be unavailable in private windows. */
+/**
+ * Several simulated people can share one browser while developing (see /dev).
+ * `?as=NAME` in the address gives each its own saved values.
+ */
+export function scopeFor(as: string | null): string {
+  const clean = (as ?? "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 20);
+  return clean ? `${clean}:` : "";
+}
+
+const scope = (() => {
+  try {
+    return scopeFor(new URL(window.location.href).searchParams.get("as"));
+  } catch {
+    return "";
+  }
+})();
+
 export function readStored(key: string): string | null {
   try {
-    return localStorage.getItem(key);
+    return localStorage.getItem(scope + key);
   } catch {
     return null;
   }
@@ -103,7 +120,7 @@ export function readStored(key: string): string | null {
 
 export function writeStored(key: string, value: string): void {
   try {
-    localStorage.setItem(key, value);
+    localStorage.setItem(scope + key, value);
   } catch {
     /* storage unavailable: the name is just not remembered */
   }

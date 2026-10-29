@@ -1,13 +1,17 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { clampToMap, roomAt, spots, spotsNear, teamById, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
+  import { clampToMap, dayMinute, eventsBy, formatLeft, isPaused, leftMs, roomAt, spots, spotsNear, teamById, teamClues, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
+  import Chat from "../../lib/Chat.svelte";
+  import ClueList from "../../lib/ClueList.svelte";
   import CloseUp from "../../lib/CloseUp.svelte";
+  import DayBar from "../../lib/DayBar.svelte";
   import NoteForm from "../../lib/NoteForm.svelte";
   import NotesPanel from "../../lib/NotesPanel.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
+  import { Ticker } from "../../lib/ticker.svelte";
 
   let { connection, game, scenario, me }: { connection: GameConnection; game: Game; scenario: Scenario; me: Player } = $props();
 
@@ -24,6 +28,20 @@
   let sentPosition: Point = $state.snapshot(position);
   let frame = 0;
   let lastFrame = 0;
+
+  // The room's clock, so the countdown and the game clock match on every device.
+  // svelte-ignore state_referenced_locally
+  const ticker = new Ticker(() => connection.now());
+  onDestroy(() => ticker.stop());
+
+  const isDay = $derived(game.phase === "day");
+  const paused = $derived(game.timer ? isPaused(game.timer) : false);
+  const left = $derived(game.timer ? leftMs(game.timer, ticker.now) : 0);
+  const minute = $derived(dayMinute(scenario, game, ticker.now));
+  const messages = $derived(isDay ? eventsBy(scenario, minute) : []);
+  const cluesFound = $derived(teamClues(game, me.team!));
+  /** Rooms where this team has found a clue, drawn with a magnifier on the map. */
+  const clueRooms = $derived(cluesFound.map((i) => scenario.day.clues[i]?.room).filter((r): r is string => !!r));
 
   const team = $derived(teamById(me.team!));
   const visited = $derived(teamVisited(game, me.team!));
@@ -133,14 +151,25 @@
 <svelte:window onkeydown={keydown} onkeyup={keyup} onblur={blur} />
 
 <main class="walk">
-  <header>
-    <span class="team" style="--team: {team.color}"><span class="door" aria-hidden="true"></span>{team.name}</span>
-    <span class="where" aria-live="polite">You are in: <strong>{here?.name ?? "the corridor"}</strong></span>
-    <StatusPill status={connection.status} />
-  </header>
+  <div class="top">
+    <header>
+      <span class="team" style="--team: {team.color}"><span class="door" aria-hidden="true"></span>{team.name}</span>
+      <span class="where" aria-live="polite">You are in: <strong>{here?.name ?? "the corridor"}</strong></span>
+      {#if game.phase === "walk" && game.timer}
+        <span class="left" class:over={left === 0} role="timer">{left === 0 ? "Time is up" : `Walk and spot · ${formatLeft(left)} left`}</span>
+      {/if}
+      <StatusPill status={connection.status} />
+    </header>
+    {#if isDay}
+      <DayBar {scenario} {minute} found={cluesFound.length} total={scenario.day.clues.length} latest={messages.at(-1) ? { from: scenario.people.find((p) => p.id === messages.at(-1)!.from)?.name ?? "", text: messages.at(-1)!.text } : undefined} />
+    {/if}
+    {#if game.phase === "walk" && left === 0 && !paused}
+      <p class="timeup" role="status">Time is up. Finish your note and wait for your teacher to start the day.</p>
+    {/if}
+  </div>
 
   <section class="map">
-    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
+    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} {clueRooms} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
     <div class="prompt" aria-live="polite">
       {#if nearby.length > 0}
         {#each nearby as spot (spot.kind + spot.id)}
@@ -158,6 +187,10 @@
   </section>
 
   <aside>
+    {#if isDay}
+      <section><Chat {scenario} events={messages} /></section>
+      <section><ClueList {scenario} found={cluesFound} /></section>
+    {/if}
     <section class="goal">
       <p class="eyebrow">Your goal</p>
       <p>{scenario.goal}</p>
@@ -221,6 +254,12 @@
   </aside>
 </main>
 
+{#if paused}
+  <div class="paused" role="alertdialog" aria-modal="true" aria-label="Paused">
+    <div><p class="big">Paused</p><p>Your teacher paused the game. Take a breath. It starts again soon.</p></div>
+  </div>
+{/if}
+
 {#if open}
   <CloseUp {scenario} spot={open} onask={(person, topic) => connection.ask(person, topic)} onnote={startNote} onclose={closeCloseUp} />
 {/if}
@@ -232,13 +271,49 @@
   .walk {
     min-height: 100dvh;
     display: grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     grid-template-rows: auto 1fr;
+    max-width: 1700px;
+    margin: 0 auto;
     gap: 12px 20px;
     padding: 12px 16px 24px;
   }
-  header {
+  .top {
     grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .left {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .left.over,
+  .timeup {
+    color: var(--alert-dark);
+  }
+  .timeup {
+    margin: 0;
+    font-weight: 600;
+  }
+  .paused {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    background: rgb(28 36 48 / 0.8);
+    color: #fff;
+  }
+  .paused .big {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0;
+  }
+  header {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -450,6 +525,12 @@
   .warn {
     color: var(--alert-dark);
     margin: 0;
+  }
+  @media (min-width: 1500px) {
+    .walk {
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px 28px;
+    }
   }
   @media (max-width: 860px) {
     .walk {

@@ -11,6 +11,7 @@
     names = "team",
     near = [],
     notes = [],
+    clueRooms = [],
     onpoint,
   }: {
     scenario: Scenario;
@@ -27,6 +28,8 @@
     names?: "team" | "all";
     /** Sticky notes to pin on the map: where the author stood, with the author's initial. */
     notes?: Note[];
+    /** Rooms where the team has found a clue; they get a magnifier. */
+    clueRooms?: string[];
     /** Ids of people and things within reach of the viewer; they get a highlight ring. */
     near?: string[];
     /** Called with map coordinates when the viewer taps or clicks the map. */
@@ -96,6 +99,13 @@
     <g class="room" class:seen={visited.has(room.id)}>
       <rect {x} {y} width={w} height={h} rx="10" />
       <text x={x + 16} y={y + 32} class="room-name">{room.name}</text>
+      {#if clueRooms.includes(room.id)}
+        <g transform="translate({x + w - 68} {y + 12})" aria-hidden="true">
+          <circle cx="11" cy="11" r="11" class="clue-bg" />
+          <circle cx="9.5" cy="9.5" r="4.5" class="clue-lens" />
+          <path d="M13 13 L17 17" class="clue-lens" />
+        </g>
+      {/if}
       {#if visited.has(room.id)}
         <g transform="translate({x + w - 34} {y + 12})" aria-hidden="true">
           <circle cx="11" cy="11" r="11" class="tick-bg" />
@@ -176,6 +186,15 @@
     font-weight: 700;
     font-size: 22px;
     fill: #4a3b2a;
+  }
+  .clue-bg {
+    fill: var(--blue);
+  }
+  .clue-lens {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
   }
   .tick-bg {
     fill: var(--safe);

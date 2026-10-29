@@ -61,9 +61,11 @@
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="note-title">
   <form onsubmit={submit}>
     <header>
-      <h2 id="note-title">Sticky note{aboutName ? ` · ${aboutName}` : ""}</h2>
+      <h2 id="note-title">Your sticky note</h2>
+      <p class="private-line">private until you share</p>
       <button type="button" class="close" onclick={onclose}>Cancel</button>
     </header>
+    <p class="on">On: <strong>{aboutName ?? "the place where you stand"}</strong></p>
 
     <div class="field">
       <label for="note-text">What could go wrong?</label>
@@ -72,7 +74,7 @@
     </div>
 
     <fieldset>
-      <legend>What would be the harm?</legend>
+      <legend>It would…</legend>
       <div class="choices">
         {#each HARM_CHOICES as c (c.id)}
           <label class="chip" class:on={harm.includes(c.id)}>
@@ -84,7 +86,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>Who could cause it?</legend>
+      <legend>Who might cause it?</legend>
       <div class="choices">
         {#each ACTOR_CHOICES as c (c.id)}
           <label class="chip" class:on={actor.includes(c.id)}>
@@ -96,7 +98,7 @@
     </fieldset>
 
     <fieldset>
-      <legend>How likely is it?</legend>
+      <legend>How likely?</legend>
       <div class="choices">
         {#each LIKELIHOOD_CHOICES as c (c.id)}
           <label class="chip" class:on={likelihood === c.id}>
@@ -110,7 +112,7 @@
     {#if tried && !ready}
       <p class="warn" role="alert">Write a few words and pick at least one harm, one who and one likelihood.</p>
     {/if}
-    <button class="stick" type="submit">Stick it on</button>
+    <button class="stick" type="submit">{aboutName ? `Stick it on ${aboutName}` : "Stick it on"}</button>
   </form>
   </div>
 </div>
@@ -142,20 +144,28 @@
   }
   header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
     gap: 12px;
   }
   h2 {
     font-size: 22px;
   }
   .close {
+    margin-left: auto;
     border: 2px solid var(--line);
     background: var(--paper);
     border-radius: var(--radius-s);
     padding: 6px 12px;
     font-weight: 600;
     cursor: pointer;
+  }
+  .private-line {
+    margin: 0;
+    color: var(--slate);
+    font-size: 14px;
+  }
+  .on {
+    margin: 0;
   }
   .field {
     display: flex;

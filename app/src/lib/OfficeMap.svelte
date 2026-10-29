@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AVATAR_RADIUS, teamById, type Player, type Scenario, type TeamId } from "@open-door/shared";
+  import { AVATAR_RADIUS, spots, teamById, type Player, type Scenario, type TeamId } from "@open-door/shared";
 
   let {
     scenario,
@@ -9,6 +9,7 @@
     yourPosition = null,
     visited = new Set<string>(),
     names = "team",
+    near = [],
     onpoint,
   }: {
     scenario: Scenario;
@@ -23,6 +24,8 @@
     visited?: Set<string>;
     /** Whose names to show: teammates only, or everyone (projector). */
     names?: "team" | "all";
+    /** Ids of people and things within reach of the viewer; they get a highlight ring. */
+    near?: string[];
     /** Called with map coordinates when the viewer taps or clicks the map. */
     onpoint?: (x: number, y: number) => void;
   } = $props();
@@ -31,15 +34,8 @@
 
   const { width, height, rooms } = $derived(scenario.map);
 
-  /** Where each scenario character stands: lower right of their room. */
-  const cast = $derived(
-    scenario.people.map((person, i) => {
-      const room = rooms.find((r) => r.id === person.room);
-      const [rx, ry, rw, rh] = room?.rect ?? [0, 0, 0, 0];
-      const sameRoomBefore = scenario.people.slice(0, i).filter((p) => p.room === person.room).length;
-      return { ...person, x: rx + rw - 40 - sameRoomBefore * 56, y: ry + rh - 44 };
-    }),
-  );
+  /** Where each person and thing stands (see `spots` in the shared package). */
+  const cast = $derived(spots(scenario));
 
   /** Others first, then teammates, then you on top. */
   const drawn = $derived(
@@ -91,11 +87,17 @@
     </g>
   {/each}
 
-  {#each cast as person (person.id)}
-    <g class="npc" transform="translate({person.x} {person.y})">
-      <circle r="20" />
-      <text y="6" class="npc-initial">{initial(person.name)}</text>
-      <text y="38" class="npc-name">{person.name}</text>
+  {#each cast as spot (spot.kind + spot.id)}
+    <g class="spot" class:npc={spot.kind === "person"} class:thing={spot.kind === "thing"} class:near={near.includes(spot.id)} transform="translate({spot.x} {spot.y})">
+      {#if near.includes(spot.id)}<circle r="30" class="reach" />{/if}
+      {#if spot.kind === "person"}
+        <circle r="20" />
+        <text y="6" class="npc-initial">{initial(spot.name)}</text>
+      {:else}
+        <rect x="-18" y="-18" width="36" height="36" rx="8" />
+        <path d="M-8 -3 H8 M-8 5 H3" class="thing-lines" />
+      {/if}
+      <text y="38" class="npc-name">{spot.name}</text>
     </g>
   {/each}
 
@@ -163,6 +165,23 @@
     fill: #fbe9da;
     stroke: #c98b5e;
     stroke-width: 2;
+  }
+  .thing rect {
+    fill: #e3ecf8;
+    stroke: #7f9cc7;
+    stroke-width: 2;
+  }
+  .thing-lines {
+    fill: none;
+    stroke: #4a6a9c;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .reach {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 3;
+    stroke-dasharray: 6 5;
   }
   .npc-initial,
   .player-initial {

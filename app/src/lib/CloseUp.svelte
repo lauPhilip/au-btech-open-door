@@ -1,0 +1,236 @@
+<script lang="ts">
+  import { onMount } from "svelte";
+  import type { PersonInScenario, Scenario, Spot } from "@open-door/shared";
+
+  let {
+    scenario,
+    spot,
+    onask,
+    onclose,
+  }: {
+    scenario: Scenario;
+    spot: Spot;
+    /** Called with the person's id and the index of the question the player chose. */
+    onask: (person: string, topic: number) => void;
+    onclose: () => void;
+  } = $props();
+
+  const person = $derived<PersonInScenario | undefined>(spot.kind === "person" ? scenario.people.find((p) => p.id === spot.id) : undefined);
+  const thing = $derived(spot.kind === "thing" ? scenario.things.find((t) => t.id === spot.id) : undefined);
+  const roomName = $derived(scenario.map.rooms.find((r) => r.id === spot.room)?.name ?? "");
+
+  /** Questions already asked in this window, in order. Closing the window starts a fresh talk. */
+  let asked = $state<number[]>([]);
+  let dialog: HTMLDivElement | undefined;
+  let closeButton: HTMLButtonElement | undefined;
+
+  function ask(index: number) {
+    if (!person || asked.includes(index)) return;
+    asked = [...asked, index];
+    onask(person.id, index);
+  }
+
+  function keydown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onclose();
+    }
+  }
+
+  onMount(() => {
+    closeButton?.focus();
+    dialog?.scrollIntoView({ block: "nearest" });
+  });
+</script>
+
+<svelte:window onkeydown={keydown} />
+
+<div class="backdrop" role="presentation" onpointerdown={(e) => e.target === e.currentTarget && onclose()}>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="closeup-title" bind:this={dialog}>
+    <header>
+      <div class="portrait" class:object={spot.kind === "thing"} aria-hidden="true">
+        {#if person}<span class="initial">{person.name.charAt(0)}</span>{:else}<span class="box"></span>{/if}
+      </div>
+      <div class="title">
+        <h2 id="closeup-title">{spot.name}</h2>
+        <p>{person ? `${person.role} · ${roomName}` : roomName}</p>
+      </div>
+      <button class="close" bind:this={closeButton} onclick={onclose} aria-label="Close and keep walking">Close</button>
+    </header>
+
+    {#if person}
+      <div class="talk" aria-live="polite">
+        <p class="bubble them">{person.hello}</p>
+        {#each asked as index (index)}
+          {@const topic = person.topics[index]!}
+          <p class="bubble you">{topic.ask}</p>
+          <p class="bubble them">{topic.answer}</p>
+        {/each}
+      </div>
+      {#if asked.length < person.topics.length}
+        <div class="asks">
+          <p class="eyebrow">Ask a question</p>
+          {#each person.topics as topic, index (index)}
+            {#if !asked.includes(index)}
+              <button class="ask" onclick={() => ask(index)}>{topic.ask}</button>
+            {/if}
+          {/each}
+        </div>
+      {:else}
+        <p class="done">That is everything {person.name} wants to tell you. Close this window to keep walking.</p>
+      {/if}
+    {:else if thing}
+      <p class="thing-text">{thing.text}</p>
+      <p class="hint">Think about it: what could go wrong here? Write it down on a sticky note.</p>
+    {/if}
+  </div>
+</div>
+
+<style>
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgb(28 36 48 / 0.55);
+  }
+  .card {
+    width: min(560px, 100%);
+    max-height: min(720px, 100%);
+    overflow-y: auto;
+    background: var(--paper);
+    border-radius: var(--radius-l);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 20px 60px rgb(28 36 48 / 0.35);
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .portrait {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #fbe9da;
+    border: 3px solid #c98b5e;
+  }
+  .portrait.object {
+    border-radius: 16px;
+    background: #e3ecf8;
+    border-color: #7f9cc7;
+  }
+  .initial {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 30px;
+    color: #7a4a26;
+  }
+  .box {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 3px solid #4a6a9c;
+  }
+  .title {
+    flex: 1;
+    min-width: 0;
+  }
+  h2 {
+    font-size: 24px;
+  }
+  .title p {
+    margin: 2px 0 0;
+    color: var(--slate);
+  }
+  .close {
+    flex: none;
+    border: 2px solid var(--line);
+    background: var(--paper);
+    border-radius: var(--radius-s);
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .close:hover {
+    border-color: var(--blue);
+  }
+  .talk {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bubble {
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 88%;
+  }
+  .them {
+    background: var(--mist);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+  }
+  .you {
+    background: var(--blue-soft);
+    color: var(--blue-dark);
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+    font-weight: 600;
+  }
+  .asks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .eyebrow {
+    margin: 0;
+    color: var(--slate);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .ask {
+    text-align: left;
+    padding: 12px 14px;
+    min-height: 48px;
+    border-radius: var(--radius-m);
+    border: 2px solid var(--blue);
+    background: var(--paper);
+    color: var(--blue-dark);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ask:hover {
+    background: var(--blue-soft);
+  }
+  .thing-text {
+    margin: 0;
+    font-size: 18px;
+  }
+  .hint,
+  .done {
+    margin: 0;
+    color: var(--slate);
+  }
+  @media (max-width: 600px) {
+    .backdrop {
+      padding: 0;
+      place-items: stretch;
+    }
+    .card {
+      width: 100%;
+      max-height: none;
+      border-radius: 0;
+    }
+  }
+</style>

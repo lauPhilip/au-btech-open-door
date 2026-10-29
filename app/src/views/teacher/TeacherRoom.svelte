@@ -81,7 +81,7 @@
   </header>
 
   {#if connection.ended}
-    <section class="panel"><h1>This session has ended</h1><p>Sessions are deleted six hours after they start. <a href="/teacher">Start a new session</a>.</p></section>
+    <section class="panel"><h1>This session has ended</h1><p>Sessions are deleted six hours after they start, or when you close them. <a href="/teacher">Start a new session</a>.</p></section>
   {:else if notTeacher}
     <section class="panel"><h1>Teacher key not accepted</h1><p>Open the teacher page in the browser that created session {code}, or <a href="/teacher">start a new session</a>.</p></section>
   {:else}
@@ -130,6 +130,24 @@
         </div>
       {/if}
     </section>
+    {#if game && (game.phase === "walk" || game.phase === "day" || game.phase === "vote")}
+      <section class="panel end">
+        <div>
+          <h2>Class done early?</h2>
+          <p>Skip the rest and go straight to the summary. Every team's notes are graded and the big screen shows the table.</p>
+        </div>
+        <button class="secondary" onclick={() => confirm("End the walk now and show the summary? This cannot be undone.") && connection.setPhase("debrief")}>End now and show summary</button>
+      </section>
+    {/if}
+    {#if game}
+      <section class="panel end">
+        <div>
+          <h2>Finished with this session?</h2>
+          <p>Close it for everyone and delete all notes and names. Download the tables first, because they cannot be brought back.</p>
+        </div>
+        <button class="secondary" onclick={() => confirm("Close the session for everyone and delete all data? This cannot be undone.") && connection.closeSession()}>Close the session</button>
+      </section>
+    {/if}
     {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
 
     {#if summaryReady}
@@ -176,6 +194,13 @@
 </main>
 
 <style>
+  .end {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
   .teacher {
     max-width: 1080px;
     margin: 0 auto;

@@ -350,6 +350,18 @@ test("the teacher moves a student, sees a stuck team and sends a hint", async ({
   await expect(ana.getByText("Hint from your teacher:")).toBeVisible();
   await ana.getByRole("button", { name: "Close the hint" }).click();
   await expect(ana.getByText("Hint from your teacher:")).toBeHidden();
+
+  // Done after a few minutes? The teacher can end the walk and go straight to the summary.
+  page.once("dialog", (d) => d.accept());
+  await teacher.getByRole("button", { name: "End now and show summary" }).click();
+  await expect(teacher.getByText(/Debrief: question 1 of/)).toBeVisible();
+  await expect(teacher.getByRole("button", { name: "End now and show summary" })).toBeHidden();
+
+  // Finished for good: closing the session ends it on every screen and deletes the data.
+  page.once("dialog", (d) => d.accept());
+  await teacher.getByRole("button", { name: "Close the session" }).click();
+  await expect(teacher.getByRole("heading", { name: "This session has ended" })).toBeVisible();
+  await expect(ana.getByRole("heading", { name: "This session has ended" })).toBeVisible();
 });
 
 test("a student who loses the network or reloads keeps their name, team, place and notes", async ({ browser }) => {

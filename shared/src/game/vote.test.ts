@@ -50,7 +50,7 @@ describe("the final vote", () => {
 
   it("goes from the day to the vote to the debrief, one step at a time", () => {
     const g = room(["a"], "day");
-    expect(setPhase(g, "debrief").ok).toBe(false);
+    expect(setPhase(room(["a"], "story"), "debrief").ok).toBe(false);
     const v = setPhase(g, "vote");
     expect(v.ok && v.value.phase).toBe("vote");
   });

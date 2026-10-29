@@ -122,6 +122,12 @@ describe("phases with countdowns", () => {
     expect(setPhase(lobby(), "day", ctx(0))).toEqual({ ok: false, error: "bad-phase" });
     expect(setPhase(toDay(toWalk(lobby())), "walk", ctx(0))).toEqual({ ok: false, error: "bad-phase" });
   });
+
+  it("lets the teacher end early: from the walk straight to the debrief, but never out of the lobby", () => {
+    expect(ok(setPhase(toWalk(lobby()), "debrief", ctx(T0))).phase).toBe("debrief");
+    expect(ok(setPhase(toDay(toWalk(lobby())), "debrief", ctx(T0))).phase).toBe("debrief");
+    expect(setPhase(lobby(), "debrief", ctx(T0))).toEqual({ ok: false, error: "bad-phase" });
+  });
 });
 
 describe("the teacher's timer controls", () => {

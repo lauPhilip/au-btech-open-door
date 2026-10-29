@@ -131,3 +131,51 @@ export function startRoom(scenario: Scenario): Room {
   if (!room) throw new Error(`Scenario ${scenario.id} has no rooms`);
   return room;
 }
+
+/** A person or thing a player can walk up to. */
+export interface Spot {
+  kind: "person" | "thing";
+  id: string;
+  name: string;
+  room: string;
+  /** Centre of the spot, in map units. */
+  x: number;
+  y: number;
+}
+
+/** Players can open a close-up when their avatar is this close to a spot (map units). */
+export const INTERACT_RANGE = 80;
+
+/**
+ * Where every person and thing stands. People stand along the bottom edge of their room,
+ * starting at the right; things sit in a row above them, spread across the room's width.
+ * The scenario file does not store positions, so this layout is the same for everyone.
+ */
+export function spots(scenario: Scenario): Spot[] {
+  const result: Spot[] = [];
+  const rooms = new Map(scenario.map.rooms.map((r) => [r.id, r]));
+  scenario.people.forEach((person, i) => {
+    const room = rooms.get(person.room);
+    if (!room) return;
+    const [rx, ry, rw, rh] = room.rect;
+    const before = scenario.people.slice(0, i).filter((p) => p.room === person.room).length;
+    result.push({ kind: "person", id: person.id, name: person.name, room: room.id, x: rx + rw - 40 - before * 56, y: ry + rh - 44 });
+  });
+  for (const room of scenario.map.rooms) {
+    const [rx, ry, rw, rh] = room.rect;
+    const here = scenario.things.filter((t) => t.room === room.id);
+    here.forEach((thing, i) => {
+      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: ry + rh - 112 });
+    });
+  }
+  return result;
+}
+
+/** The spots within reach of a point, nearest first. */
+export function spotsNear(scenario: Scenario, x: number, y: number, range = INTERACT_RANGE): Spot[] {
+  return spots(scenario)
+    .map((spot) => ({ spot, distance: Math.hypot(spot.x - x, spot.y - y) }))
+    .filter((s) => s.distance <= range)
+    .sort((a, b) => a.distance - b.distance)
+    .map((s) => s.spot);
+}

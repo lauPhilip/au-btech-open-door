@@ -351,3 +351,51 @@ test("the teacher moves a student, sees a stuck team and sends a hint", async ({
   await ana.getByRole("button", { name: "Close the hint" }).click();
   await expect(ana.getByText("Hint from your teacher:")).toBeHidden();
 });
+
+test("a student who loses the network or reloads keeps their name, team, place and notes", async ({ browser }) => {
+  const teacher = await (await browser.newContext()).newPage();
+  await teacher.goto("/teacher");
+  await teacher.getByRole("button", { name: "Create session" }).click();
+  await expect(teacher).toHaveURL(/code=/);
+  const code = new URL(teacher.url()).searchParams.get("code")!;
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  // Keep hold of the live connection, so the test can cut it like a bad network would.
+  let live: { close: (options?: { code?: number }) => void } | null = null;
+  await page.routeWebSocket(/game-room/, (ws) => {
+    ws.connectToServer();
+    live = ws;
+  });
+  await page.goto(`/j/${code}`);
+  await page.getByLabel("First name or nickname").fill("Ada");
+  await page.getByLabel("Face 3").click();
+  await page.getByRole("button", { name: "Next" }).click();
+  await page.getByRole("button", { name: /Blue door/ }).click();
+  await expect(page.getByText("You're in.")).toBeVisible();
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await page.getByRole("button", { name: /^Walk to Packing station,/ }).click();
+  await expect(page.getByText("You are in: Packing station")).toBeVisible({ timeout: 15_000 });
+
+  // She writes a note.
+  await page.getByRole("button", { name: "Sticky note" }).click();
+  const form = page.getByRole("dialog", { name: /sticky note/i });
+  await form.getByLabel("What could go wrong?").fill("Printer on guest wifi");
+  await form.getByRole("checkbox", { name: /Change something/ }).check();
+  await form.getByRole("checkbox", { name: /A visitor or driver/ }).check();
+  await form.getByRole("radio", { name: /Seen at firms like us/ }).check();
+  await form.getByRole("button", { name: /Stick it on/ }).click();
+  await expect(page.getByText("1 · private until shared").first()).toBeVisible();
+
+  // The network drops: she sees "Reconnecting…", then it comes back and nothing is lost.
+  (live as unknown as { close: (o?: { code?: number }) => void }).close({ code: 1006 });
+  await expect(page.getByText("Reconnecting…")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("Connected")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText("You are in: Packing station")).toBeVisible();
+
+  // A full reload brings back team, place and notes too.
+  await page.reload();
+  await expect(page.getByText("Blue door").first()).toBeVisible();
+  await expect(page.getByText("You are in: Packing station")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("1 · private until shared").first()).toBeVisible();
+});

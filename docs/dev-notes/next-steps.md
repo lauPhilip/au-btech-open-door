@@ -56,6 +56,12 @@ A short note on where development stands, so a new work session can pick up stra
   - **Hints:** one tap sends a hint from three choices (the two next rooms the team has not entered, or "talk to everyone in the room"). It shows as a yellow banner on that team's phones until they close it.
   - **Moving players:** before the walk the teacher can move a student to another table from a menu next to their name. Full tables are disabled in the menu.
 
+- **Checks that guard quality** (#36, #37, #39, #6, #2). Built 29 October 2026:
+  - **Readability (#37):** `readability.test.ts` fails when a scenario sentence has 20 or more words, when the whole scenario reads below Flesch 60, or when a longer text reads below 45. The Nordknit scenario passes as written.
+  - **Accessibility (#39):** `e2e/a11y.spec.ts` runs axe over the join page, team table, story, walk, day, vote, finish, teacher and projector screens, and fails on serious or critical problems.
+  - **Reconnect (#6):** an end-to-end test cuts a student's connection, sees "Reconnecting…" then "Connected", and checks that name, team, place and notes survive both the drop and a reload.
+  - **CI (#2):** the workflow now also runs the browser tests. Scenario schema and reference checks (#36) already run as part of `npm run check`.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

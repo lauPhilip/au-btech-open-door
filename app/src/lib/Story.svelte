@@ -66,7 +66,7 @@
 
   <nav class="controls">
     <button onclick={() => index--} disabled={index === 0} aria-label="Back">←</button>
-    <span class="dots" aria-label="Card {index + 1} of {cards.length}">
+    <span class="dots" role="img" aria-label="Card {index + 1} of {cards.length}">
       {#each cards as _, i (i)}<span class="d" class:on={i === index}></span>{/each}
     </span>
     <button class="next" onclick={() => index++} disabled={last}>{last ? "That's it" : "Next"}</button>

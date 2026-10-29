@@ -80,6 +80,11 @@ export class GameConnection {
     this.send({ t: "unnote", id });
   }
 
+  /** Vote for an option of the final choice. */
+  vote(option: number): void {
+    this.send({ t: "vote", option });
+  }
+
   /** Pause or resume the whole class, or add five minutes to the walk (teacher only). */
   timer(action: TimerAction): void {
     this.send({ t: "timer", action });

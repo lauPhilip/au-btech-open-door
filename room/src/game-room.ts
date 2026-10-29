@@ -192,6 +192,9 @@ export class GameRoom extends Server {
         }
         break;
       }
+      case "summary":
+        this.send(connection, { t: "summary", notes: this.notes });
+        break;
       case "assign":
         await this.apply(connection, assignTeam(game, message.player, message.team));
         break;

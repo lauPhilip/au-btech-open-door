@@ -53,6 +53,10 @@ export interface Game {
   results: Partial<Record<TeamId, Array<"hit" | "close" | "miss">>>;
   /** Which debrief question the teacher is showing on the projector (issue #30). */
   prompt: number;
+  /** How many sticky notes each team has written, so the teacher can see who is working (issue #33). */
+  noteCounts: Partial<Record<TeamId, number>>;
+  /** The latest hint the teacher sent to each team (issue #33). */
+  hints: Partial<Record<TeamId, { text: string; at: number }>>;
 }
 
 export type GameError =
@@ -67,6 +71,8 @@ export type GameError =
   | "unknown-question"
   | "not-voting"
   | "not-debrief"
+  | "bad-hint"
+  | "too-late"
   | "unknown-option"
   | "paused"
   | "bad-note"
@@ -85,6 +91,8 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "bad-face": "Pick a face.",
   "too-far": "Walk closer to talk to them.",
   "unknown-question": "That question is not in this scenario.",
+  "bad-hint": "A hint needs a few words and a team that is playing.",
+  "too-late": "Players can only change tables before the walk starts.",
   "not-debrief": "The debrief has not started yet.",
   "not-voting": "The vote has not started yet.",
   "unknown-option": "That choice is not on the list.",
@@ -110,7 +118,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0 };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0, noteCounts: {}, hints: {} };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {
@@ -289,4 +297,19 @@ export function setPrompt(game: Game, scenario: Scenario, index: number): Result
   if (game.phase !== "debrief") return fail("not-debrief");
   const last = scenario.debrief.prompts.length - 1;
   return ok({ ...game, prompt: Math.max(0, Math.min(last, Math.trunc(index))) });
+}
+
+/** The teacher moves a student to another table, before the walk starts (issue #10). */
+export function assignTeam(game: Game, id: string, team: TeamId): Result<Game> {
+  if (game.phase !== "lobby" && game.phase !== "story") return fail("too-late");
+  return chooseTeam(game, id, team);
+}
+
+export const HINT_MAX_CHARS = 120;
+
+/** The teacher sends a short hint to one team. It shows on their phones until they close it. */
+export function sendHint(game: Game, team: TeamId, text: string, now: number): Result<Game> {
+  const clean = text.replace(/\s+/g, " ").trim().slice(0, HINT_MAX_CHARS);
+  if (clean.length < 3 || !isPlaying(game) || !game.players.some((p) => p.team === team)) return fail("bad-hint");
+  return ok({ ...game, hints: { ...game.hints, [team]: { text: clean, at: now } } });
 }

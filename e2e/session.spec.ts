@@ -429,3 +429,49 @@ test("a student can swap the map for the room view and walk door to door", async
   await page.getByRole("button", { name: "Map" }).click();
   await expect(page.getByRole("img", { name: /Top-down map/ })).toBeVisible();
 });
+
+test("a team downloads its notes as a CyPro table and the teacher downloads the class summary", async ({ browser }) => {
+  const teacher = await (await browser.newContext()).newPage();
+  await teacher.goto("/teacher");
+  await teacher.getByRole("button", { name: "Create session" }).click();
+  await expect(teacher).toHaveURL(/code=/);
+  const code = new URL(teacher.url()).searchParams.get("code")!;
+  const page = await student(browser, code, "Ada", 2, "Blue door", true);
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await page.getByRole("button", { name: /^Walk to Packing station,/ }).click();
+  await expect(page.getByText("You are in: Packing station")).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("button", { name: "Sticky note" }).click();
+  const form = page.getByRole("dialog", { name: /sticky note/i });
+  await form.getByLabel("What could go wrong?").fill("=SUM(1+1) printer on guest wifi");
+  await form.getByRole("checkbox", { name: /Change something/ }).check();
+  await form.getByRole("checkbox", { name: /A visitor or driver/ }).check();
+  await form.getByRole("radio", { name: /Seen at firms like us/ }).check();
+  await form.getByRole("button", { name: /Stick it on/ }).click();
+  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await teacher.getByRole("button", { name: "Start the vote" }).click();
+  await page.getByRole("radio").first().click();
+  await teacher.getByRole("button", { name: "Show the result" }).click();
+
+  // The student's table: CyPro columns, the note, and formulas defused.
+  const [file] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Download CSV" }).click()]);
+  expect(file.suggestedFilename()).toMatch(/^blue-door-[a-z0-9]{4}-cypro-threats\.csv$/);
+  const csv = (await import("node:fs")).readFileSync((await file.path())!, "utf8");
+  expect(csv).toContain('"Threat","Target (asset or component)","Where","Harm (C · I · A)","Threat actor","Likelihood (1–4)","Impact","Noted by"');
+  expect(csv).toContain("'=SUM(1+1) printer on guest wifi");
+  expect(csv).toContain("I · Integrity (change)");
+  expect(csv).toContain("3 · Seen at firms like us");
+  expect(csv).toContain('"Ada"');
+
+  // The teacher's summary has every team's notes and the debrief table.
+  await expect(teacher.getByRole("region", { name: "Class summary" })).toBeVisible();
+  await expect(teacher.getByText(/deleted six hours after they start/)).toBeVisible();
+  const [notes] = await Promise.all([teacher.waitForEvent("download"), teacher.getByRole("button", { name: "Download all notes (CSV)" }).click()]);
+  const all = (await import("node:fs")).readFileSync((await notes.path())!, "utf8");
+  expect(all).toContain('"Team","Threat"');
+  expect(all).toContain('"Blue door"');
+  expect(all).toContain("printer on guest wifi");
+  const [debrief] = await Promise.all([teacher.waitForEvent("download"), teacher.getByRole("button", { name: "Download the debrief table (CSV)" }).click()]);
+  const table = (await import("node:fs")).readFileSync((await debrief.path())!, "utf8");
+  expect(table).toContain('"Problem on the day","Blue door"');
+});

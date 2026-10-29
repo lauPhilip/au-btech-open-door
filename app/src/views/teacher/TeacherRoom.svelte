@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
+  import { classTable, debriefTable, fileName, THREAT_COLUMNS, toCsv, teamTable, teamById, TEAMS, dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
   import TeamOverview from "../../lib/TeamOverview.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
+  import { download, printTables } from "../../lib/exporting";
   import { Ticker } from "../../lib/ticker.svelte";
 
   let { code, teacherKey }: { code: string; teacherKey: string } = $props();
@@ -41,6 +42,32 @@
   ];
   const nextStep = $derived(STEPS.find((s) => s.phase === next));
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
+
+  // The class summary needs everyone's notes; ask for them when the day is over.
+  $effect(() => {
+    if (game && (game.phase === "vote" || game.phase === "debrief")) connection.requestSummary();
+  });
+  const summaryReady = $derived(game !== null && scenario !== undefined && (game.phase === "vote" || game.phase === "debrief"));
+  const summaryBase = $derived(fileName(scenario?.company.name ?? "class", code));
+
+  function downloadNotes() {
+    if (!game || !scenario) return;
+    download(`${summaryBase}-notes.csv`, toCsv([["Team", ...THREAT_COLUMNS], ...classTable(scenario, game, connection.allNotes)]));
+  }
+  function downloadDebrief() {
+    if (!game || !scenario) return;
+    download(`${summaryBase}-debrief.csv`, toCsv(debriefTable(scenario, game)));
+  }
+  function printSummary() {
+    if (!game || !scenario) return;
+    printTables(`${scenario.company.name} · ${scenario.title} · class summary`, [
+      { heading: "Who saw it coming", rows: debriefTable(scenario, game) },
+      ...TEAMS.filter((t) => game.players.some((p) => p.team === t.id)).map((t) => ({
+        heading: `${teamById(t.id).name}: CyPro threat table`,
+        rows: [[...THREAT_COLUMNS], ...teamTable(scenario, game, connection.allNotes, t.id)],
+      })),
+    ]);
+  }
 
   function openScreen() {
     window.open(`/screen/${code}`, `open-door-screen-${code}`);
@@ -104,6 +131,18 @@
       {/if}
     </section>
     {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
+
+    {#if summaryReady}
+      <section class="panel" aria-label="Class summary">
+        <h2>Class summary</h2>
+        <p>Every team's notes as a CyPro threat table, and the table of who saw what. Sessions are deleted six hours after they start, so save these before you close this page.</p>
+        <div class="prompts">
+          <button class="secondary" onclick={downloadNotes}>Download all notes (CSV)</button>
+          <button class="secondary" onclick={downloadDebrief} disabled={game?.phase !== "debrief"}>Download the debrief table (CSV)</button>
+          <button class="secondary" onclick={printSummary}>Print or save as PDF</button>
+        </div>
+      </section>
+    {/if}
 
     {#if timer && game && scenario}
       <section class="panel control" aria-label="Class controls">

@@ -4,6 +4,7 @@
   import type { GameConnection } from "../../lib/game.svelte";
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
   import CloseUp from "../../lib/CloseUp.svelte";
+  import NoteForm from "../../lib/NoteForm.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
 
@@ -31,6 +32,8 @@
   const found = $derived(teamRevealed(game, me.team!));
   /** The person or thing whose close-up is open, or null while walking. */
   let open = $state<Spot | null>(null);
+  /** The note form is open; `about` is who or what it is about. */
+  let noting = $state<{ about: Spot | null } | null>(null);
   const roomName = (id: string | null) => scenario.map.rooms.find((r) => r.id === id)?.name ?? "Corridor";
 
   function tick(now: number) {
@@ -73,8 +76,15 @@
     open = null;
   }
 
+  function startNote(about: Spot | null) {
+    held.clear();
+    target = null;
+    open = null;
+    noting = { about };
+  }
+
   function keydown(event: KeyboardEvent) {
-    if (open) return;
+    if (open || noting) return;
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
     if (event.key.toLowerCase() === "e" && !event.metaKey && !event.ctrlKey && !event.altKey && nearby[0]) {
       event.preventDefault();
@@ -121,6 +131,7 @@
       {:else}
         <span class="quiet">Walk up to a person or a thing to talk or look closer.</span>
       {/if}
+      <button class="action sticky" onclick={() => startNote(nearby[0] ?? null)}>Sticky note</button>
     </div>
     <p class="help">Tap or click where you want to go. On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
   </section>
@@ -143,6 +154,22 @@
           </li>
         {/each}
       </ul>
+    </section>
+
+    <section>
+      <h2>Your notes <small>{connection.notes.length} written, only you can see them</small></h2>
+      {#if connection.notes.length > 0}
+        <ul class="notes">
+          {#each connection.notes as note (note.id)}
+            <li>
+              <span>{note.text}</span>
+              <button class="del" onclick={() => connection.removeNote(note.id)} aria-label="Delete note: {note.text}">✕</button>
+            </li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="empty">Spot something that could go wrong? Press “Sticky note”.</p>
+      {/if}
     </section>
 
     <section>
@@ -173,7 +200,10 @@
 </main>
 
 {#if open}
-  <CloseUp {scenario} spot={open} onask={(person, topic) => connection.ask(person, topic)} onclose={closeCloseUp} />
+  <CloseUp {scenario} spot={open} onask={(person, topic) => connection.ask(person, topic)} onnote={startNote} onclose={closeCloseUp} />
+{/if}
+{#if noting}
+  <NoteForm about={noting.about?.id ?? null} aboutName={noting.about?.name ?? null} onsubmit={(input) => connection.addNote(input)} onclose={() => (noting = null)} />
 {/if}
 
 <style>
@@ -242,6 +272,29 @@
     color: #fff;
     font-weight: 700;
     cursor: pointer;
+  }
+  .action.sticky {
+    background: var(--sticky);
+    color: var(--ink);
+  }
+  .action.sticky:hover {
+    background: #f5d450;
+  }
+  .notes li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    background: #fff9d6;
+    border-left: 4px solid var(--sticky);
+    padding: 6px 8px;
+    border-radius: 6px;
+  }
+  .del {
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--slate);
+    min-width: 32px;
   }
   .action:hover {
     background: var(--blue-dark);

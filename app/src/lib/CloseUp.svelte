@@ -6,12 +6,15 @@
     scenario,
     spot,
     onask,
+    onnote,
     onclose,
   }: {
     scenario: Scenario;
     spot: Spot;
     /** Called with the person's id and the index of the question the player chose. */
     onask: (person: string, topic: number) => void;
+    /** Called when the player wants to write a sticky note about this person or thing. */
+    onnote: (spot: Spot) => void;
     onclose: () => void;
   } = $props();
 
@@ -81,8 +84,9 @@
       {/if}
     {:else if thing}
       <p class="thing-text">{thing.text}</p>
-      <p class="hint">Think about it: what could go wrong here? Write it down on a sticky note.</p>
+      <p class="hint">Think about it: what could go wrong here?</p>
     {/if}
+    <button class="note" onclick={() => onnote(spot)}>Write a sticky note about {spot.name}</button>
   </div>
 </div>
 
@@ -212,6 +216,17 @@
   }
   .ask:hover {
     background: var(--blue-soft);
+  }
+  .note {
+    align-self: flex-start;
+    min-height: 48px;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: var(--radius-m);
+    background: var(--sticky);
+    color: var(--ink);
+    font-weight: 700;
+    cursor: pointer;
   }
   .thing-text {
     margin: 0;

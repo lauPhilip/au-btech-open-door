@@ -78,3 +78,43 @@ input {
     transition: none !important;
   }
 }
+
+/* Printing a table for the report: only the sheet is shown (see lib/exporting.ts). */
+#print-sheet {
+  display: none;
+}
+@media print {
+  body.printing > *:not(#print-sheet) {
+    display: none !important;
+  }
+  body.printing #print-sheet {
+    display: block;
+    color: #000;
+    background: #fff;
+    font-size: 11pt;
+  }
+  #print-sheet h1 {
+    font-size: 18pt;
+  }
+  #print-sheet h2 {
+    font-size: 13pt;
+    margin: 16pt 0 6pt;
+  }
+  #print-sheet table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #print-sheet th,
+  #print-sheet td {
+    border: 1px solid #000;
+    padding: 4pt 6pt;
+    text-align: left;
+    vertical-align: top;
+  }
+  #print-sheet thead {
+    display: table-header-group;
+  }
+  #print-sheet tr {
+    break-inside: avoid;
+  }
+}

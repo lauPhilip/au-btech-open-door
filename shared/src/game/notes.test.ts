@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { scenarios } from "../scenarios.generated";
 import { mayRoleSend, parseGameMessage } from "./messages";
-import { addNote, cleanNoteText, NOTE_MAX_CHARS, NOTES_PER_PLAYER, notesBy, removeNote, type Note, type NoteInput } from "./notes";
+import { addNote, cleanNoteText, mergeNotes, NOTE_MAX_CHARS, NOTES_PER_PLAYER, notesBy, removeNote, setShared, visibleNotes, type Note, type NoteInput } from "./notes";
 import { chooseTeam, join, move, newGame, setPhase, type Game } from "./rules";
 
 const scenario = scenarios["nordknit-black-friday"]!;
@@ -71,5 +71,74 @@ describe("sticky notes", () => {
     expect(mayRoleSend("player", msg)).toBe(true);
     expect(mayRoleSend("teacher", msg)).toBe(false);
     expect(mayRoleSend("screen", msg)).toBe(false);
+  });
+});
+
+describe("sharing and merging notes (#23)", () => {
+  /** Ida and Jo on the blue team, Kim on green, all walking. */
+  function classroom(): Game {
+    let game = newGame("HXQ4", scenario.id, 45, 0);
+    for (const [id, team] of [["p0", "blue"], ["p1", "blue"], ["p2", "green"]] as const) {
+      game = ok(join(game, scenario, id, id, 0, 0));
+      game = ok(chooseTeam(game, id, team));
+    }
+    game = ok(setPhase(ok(setPhase(game, "story")), "walk"));
+    return game;
+  }
+  const write = (notes: Note[], game: Game, who: string, over: Partial<NoteInput>, id: string) =>
+    ok(addNote(notes, game, scenario, who, { ...input, ...over }, id, 0));
+
+  it("starts private and is visible to the author only", () => {
+    const game = classroom();
+    const notes = write([], game, "p0", {}, "n1");
+    expect(notes[0]).toMatchObject({ shared: false, mergedWith: [] });
+    expect(visibleNotes(notes, game, "p0")).toHaveLength(1);
+    expect(visibleNotes(notes, game, "p1")).toHaveLength(0);
+  });
+
+  it("shows a shared note to the team but not to other teams, and can take it back", () => {
+    const game = classroom();
+    let notes = ok(setShared(write([], game, "p0", {}, "n1"), "p0", "n1", true));
+    expect(visibleNotes(notes, game, "p1")).toHaveLength(1);
+    expect(visibleNotes(notes, game, "p2")).toHaveLength(0);
+    notes = ok(setShared(notes, "p0", "n1", false));
+    expect(visibleNotes(notes, game, "p1")).toHaveLength(0);
+  });
+
+  it("lets only the author share or unshare", () => {
+    const game = classroom();
+    const notes = write([], game, "p0", {}, "n1");
+    expect(setShared(notes, "p1", "n1", true)).toEqual({ ok: false, error: "unknown-note" });
+  });
+
+  it("merges two shared notes: union of choices, higher likelihood, kept text", () => {
+    const game = classroom();
+    let notes = write([], game, "p0", { text: "Password under keyboard", harm: ["leak"], actor: ["visitor"], likelihood: 2 }, "n1");
+    notes = write(notes, game, "p1", { text: "Shared admin login", harm: ["change"], actor: ["employee"], likelihood: 4 }, "n2");
+    notes = ok(setShared(ok(setShared(notes, "p0", "n1", true)), "p1", "n2", true));
+    const merged = ok(mergeNotes(notes, game, "p1", "n1", "n2"));
+    expect(merged).toHaveLength(1);
+    expect(merged[0]).toMatchObject({ id: "n1", text: "Password under keyboard", harm: ["leak", "change"], actor: ["visitor", "employee"], likelihood: 4, mergedWith: ["p1"] });
+  });
+
+  it("refuses to merge private notes, other teams' notes, or a note with itself", () => {
+    const game = classroom();
+    let notes = write([], game, "p0", {}, "n1");
+    notes = write(notes, game, "p1", {}, "n2");
+    notes = write(notes, game, "p2", {}, "n3");
+    expect(mergeNotes(notes, game, "p0", "n1", "n2")).toEqual({ ok: false, error: "unknown-note" }); // still private
+    notes = ok(setShared(ok(setShared(ok(setShared(notes, "p0", "n1", true)), "p1", "n2", true)), "p2", "n3", true));
+    expect(mergeNotes(notes, game, "p0", "n1", "n3")).toEqual({ ok: false, error: "unknown-note" }); // other team
+    expect(mergeNotes(notes, game, "p0", "n1", "n1")).toEqual({ ok: false, error: "unknown-note" });
+    expect(mergeNotes(notes, game, "p2", "n1", "n2")).toEqual({ ok: false, error: "unknown-note" }); // not on that team
+  });
+
+  it("parses share and merge messages", () => {
+    expect(parseGameMessage('{"t":"share","id":"abc12345","shared":true}')).toEqual({ t: "share", id: "abc12345", shared: true });
+    expect(parseGameMessage('{"t":"share","id":"abc12345","shared":"yes"}')).toBeNull();
+    expect(parseGameMessage('{"t":"merge","keep":"abc12345","drop":"def67890"}')).toEqual({ t: "merge", keep: "abc12345", drop: "def67890" });
+    expect(parseGameMessage('{"t":"merge","keep":"abc12345"}')).toBeNull();
+    expect(mayRoleSend("player", { t: "merge", keep: "a", drop: "b" })).toBe(true);
+    expect(mayRoleSend("screen", { t: "share", id: "a", shared: true })).toBe(false);
   });
 });

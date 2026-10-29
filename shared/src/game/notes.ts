@@ -29,6 +29,10 @@ export interface Note {
   /** The person or thing the note is about, if the player wrote it from a close-up. */
   about: string | null;
   createdAt: number;
+  /** False: only the author sees it. True: the whole team sees it (issue #23). */
+  shared: boolean;
+  /** Ids of the players whose notes were merged into this one, besides the author. */
+  mergedWith: string[];
 }
 
 /** What the note form sends. */
@@ -42,24 +46,24 @@ export interface NoteInput {
 
 /** Plain-language choices for the form. The order is the order on screen. */
 export const HARM_CHOICES: ReadonlyArray<{ id: Harm; label: string; hint: string }> = [
-  { id: "leak", label: "Leak", hint: "Someone sees data they should not see" },
-  { id: "change", label: "Change", hint: "Someone changes data or settings" },
-  { id: "stop", label: "Stop", hint: "Something stops working" },
+  { id: "leak", label: "Leak information", hint: "Someone sees data they should not see" },
+  { id: "change", label: "Change something", hint: "Someone changes data or settings" },
+  { id: "stop", label: "Stop the work", hint: "Something stops working" },
 ];
 
 export const ACTOR_CHOICES: ReadonlyArray<{ id: Actor; label: string; hint: string }> = [
   { id: "online", label: "Someone online", hint: "An attacker on the internet" },
-  { id: "visitor", label: "A visitor", hint: "Someone who walks in" },
+  { id: "visitor", label: "A visitor or driver", hint: "Someone who walks in" },
   { id: "employee", label: "An employee", hint: "On purpose or by mistake" },
   { id: "supplier", label: "A supplier", hint: "A partner or service provider" },
   { id: "accident", label: "An accident", hint: "Nobody did it on purpose" },
 ];
 
 export const LIKELIHOOD_CHOICES: ReadonlyArray<{ id: Likelihood; label: string }> = [
-  { id: 1, label: "In theory" },
-  { id: 2, label: "Heard of it elsewhere" },
-  { id: 3, label: "Seen at companies like ours" },
-  { id: 4, label: "Has happened here" },
+  { id: 1, label: "1 · In theory only" },
+  { id: 2, label: "2 · Heard of it elsewhere" },
+  { id: 3, label: "3 · Seen at firms like us" },
+  { id: 4, label: "4 · Happened here" },
 ];
 
 export const HARM_IDS: readonly Harm[] = HARM_CHOICES.map((c) => c.id);
@@ -113,6 +117,8 @@ export function addNote(
     room: roomAt(scenario, player.x, player.y)?.id ?? null,
     about,
     createdAt: now,
+    shared: false,
+    mergedWith: [],
   };
   return { ok: true, value: [...notes, note] };
 }
@@ -121,6 +127,42 @@ export function addNote(
 export function removeNote(notes: readonly Note[], playerId: string, id: string): { ok: true; value: Note[] } | Fail {
   if (!notes.some((n) => n.id === id && n.author === playerId)) return fail("unknown-note");
   return { ok: true, value: notes.filter((n) => n.id !== id) };
+}
+
+/** Show your own note to your team, or take it back. Only the author can do this. */
+export function setShared(notes: readonly Note[], playerId: string, id: string, shared: boolean): { ok: true; value: Note[] } | Fail {
+  const note = notes.find((n) => n.id === id && n.author === playerId);
+  if (!note) return fail("unknown-note");
+  if (note.shared === shared) return { ok: true, value: [...notes] };
+  return { ok: true, value: notes.map((n) => (n === note ? { ...n, shared } : n)) };
+}
+
+/**
+ * Merge two shared notes of the player's team into one. The first note stays, with its text;
+ * harms and who are combined and the higher likelihood wins. Anyone on the team may merge.
+ */
+export function mergeNotes(notes: readonly Note[], game: Game, playerId: string, keepId: string, dropId: string): { ok: true; value: Note[] } | Fail {
+  const player = findPlayer(game, playerId);
+  if (!player?.team) return fail("no-team");
+  const keep = notes.find((n) => n.id === keepId);
+  const drop = notes.find((n) => n.id === dropId);
+  if (!keep || !drop || keep === drop || !keep.shared || !drop.shared || keep.team !== player.team || drop.team !== player.team) {
+    return fail("unknown-note");
+  }
+  const merged: Note = {
+    ...keep,
+    harm: HARM_IDS.filter((h) => keep.harm.includes(h) || drop.harm.includes(h)),
+    actor: ACTOR_IDS.filter((a) => keep.actor.includes(a) || drop.actor.includes(a)),
+    likelihood: Math.max(keep.likelihood, drop.likelihood) as Likelihood,
+    mergedWith: [...new Set([...keep.mergedWith, drop.author, ...drop.mergedWith])].filter((a) => a !== keep.author),
+  };
+  return { ok: true, value: notes.filter((n) => n !== drop).map((n) => (n === keep ? merged : n)) };
+}
+
+/** What one player may see: their own notes, plus everything their team has shared. */
+export function visibleNotes(notes: readonly Note[], game: Game, playerId: string): Note[] {
+  const team = findPlayer(game, playerId)?.team ?? null;
+  return notes.filter((n) => n.author === playerId || (n.shared && team !== null && n.team === team));
 }
 
 /** The notes one player has written. */

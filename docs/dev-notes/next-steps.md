@@ -29,6 +29,11 @@ A short note on where development stands, so a new work session can pick up stra
   - **Wording** now follows the concept book: "Stop the work", "A visitor or driver", numbered likelihood levels, "Back to the map", "My notes · private until shared" and "Team notes · on the map".
   - **Not done yet from the board:** the projector's "notes per team" counts (belongs with #29), and "Stick it on" has no sticky-drop animation.
 
+- **Accessibility pass** (#17, #40). Built 29 October 2026:
+  - **Room list as a second way to walk (#17):** every room in the sidebar is a button ("Walk to Server cupboard, not visited yet") that walks the avatar to the middle of the room, and the people and things in each room are buttons too. The "Talk to …" prompt then appears as usual, so the whole game up to the close-ups works without the map.
+  - **Reduced motion and colour-safe states (#40):** the global `prefers-reduced-motion` rule already stops animations and avatar gliding, and an e2e test now proves it (and fails without the setting). No state is shown by colour alone: rooms have ticks and text, notes have dashes for private, teammates have initials, likelihood has numbers. `contrast.test.ts` checks the 13 text and background pairs against 4.5:1.
+  - **Not covered yet:** the axe checks in CI (#39), and a screen-reader test with a real reader.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.
@@ -40,7 +45,7 @@ A short note on where development stands, so a new work session can pick up stra
 
 Goal: the day happens, and the team's notes meet the answer key.
 
-1. **Room list as a keyboard and screen-reader alternative** (#17) and **reduced motion and colour-safe states** (#40): the prompt row is the keyboard route to people and things; the map is still the only way to walk there.
+1. **Axe checks in CI** (#39) and a real screen-reader pass over the walk view and close-ups.
 2. **Walls and doors** (see known limits below) before the day starts, so clues in rooms mean something.
 3. **First illustrated close-ups** (#21): replace the initial and the box in `CloseUp.svelte` with illustrations.
 5. Then **M2 slice 3 – the day happens** (#25–#28): clock, chat messages and the alert, clues in rooms, the final team vote, and matching notes with the answer key.

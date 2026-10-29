@@ -4,6 +4,7 @@
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
+  import TeamOverview from "../../lib/TeamOverview.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
   import { Ticker } from "../../lib/ticker.svelte";
 
@@ -124,8 +125,13 @@
     {/if}
 
     <section>
-      <h2 class="section-title">Teams</h2>
-      <TeamBoard {players} />
+      {#if game && scenario && (game.phase === "walk" || game.phase === "day")}
+        <h2 class="section-title">How the teams are doing</h2>
+        <TeamOverview {connection} {game} {scenario} now={ticker.now} />
+      {:else}
+        <h2 class="section-title">Teams</h2>
+        <TeamBoard {players} onmove={game && (game.phase === "lobby" || game.phase === "story") ? (id, team) => connection.assign(id, team) : undefined} />
+      {/if}
     </section>
   {/if}
 </main>

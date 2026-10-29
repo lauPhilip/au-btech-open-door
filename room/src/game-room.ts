@@ -2,7 +2,9 @@ import { Server, type Connection, type ConnectionContext } from "partyserver";
 import {
   addNote,
   adjustTimer,
+  assignTeam,
   castVote,
+  sendHint,
   gradeAll,
   setPrompt,
   TEAMS,
@@ -82,6 +84,8 @@ export class GameRoom extends Server {
       this.game.revealed ??= {};
       this.game.votes ??= {};
       this.game.results ??= {};
+      this.game.noteCounts ??= {};
+      this.game.hints ??= {};
       this.game.prompt ??= 0;
       this.game.clues ??= {};
       this.game.timer ??= null;
@@ -188,6 +192,12 @@ export class GameRoom extends Server {
         }
         break;
       }
+      case "assign":
+        await this.apply(connection, assignTeam(game, message.player, message.team));
+        break;
+      case "hint":
+        await this.apply(connection, sendHint(game, message.team, message.text, Date.now()));
+        break;
       case "prompt":
         await this.apply(connection, setPrompt(game, scenario, message.index));
         break;
@@ -271,6 +281,18 @@ export class GameRoom extends Server {
     this.notes = result.value;
     await this.ctx.storage.put("notes", this.notes);
     this.sendNotesToPlayers();
+    await this.countNotes();
+  }
+
+  /** Keep a count of notes per team in the game, so the teacher's overview can show who is working. */
+  private async countNotes(): Promise<void> {
+    if (!this.game) return;
+    const counts: Game["noteCounts"] = {};
+    for (const n of this.notes) counts[n.team] = (counts[n.team] ?? 0) + 1;
+    if (JSON.stringify(counts) === JSON.stringify(this.game.noteCounts)) return;
+    this.game = { ...this.game, noteCounts: counts };
+    this.broadcastState();
+    await this.ctx.storage.put("game", this.game);
   }
 
   private sendNotesToPlayers(): void {

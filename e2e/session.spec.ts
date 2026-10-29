@@ -323,3 +323,31 @@ test("the class votes on what the CEO should do and sees what their notes predic
   await teacher.getByRole("button", { name: "Next question" }).click();
   await expect(projector.getByText(/The fake visitor came in before reception opened/)).toBeVisible();
 });
+
+test("the teacher moves a student, sees a stuck team and sends a hint", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const ana = page.frameLocator('iframe[title="Student Ana"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
+
+  // Before the walk the teacher can move a student to another table.
+  await teacher.getByLabel("Move Ana to another table").selectOption({ label: "Yellow door" });
+  await expect(ana.getByText("Yellow door").first()).toBeVisible();
+
+  // During the walk the overview shows every team; a team that does not move for three minutes is flagged.
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await expect(teacher.getByRole("table", { name: "Progress per team" })).toBeVisible();
+  await expect(teacher.getByText("May need help")).toBeHidden();
+  await page.clock.fastForward(200_000);
+  await expect(teacher.getByText(/May need help · no movement for 3 min/).first()).toBeVisible();
+
+  // One tap sends a hint that shows on that team's phones until closed.
+  await teacher.getByRole("row").filter({ hasText: "Yellow door" }).getByRole("button", { name: "Send a hint" }).click();
+  await teacher.getByRole("button", { name: "Talk to everyone in the room you are in." }).click();
+  await expect(ana.getByText("Hint from your teacher:")).toBeVisible();
+  await ana.getByRole("button", { name: "Close the hint" }).click();
+  await expect(ana.getByText("Hint from your teacher:")).toBeHidden();
+});

@@ -1,4 +1,5 @@
 import { PartySocket } from "partysocket";
+import { isPaused } from "@open-door/shared";
 import type { Game, GameClientMessage, Note, NoteInput, TimerAction, GameServerMessage, Phase, Role, TeamId } from "@open-door/shared";
 import type { Status } from "./room.svelte";
 
@@ -20,6 +21,10 @@ export class GameConnection {
   notes = $state<Note[]>([]);
   /** Room clock minus this device's clock, so the countdown matches on every screen. */
   clockOffset = $state(0);
+  /** When (room clock) each player last moved, as seen on this device. The teacher's overview uses it to spot stuck teams. */
+  lastMove = $state<Record<string, number>>({});
+  /** When this device last saw the class resume after a pause. */
+  resumedAt = $state(0);
   /** True when the room closed the connection for good (no session, or it ended). */
   ended = $state(false);
 
@@ -80,6 +85,16 @@ export class GameConnection {
     this.send({ t: "unnote", id });
   }
 
+  /** Move a student to another table (teacher only, before the walk). */
+  assign(player: string, team: TeamId): void {
+    this.send({ t: "assign", player, team });
+  }
+
+  /** Send a hint to one team (teacher only). */
+  hint(team: TeamId, text: string): void {
+    this.send({ t: "hint", team, text });
+  }
+
   /** Show another debrief question on the projector (teacher only). */
   prompt(index: number): void {
     this.send({ t: "prompt", index });
@@ -137,10 +152,13 @@ export class GameConnection {
         this.you = message.id;
         this.role = message.role;
         break;
-      case "state":
+      case "state": {
+        const wasPaused = this.game?.timer ? isPaused(this.game.timer) : false;
         this.game = message.game;
         this.clockOffset = message.now - Date.now();
+        if (wasPaused && message.game.timer && !isPaused(message.game.timer)) this.resumedAt = message.now;
         break;
+      }
       case "notes":
         this.notes = message.notes;
         break;
@@ -150,6 +168,7 @@ export class GameConnection {
         for (const p of this.game.players) {
           const entry = byId.get(p.id);
           if (entry) {
+            this.lastMove[p.id] = this.now();
             p.x = entry[1];
             p.y = entry[2];
             p.room = entry[3];

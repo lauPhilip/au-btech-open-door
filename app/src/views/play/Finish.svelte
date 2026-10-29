@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { matchNotes, teamById, teamVote, type Game, type Note, type Player, type Scenario } from "@open-door/shared";
+  import { fileName, matchNotes, teamTable, THREAT_COLUMNS, toCsv, teamById, teamVote, type Game, type Note, type Player, type Scenario } from "@open-door/shared";
+  import { download, printTables } from "../../lib/exporting";
   import type { GameConnection } from "../../lib/game.svelte";
   import Face from "../../lib/Face.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
@@ -11,6 +12,9 @@
   const picked = $derived(vote?.winner != null ? scenario.day.final_choice.options[vote.winner] : null);
   const matches = $derived(me.team ? matchNotes(scenario, connection.notes as Note[], me.team) : []);
   const saw = $derived(matches.filter((m) => m.note).length);
+  const table = $derived(me.team ? [[...THREAT_COLUMNS], ...teamTable(scenario, game, connection.notes as Note[], me.team)] : []);
+  const base = $derived(fileName(team?.name ?? "team", game.code, "cypro-threats"));
+  const title = $derived(`${scenario.company.name} · ${scenario.title} · ${team?.name ?? ""}`);
   const targetName = (id: string) => scenario.things.find((t) => t.id === id)?.name ?? scenario.people.find((p) => p.id === id)?.name ?? id;
 </script>
 
@@ -49,6 +53,15 @@
         {/each}
       </ul>
     </section>
+    <section class="take">
+      <h2>Take it with you</h2>
+      <p class="help">Your team's notes as a CyPro threat table, ready for your report. Impact is left empty for you to fill in.</p>
+      <div class="buttons">
+        <button onclick={() => download(`${base}.csv`, toCsv(table))} disabled={table.length < 2}>Download CSV</button>
+        <button onclick={() => printTables(title, [{ heading: "CyPro threat table", rows: table }])} disabled={table.length < 2}>Print or save as PDF</button>
+      </div>
+      {#if table.length < 2}<p class="help">Your team has no shared notes yet.</p>{/if}
+    </section>
     <p class="help">Look at the big screen for the class debrief.</p>
   </div>
 </main>
@@ -74,4 +87,8 @@
   .hit .badge { background: #1d7a4a; border-color: #1d7a4a; color: #fff; }
   .what { font-size: 15px; color: var(--slate); }
   .note { margin-top: 6px !important; padding: 6px 10px; background: #ffe27a; border-radius: 4px; font-size: 15px; }
+  .take { background: var(--paper); border-radius: var(--radius-l); padding: 20px 24px; }
+  .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .buttons button { min-height: 48px; padding: 0 18px; border-radius: var(--radius-m); border: 2px solid var(--blue); background: var(--paper); color: var(--blue); font: inherit; font-weight: 700; cursor: pointer; }
+  .buttons button:disabled { opacity: 0.5; cursor: default; }
 </style>

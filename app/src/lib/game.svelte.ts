@@ -21,6 +21,8 @@ export class GameConnection {
   notes = $state<Note[]>([]);
   /** Room clock minus this device's clock, so the countdown matches on every screen. */
   clockOffset = $state(0);
+  /** Every note of every team; only the teacher gets these. */
+  allNotes = $state<Note[]>([]);
   /** When (room clock) each player last moved, as seen on this device. The teacher's overview uses it to spot stuck teams. */
   lastMove = $state<Record<string, number>>({});
   /** When this device last saw the class resume after a pause. */
@@ -83,6 +85,11 @@ export class GameConnection {
 
   removeNote(id: string): void {
     this.send({ t: "unnote", id });
+  }
+
+  /** Ask for every team's notes (teacher only). They arrive in `allNotes`. */
+  requestSummary(): void {
+    this.send({ t: "summary" });
   }
 
   /** Move a student to another table (teacher only, before the walk). */
@@ -161,6 +168,9 @@ export class GameConnection {
       }
       case "notes":
         this.notes = message.notes;
+        break;
+      case "summary":
+        this.allNotes = message.notes;
         break;
       case "moves": {
         if (!this.game) return;

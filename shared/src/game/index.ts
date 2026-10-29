@@ -9,3 +9,4 @@ export * from "./vote";
 export * from "./match";
 export * from "./day";
 export * from "./overview";
+export * from "./export";

@@ -3,6 +3,9 @@ import {
   addNote,
   adjustTimer,
   castVote,
+  gradeAll,
+  setPrompt,
+  TEAMS,
   ask,
   mergeNotes,
   removeNote,
@@ -78,6 +81,8 @@ export class GameRoom extends Server {
     if (this.game) {
       this.game.revealed ??= {};
       this.game.votes ??= {};
+      this.game.results ??= {};
+      this.game.prompt ??= 0;
       this.game.clues ??= {};
       this.game.timer ??= null;
     }
@@ -168,6 +173,12 @@ export class GameRoom extends Server {
         break;
       case "phase": {
         const result = setPhase(game, message.phase, { scenario, now: Date.now() });
+        // The debrief grades every team's notes against the answer key once, so the projector can show the table.
+        if (result.ok && message.phase === "debrief") {
+          const results: Game["results"] = {};
+          for (const t of TEAMS) if (result.value.players.some((p) => p.team === t.id)) results[t.id] = gradeAll(scenario, this.notes, t.id);
+          result.value = { ...result.value, results, prompt: 0 };
+        }
         await this.apply(connection, result);
         // Everything written so far becomes the team's, when the day starts (concept book, board 04).
         if (result.ok && (message.phase === "day" || message.phase === "vote")) {
@@ -177,6 +188,9 @@ export class GameRoom extends Server {
         }
         break;
       }
+      case "prompt":
+        await this.apply(connection, setPrompt(game, scenario, message.index));
+        break;
       case "vote":
         await this.apply(connection, castVote(game, scenario, connection.id, message.option));
         break;

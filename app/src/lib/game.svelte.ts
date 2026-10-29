@@ -53,6 +53,11 @@ export class GameConnection {
     this.send({ t: "move", x: Math.round(x), y: Math.round(y) });
   }
 
+  /** Ask a person one of their questions; the room records which assets the team has found. */
+  ask(person: string, topic: number): void {
+    this.send({ t: "ask", person, topic });
+  }
+
   setPhase(phase: Phase): void {
     this.send({ t: "phase", phase });
   }

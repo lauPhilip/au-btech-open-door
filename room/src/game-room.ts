@@ -1,5 +1,6 @@
 import { Server, type Connection, type ConnectionContext } from "partyserver";
 import {
+  ask,
   ERROR_TEXT,
   findPlayer,
   isCode,
@@ -62,6 +63,8 @@ export class GameRoom extends Server {
   async onStart(): Promise<void> {
     this.game = (await this.ctx.storage.get<Game>("game")) ?? null;
     this.teacherKey = (await this.ctx.storage.get<string>("teacherKey")) ?? null;
+    // Sessions saved before milestone M2 slice 2 have no revealed list.
+    if (this.game) this.game.revealed ??= {};
   }
 
   /** Called by the Worker when a teacher creates a session. False if the code is taken. */
@@ -126,6 +129,9 @@ export class GameRoom extends Server {
         break;
       case "team":
         await this.apply(connection, chooseTeam(game, connection.id, message.team));
+        break;
+      case "ask":
+        await this.apply(connection, ask(game, scenario, connection.id, message.person, message.topic));
         break;
       case "phase":
         await this.apply(connection, setPhase(game, message.phase));

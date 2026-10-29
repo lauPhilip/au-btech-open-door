@@ -7,6 +7,7 @@
   import ClueList from "../../lib/ClueList.svelte";
   import CloseUp from "../../lib/CloseUp.svelte";
   import DayBar from "../../lib/DayBar.svelte";
+  import RoomScene from "../../lib/RoomScene.svelte";
   import NoteForm from "../../lib/NoteForm.svelte";
   import NotesPanel from "../../lib/NotesPanel.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
@@ -54,6 +55,11 @@
   const found = $derived(teamRevealed(game, me.team!));
   /** The person or thing whose close-up is open, or null while walking. */
   let open = $state<Spot | null>(null);
+  /** Top-down map, or the inside of the room you stand in. Both show the same people and things. */
+  let view = $state<"map" | "room">("map");
+  /** A person or thing the player tapped in the room view; the close-up opens when the avatar gets there. */
+  let pendingOpen: Spot | null = null;
+  const teammatesHere = $derived(game.players.filter((p) => p.team === me.team && p.id !== me.id && p.room === here?.id));
   /** The note form is open; `about` is who or what it is about. */
   let noting = $state<{ about: Spot | null } | null>(null);
   const roomName = (id: string | null) => scenario.map.rooms.find((r) => r.id === id)?.name ?? "Corridor";
@@ -64,7 +70,14 @@
     lastFrame = now;
     const { at, arrived } = step(position, target, heldDirection(held), seconds);
     const next = clampToMap(scenario, at.x, at.y);
-    if (arrived) target = null;
+    if (arrived) {
+      target = null;
+      if (pendingOpen) {
+        const spot = pendingOpen;
+        pendingOpen = null;
+        openCloseUp(spot);
+      }
+    }
     if (next.x !== position.x || next.y !== position.y) position = next;
     const changed = position.x !== sentPosition.x || position.y !== sentPosition.y;
     const moving = target !== null || held.size > 0;
@@ -102,7 +115,18 @@
     walkTo(spot.x, spot.y + 40);
   }
 
+  /** Tapped in the room view: open at once if close enough, else walk there first. */
+  function goToSpot(spot: Spot) {
+    if (nearby.some((n) => n.kind === spot.kind && n.id === spot.id)) {
+      openCloseUp(spot);
+      return;
+    }
+    walkToSpot(spot);
+    pendingOpen = spot;
+  }
+
   function walkTo(x: number, y: number) {
+    pendingOpen = null;
     target = clampToMap(scenario, x, y);
     wake();
   }
@@ -178,7 +202,15 @@
   </div>
 
   <section class="map">
-    <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} {clueRooms} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
+    <div class="views" role="group" aria-label="View">
+      <button aria-pressed={view === "map"} onclick={() => (view = "map")}>Map</button>
+      <button aria-pressed={view === "room"} onclick={() => (view = "room")}>Room view</button>
+    </div>
+    {#if view === "map"}
+      <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} {clueRooms} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
+    {:else}
+      <RoomScene {scenario} roomId={here?.id ?? null} others={teammatesHere} onspot={goToSpot} onroom={walkToRoom} />
+    {/if}
     <div class="prompt" aria-live="polite">
       {#if nearby.length > 0}
         {#each nearby as spot (spot.kind + spot.id)}
@@ -192,7 +224,7 @@
       {/if}
       <button class="action sticky" onclick={() => startNote(nearby[0] ?? null)}>Sticky note</button>
     </div>
-    <p class="help">Tap or click where you want to go. On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
+    <p class="help">{view === "map" ? "Tap or click where you want to go." : "Tap a person or a thing, or a door to walk there."} On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
   </section>
 
   <aside>
@@ -565,5 +597,28 @@
     border: none;
     cursor: pointer;
     color: var(--ink);
+  }
+  .views {
+    display: inline-flex;
+    gap: 0;
+    margin-bottom: 8px;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .views button {
+    min-height: 44px;
+    padding: 0 18px;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .views button[aria-pressed="true"] {
+    background: var(--blue);
+    color: #fff;
   }
 </style>

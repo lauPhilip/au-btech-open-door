@@ -29,3 +29,20 @@ jobs:
         run: npm test
       - name: Build the app
         run: npm run build
+
+  e2e:
+    name: End-to-end and accessibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build the app
+        run: npm run build
+      - name: Install a browser
+        run: npx playwright install --with-deps chromium
+      - name: Run the class sessions and the axe checks
+        run: npm run test:e2e

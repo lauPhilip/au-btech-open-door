@@ -1,10 +1,12 @@
 import { Server, type Connection, type ConnectionContext } from "partyserver";
 import {
   addNote,
+  adjustTimer,
   ask,
   mergeNotes,
   removeNote,
   setShared,
+  shareAll,
   visibleNotes,
   type Note,
   ERROR_TEXT,
@@ -72,7 +74,11 @@ export class GameRoom extends Server {
     this.game = (await this.ctx.storage.get<Game>("game")) ?? null;
     this.teacherKey = (await this.ctx.storage.get<string>("teacherKey")) ?? null;
     // Sessions saved before milestone M2 slice 2 have no revealed list.
-    if (this.game) this.game.revealed ??= {};
+    if (this.game) {
+      this.game.revealed ??= {};
+      this.game.clues ??= {};
+      this.game.timer ??= null;
+    }
     this.notes = (await this.ctx.storage.get<Note[]>("notes")) ?? [];
   }
 
@@ -116,7 +122,7 @@ export class GameRoom extends Server {
       this.game = setOnline(this.game, connection.id, true);
       this.broadcastState();
     } else {
-      this.send(connection, { t: "state", game: this.game });
+      this.send(connection, { t: "state", game: this.game, now: Date.now() });
     }
   }
 
@@ -158,18 +164,29 @@ export class GameRoom extends Server {
       case "merge":
         await this.applyNotes(connection, mergeNotes(this.notes, game, connection.id, message.keep, message.drop));
         break;
-      case "phase":
-        await this.apply(connection, setPhase(game, message.phase));
+      case "phase": {
+        const result = setPhase(game, message.phase, { scenario, now: Date.now() });
+        await this.apply(connection, result);
+        // Everything written so far becomes the team's, when the day starts (concept book, board 04).
+        if (result.ok && message.phase === "day") {
+          this.notes = shareAll(this.notes);
+          await this.ctx.storage.put("notes", this.notes);
+          this.sendNotesToPlayers();
+        }
+        break;
+      }
+      case "timer":
+        await this.apply(connection, adjustTimer(game, message.action, Date.now()));
         break;
       case "move": {
         const result = move(game, scenario, connection.id, message.x, message.y);
         // Moves arrive many times a second; a refused move is simply dropped.
         if (!result.ok) return;
-        const { player, firstVisit } = result.value;
+        const { player, firstVisit, newClue } = result.value;
         this.game = result.value.game;
         this.positionsDirty = true;
-        if (firstVisit) {
-          // A new room changes the team's checklist, so everyone gets the full state.
+        if (firstVisit || newClue) {
+          // A new room or a new clue changes what the team sees, so everyone gets the full state.
           this.pending.delete(player.id);
           this.broadcastState();
           await this.savePositions(true);
@@ -266,7 +283,7 @@ export class GameRoom extends Server {
 
   private broadcastState(): void {
     if (!this.game) return;
-    this.broadcast(JSON.stringify({ t: "state", game: this.game } satisfies GameServerMessage));
+    this.broadcast(JSON.stringify({ t: "state", game: this.game, now: Date.now() } satisfies GameServerMessage));
   }
 
   private connectionCount(): number {

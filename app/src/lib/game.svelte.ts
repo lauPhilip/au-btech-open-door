@@ -1,5 +1,5 @@
 import { PartySocket } from "partysocket";
-import type { Game, GameClientMessage, Note, NoteInput, GameServerMessage, Phase, Role, TeamId } from "@open-door/shared";
+import type { Game, GameClientMessage, Note, NoteInput, TimerAction, GameServerMessage, Phase, Role, TeamId } from "@open-door/shared";
 import type { Status } from "./room.svelte";
 
 /** How the connection identifies itself: a player with a stable id, the teacher with a key, or the projector. */
@@ -18,6 +18,8 @@ export class GameConnection {
   error = $state<string | null>(null);
   /** Your own sticky notes plus the notes your team shared, as the room last sent them. */
   notes = $state<Note[]>([]);
+  /** Room clock minus this device's clock, so the countdown matches on every screen. */
+  clockOffset = $state(0);
   /** True when the room closed the connection for good (no session, or it ended). */
   ended = $state(false);
 
@@ -78,6 +80,16 @@ export class GameConnection {
     this.send({ t: "unnote", id });
   }
 
+  /** Pause or resume the whole class, or add five minutes to the walk (teacher only). */
+  timer(action: TimerAction): void {
+    this.send({ t: "timer", action });
+  }
+
+  /** The room's clock in ms, as best this device knows it. */
+  now(): number {
+    return Date.now() + this.clockOffset;
+  }
+
   setPhase(phase: Phase): void {
     this.send({ t: "phase", phase });
   }
@@ -117,6 +129,7 @@ export class GameConnection {
         break;
       case "state":
         this.game = message.game;
+        this.clockOffset = message.now - Date.now();
         break;
       case "notes":
         this.notes = message.notes;

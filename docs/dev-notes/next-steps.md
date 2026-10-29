@@ -34,6 +34,13 @@ A short note on where development stands, so a new work session can pick up stra
   - **Reduced motion and colour-safe states (#40):** the global `prefers-reduced-motion` rule already stops animations and avatar gliding, and an e2e test now proves it (and fails without the setting). No state is shown by colour alone: rooms have ticks and text, notes have dashes for private, teammates have initials, likelihood has numbers. `contrast.test.ts` checks the 13 text and background pairs against 4.5:1.
   - **Not covered yet:** the axe checks in CI (#39), and a screen-reader test with a real reader.
 
+- **The day engine** (#25, #26, #32). Built 29 October 2026:
+  - **Timers:** `shared/src/game/timer.ts` and `day.ts` hold a pausable timer with added time. The walk has a countdown, and the day runs on a game clock (07:55 to 10:00). A 45-minute class plays the day at half length. The server sends its own clock so phones agree.
+  - **The day:** the teacher starts it from the controls. Chat messages and the red alert are derived from the clock, so every screen shows the same moment. Notes are shared with the team when the day starts.
+  - **Clues:** each team finds the four clues by being in the right room during the day. Found clues show on the map with a magnifier, in a clue list, and on the projector as a count per team.
+  - **Teacher controls:** pause all, resume all, and plus five minutes during the walk. Everything that moves players is blocked while paused.
+  - **Checked at:** phone 390 wide, laptop 1366 and large 1920, plus the projector, with the white-on-alert-red pair added to `contrast.test.ts`.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

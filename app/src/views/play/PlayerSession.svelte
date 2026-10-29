@@ -40,7 +40,7 @@
   <main class="page"><div class="card"><p class="big">Joining session {code}…</p><StatusPill status={connection.status} /></div></main>
 {:else if !me.team || (changingTeam && game.phase === "lobby")}
   <TeamPick {game} {me} error={connection.error} onpick={(t) => { connection.chooseTeam(t); changingTeam = false; }} />
-{:else if game.phase === "walk"}
+{:else if game.phase === "walk" || game.phase === "day"}
   <Walk {connection} {game} {scenario} {me} />
 {:else}
   <main class="page">

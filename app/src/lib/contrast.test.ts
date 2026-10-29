@@ -40,6 +40,7 @@ const pairs: Array<[string, string, string]> = [
   ["text on a sticky button", ink, sticky],
   ["connected status", safeDark, "#e3f4ec"],
   ["problem text on a card", alertDark, paper],
+  ["alert banner text", paper, alertDark],
   ["reconnecting status", alertDark, "#fdeae6"],
 ];
 

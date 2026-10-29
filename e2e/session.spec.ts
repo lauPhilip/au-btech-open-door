@@ -232,3 +232,50 @@ test("nothing moves on its own when the player asks for reduced motion", async (
   await expect(ana.getByText("You are in: Meeting room")).toBeVisible();
   expect(await moving()).toBe(0); // avatars on the map jump instead of gliding
 });
+
+test("the teacher runs the walk and the day: pause, start, clues and messages", async ({ page }) => {
+  await page.clock.install();
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const ana = page.frameLocator('iframe[title="Student Ana"]');
+  const ben = page.frameLocator('iframe[title="Student Ben"]');
+  const chen = page.frameLocator('iframe[title="Student Chen"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await ana.getByRole("button", { name: "Next" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+
+  // The walk has a countdown for everyone.
+  await expect(ana.getByText(/Walk and spot · \d+:\d\d left/)).toBeVisible();
+  await expect(teacher.getByText(/\d+:\d\d left/)).toBeVisible();
+
+  // Pausing stops the whole class; resuming lets them play again.
+  await teacher.getByRole("button", { name: "Pause all" }).click();
+  await expect(ana.getByRole("alertdialog", { name: "Paused" })).toBeVisible();
+  await expect(chen.getByRole("alertdialog", { name: "Paused" })).toBeVisible();
+  await teacher.getByRole("button", { name: "Resume all" }).click();
+  await expect(ana.getByRole("alertdialog", { name: "Paused" })).toBeHidden();
+  await teacher.getByRole("button", { name: "+5 minutes" }).click();
+
+  // The day starts: alert, clock and a clue counter.
+  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await expect(ana.getByRole("alert").getByText("Orders have stopped printing.")).toBeVisible();
+  await expect(ana.getByRole("timer", { name: /Game clock 07:5\d/ })).toBeVisible();
+  await expect(ana.getByLabel("Clues found: 0 of 4")).toBeVisible();
+  await expect(ana.getByText("All quiet so far.")).toBeVisible();
+  await expect(teacher.getByText(/day ends 10:00/)).toBeVisible();
+
+  // Walking into a room with a clue finds it for the whole team, not for the other team.
+  await ana.getByRole("button", { name: /^Walk to Packing station,/ }).click();
+  // (There are no walls yet, so clue rooms on the way count too: at least one clue, maybe two.)
+  await expect(ana.getByLabel(/Clues found: [1-4] of 4/)).toBeVisible({ timeout: 15_000 });
+  await expect(ana.getByText(/paused by admin/)).toBeVisible();
+  await expect(ben.getByLabel(/Clues found: [1-4] of 4/)).toBeVisible();
+  await expect(chen.getByLabel("Clues found: 0 of 4")).toBeVisible();
+
+  // Mei's first message arrives at 08:04, nine game minutes in (7.5 s each in a 45-minute class).
+  await page.clock.fastForward(80_000);
+  await expect(ana.getByText(/The shop is up and orders come in/).first()).toBeVisible({ timeout: 10_000 });
+  await expect(chen.getByText(/The shop is up and orders come in/).first()).toBeVisible();
+});

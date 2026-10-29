@@ -3,7 +3,7 @@
 
 import type { Actor, Harm } from "../scenario";
 import { roomAt, spots, type Scenario } from "../scenario";
-import { findPlayer, type Game, type GameError } from "./rules";
+import { findPlayer, playBlock, type Game, type GameError } from "./rules";
 import type { TeamId } from "./teams";
 
 /** Longest note text, in characters. A note is a sticky note, not an essay. */
@@ -96,7 +96,8 @@ export function addNote(
 ): { ok: true; value: Note[] } | Fail {
   const player = findPlayer(game, playerId);
   if (!player) return fail("not-joined");
-  if (game.phase !== "walk") return fail("not-walking");
+  const block = playBlock(game);
+  if (block) return fail(block);
   if (!player.team) return fail("no-team");
   const text = cleanNoteText(input.text);
   const harm = pick(input.harm, HARM_IDS);
@@ -163,6 +164,11 @@ export function mergeNotes(notes: readonly Note[], game: Game, playerId: string,
 export function visibleNotes(notes: readonly Note[], game: Game, playerId: string): Note[] {
   const team = findPlayer(game, playerId)?.team ?? null;
   return notes.filter((n) => n.author === playerId || (n.shared && team !== null && n.team === team));
+}
+
+/** Everything written so far becomes visible to its team, for example when the day starts. */
+export function shareAll(notes: readonly Note[]): Note[] {
+  return notes.map((n) => (n.shared ? n : { ...n, shared: true }));
 }
 
 /** The notes one player has written. */

@@ -67,9 +67,9 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(laura.getByText("You are in: Webshop team")).toBeVisible({ timeout: 10_000 });
   // Her teammate's checklist ticks the room; the other team's does not.
   // (There are no walls yet, so rooms she walked through on the way count too.)
-  const roomItem = (page: Page, room: string) => page.getByRole("list").first().getByRole("listitem").filter({ hasText: room });
-  await expect(roomItem(wei, "Webshop team")).not.toContainText("not visited");
-  await expect(roomItem(linh, "Webshop team")).toContainText("not visited");
+  const roomButton = (page: Page, room: string) => page.getByRole("button", { name: new RegExp(`^Walk to ${room},`) });
+  await expect(roomButton(wei, "Webshop team")).not.toHaveAccessibleName(/not visited/);
+  await expect(roomButton(linh, "Webshop team")).toHaveAccessibleName(/not visited/);
   await expect(linh.getByText("1 of 9 visited by your team")).toBeVisible();
   await expect(screen.getByText(/[2-9] of 9 rooms/)).toBeVisible();
 
@@ -157,6 +157,12 @@ test("a class joins, hears the story and walks the office together", async ({ br
   // He has left the meeting room (where he ends up depends on where he started).
   await expect(wei.getByText("You are in: Meeting room")).toBeHidden();
 
+  // The room list is a second way to walk, for keyboards and screen readers: no map needed.
+  await wei.getByRole("button", { name: "Walk to Server cupboard, not visited yet" }).click();
+  await expect(wei.getByText("You are in: Server cupboard")).toBeVisible({ timeout: 10_000 });
+  await wei.getByRole("button", { name: "Walk to Ahmed" }).click();
+  await expect(wei.getByRole("button", { name: /Talk to Ahmed/ })).toBeVisible({ timeout: 10_000 });
+
   // Linh on the phone taps the accounting office.
   await tapMap(linh, 520, 120);
   await expect(linh.getByText("You are in: Accounting")).toBeVisible({ timeout: 10_000 });
@@ -202,4 +208,27 @@ test("the simulator runs a teacher, a projector and students in one window", asy
   // Reloading the whole simulator keeps every role.
   await page.reload();
   await expect(page.frameLocator('iframe[title="Student Ana"]').getByText("You are in: Meeting room")).toBeVisible();
+});
+
+test("nothing moves on its own when the player asks for reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const ana = page.frameLocator('iframe[title="Student Ana"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await expect(ana.getByRole("button", { name: "Next" })).toBeVisible();
+  const moving = async () =>
+    ana.locator("body").evaluate(() =>
+      [...document.querySelectorAll("*")].filter((el) => {
+        const style = getComputedStyle(el);
+        return style.animationName !== "none" || parseFloat(style.transitionDuration) > 0;
+      }).length,
+    );
+  expect(await moving()).toBe(0);
+  await ana.getByRole("button", { name: "Next" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await expect(ana.getByText("You are in: Meeting room")).toBeVisible();
+  expect(await moving()).toBe(0); // avatars on the map jump instead of gliding
 });

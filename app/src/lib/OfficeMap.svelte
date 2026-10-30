@@ -41,6 +41,9 @@
   // The picture of the building behind the room outlines (drawn once, with no text; names are added here).
   const art = import.meta.glob("../assets/art/map.webp", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
   const mapArt = Object.values(art)[0] ?? null;
+  /** Small cut-out pictures of the things, used as their markers. */
+  const cutouts = import.meta.glob("../assets/art/thing-*.webp", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
+  const markerFor = (id: string) => Object.entries(cutouts).find(([path]) => path.endsWith(`/thing-${id}.webp`))?.[1];
 
   const { width, height, rooms } = $derived(scenario.map);
 
@@ -152,8 +155,9 @@
         <circle r="20" />
         <text y="6" class="npc-initial">{initial(spot.name)}</text>
       {:else}
+        {@const marker = markerFor(spot.id)}
         <rect x="-18" y="-18" width="36" height="36" rx="8" />
-        <path d="M-8 -3 H8 M-8 5 H3" class="thing-lines" />
+        {#if marker}<image href={marker} x="-16" y="-16" width="32" height="32" preserveAspectRatio="xMidYMid meet" />{:else}<path d="M-8 -3 H8 M-8 5 H3" class="thing-lines" />{/if}
       {/if}
       <text y="38" class="npc-name">{spot.name}</text>
     </g>

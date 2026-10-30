@@ -25,6 +25,12 @@
   const roomName = $derived(scenario.map.rooms.find((r) => r.id === spot.room)?.name ?? "");
 
   /** Questions already asked in this window, in order. Closing the window starts a fresh talk. */
+  const pictures = import.meta.glob("../assets/art/*.webp", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
+  const pic = (name: string) => Object.entries(pictures).find(([path]) => path.endsWith(`/${name}.webp`))?.[1];
+  const portrait = $derived(person ? pic(`portrait-${person.id}`) : undefined);
+  const closeup = $derived(thing ? pic(`closeup-${thing.id}`) : undefined);
+  const cutout = $derived(thing ? pic(`thing-${thing.id}`) : undefined);
+
   let asked = $state<number[]>([]);
   /** The technical "look closer" layer is hidden until asked for (progressive disclosure). */
   let technical = $state(false);
@@ -64,7 +70,11 @@
 
     <div class="body">
       <div class="art" class:person={!!person} aria-hidden={person ? "true" : undefined}>
-        {#if person}<div class="big-bust"><Bust id={person.id} size={200} /></div>{:else}<Prop id={spot.id} name={spot.name} />{/if}
+        {#if person}
+          {#if portrait}<img class="portrait" src={portrait} alt="" />{:else}<div class="big-bust"><Bust id={person.id} size={200} /></div>{/if}
+        {:else if closeup}<img class="closeup" src={closeup} alt="" />
+        {:else if cutout}<img class="cutout" src={cutout} alt="" />
+        {:else}<Prop id={spot.id} name={spot.name} />{/if}
       </div>
       <div class="content">
     {#if person}
@@ -150,6 +160,9 @@
     padding: 24px;
     background: linear-gradient(#fbe9da, #f0ddbf);
   }
+  .art.person:has(.portrait) { padding: 0; }
+  .portrait, .closeup { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cutout { display: block; width: min(86%, 420px); height: auto; max-height: 100%; padding: 18px 0; filter: drop-shadow(0 10px 14px rgb(28 36 48 / 0.25)); }
   .big-bust {
     line-height: 0;
     border-radius: 50%;

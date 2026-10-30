@@ -91,7 +91,7 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
     case "close":
       return { t: "close" };
     case "prompt":
-      return typeof m.index === "number" && Number.isInteger(m.index) && m.index >= 0 && m.index < 20 ? { t: "prompt", index: m.index } : null;
+      return typeof m.index === "number" && Number.isInteger(m.index) && m.index >= 0 && m.index <= 20 ? { t: "prompt", index: m.index } : null;
     case "vote":
       return typeof m.option === "number" && Number.isInteger(m.option) && m.option >= 0 && m.option < 10 ? { t: "vote", option: m.option } : null;
     case "ready":

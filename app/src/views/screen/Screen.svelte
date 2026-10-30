@@ -3,7 +3,7 @@
   import QRCode from "qrcode";
   import DebriefTable from "../../lib/DebriefTable.svelte";
   import CyProNames from "../../lib/CyProNames.svelte";
-  import { allVotes, dayMinute, teamById, eventsBy, formatLeft, isPaused, leftMs, scenarios, TEAMS, teamClues, teamVisited } from "@open-door/shared";
+  import { allVotes, summaryPrompt, dayMinute, teamById, eventsBy, formatLeft, isPaused, leftMs, scenarios, TEAMS, teamClues, teamVisited } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
@@ -94,7 +94,19 @@
         <DebriefTable {game} {scenario} />
       </div>
       <aside class="right">
-        <p class="question" aria-live="polite"><span class="eyebrow">Question for the class</span>{scenario.debrief.prompts[game.prompt] ?? ""}</p>
+        {#if game.prompt >= summaryPrompt(scenario)}
+          <div class="summary" aria-live="polite">
+            <p class="eyebrow">Class summary</p>
+            <ul>
+              {#each TEAMS.filter((t) => game.results[t.id]) as t (t.id)}
+                <li style="--team: {t.color}"><strong>{t.name}</strong> saw <b>{(game.results[t.id] ?? []).filter((g) => g === "hit").length}</b> of {scenario.threats.length} problems</li>
+              {/each}
+            </ul>
+            <p class="thanks">Thank you. Your teacher will end the session soon.</p>
+          </div>
+        {:else}
+          <p class="question" aria-live="polite"><span class="eyebrow">Question for the class</span>{scenario.debrief.prompts[game.prompt] ?? ""}</p>
+        {/if}
         <CyProNames />
         {#if scenario.debrief.next_class}<p class="next"><strong>Next class:</strong> {scenario.debrief.next_class}</p>{/if}
       </aside>
@@ -371,6 +383,37 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     margin-bottom: 4px;
+  }
+  .summary {
+    background: var(--paper);
+    border-left: 10px solid var(--sticky);
+    border-radius: var(--radius-l);
+    padding: 16px 22px;
+  }
+  .summary .eyebrow {
+    margin: 0 0 8px;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--slate);
+    font-weight: 700;
+  }
+  .summary ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    font-size: 24px;
+  }
+  .summary li {
+    border-left: 8px solid var(--team);
+    padding: 2px 12px;
+  }
+  .summary .thanks {
+    margin: 12px 0 0;
+    font-size: 22px;
+    font-weight: 600;
   }
   .decisions {
     list-style: none;

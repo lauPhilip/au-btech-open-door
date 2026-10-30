@@ -14,6 +14,8 @@ import {
   move,
   newGame,
   setOnline,
+  setPrompt,
+  summaryPrompt,
   setPhase,
   spawnPoint,
   teamCounts,
@@ -282,5 +284,19 @@ describe("asking questions", () => {
     expect(mayRoleSend("player", msg)).toBe(true);
     expect(mayRoleSend("teacher", msg)).toBe(false);
     expect(mayRoleSend("screen", msg)).toBe(false);
+  });
+});
+
+describe("the debrief questions", () => {
+  const debrief = { ...withPlayers(1), phase: "debrief" as const };
+  it("go on to the class summary after the last question, and no further", () => {
+    const last = scenario.debrief.prompts.length - 1;
+    expect(value(setPrompt(debrief, scenario, last)).prompt).toBe(last);
+    expect(value(setPrompt(debrief, scenario, last + 1)).prompt).toBe(summaryPrompt(scenario));
+    expect(value(setPrompt(debrief, scenario, last + 9)).prompt).toBe(summaryPrompt(scenario));
+    expect(value(setPrompt(debrief, scenario, -3)).prompt).toBe(0);
+  });
+  it("only run during the debrief", () => {
+    expect(setPrompt(withPlayers(1), scenario, 1)).toEqual({ ok: false, error: "not-debrief" });
   });
 });

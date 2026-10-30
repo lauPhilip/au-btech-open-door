@@ -40,11 +40,11 @@
   const figure = (id: string) => art[`person-${id}`];
   /** Where the feet of a person touch the painted floor in each room, and how big they look there (the camera is closer in some rooms). */
   const FLOOR: Record<string, { feet: number; scale: number }> = {
-    webshop: { feet: 372, scale: 0.95 },
-    accounting: { feet: 384, scale: 0.9 },
-    ceo: { feet: 380, scale: 1 },
-    server: { feet: 400, scale: 1.12 },
-    packing: { feet: 414, scale: 1.45 },
+    webshop: { feet: 372, scale: 1.15 },
+    accounting: { feet: 384, scale: 1.5 },
+    ceo: { feet: 380, scale: 1.2 },
+    server: { feet: 400, scale: 1.65 },
+    packing: { feet: 414, scale: 2.6 },
     dock: { feet: 358, scale: 1.12 },
   };
   /** How high up the wall or table each thing sits in its painted room (scene units); across the room comes from the scenario's `at`. */
@@ -284,7 +284,7 @@
     display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font: inherit;
   }
   .hot.person { transform: translate(-50%, calc(-100% + 30px)); }
-  .figure { height: calc(clamp(92px, 26cqw, 230px) * var(--scale, 1)); width: auto; filter: drop-shadow(0 6px 6px rgba(28, 36, 48, 0.28)); pointer-events: none; }
+  .figure { height: max(64px, min(calc(26cqw * var(--scale, 1)), 46cqw)); width: auto; filter: drop-shadow(0 6px 6px rgba(28, 36, 48, 0.28)); pointer-events: none; }
   .hot:hover .figure, .hot:focus-visible .figure { filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 6px var(--blue)); }
   .bust { border-radius: 50%; box-shadow: 0 3px 10px rgba(28, 36, 48, 0.25); line-height: 0; border: 3px solid #fff; }
   .bust :global(svg) { width: clamp(52px, 11cqw, 92px); height: auto; }

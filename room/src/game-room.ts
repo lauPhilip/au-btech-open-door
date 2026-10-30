@@ -3,6 +3,8 @@ import {
   addNote,
   adjustTimer,
   assignTeam,
+  removePlayer,
+  renamePlayer,
   castVote,
   sendHint,
   setReady,
@@ -94,6 +96,7 @@ export class GameRoom extends Server {
       this.game.noteCounts ??= {};
       this.game.hints ??= {};
       this.game.ready ??= {};
+      this.game.removed ??= [];
       this.game.prompt ??= 0;
       this.game.clues ??= {};
       this.game.timer ??= null;
@@ -131,6 +134,10 @@ export class GameRoom extends Server {
       key && this.teacherKey && key === this.teacherKey ? "teacher" : url.searchParams.get("role") === "screen" ? "screen" : "player";
     if (role === "player" && !PLAYER_ID.test(connection.id)) {
       connection.close(4400, "Bad player id");
+      return;
+    }
+    if (role === "player" && this.game.removed.includes(connection.id)) {
+      connection.close(4403, "Removed");
       return;
     }
     connection.setState({ role });
@@ -215,6 +222,21 @@ export class GameRoom extends Server {
         break;
       case "assign":
         await this.apply(connection, assignTeam(game, message.player, message.team));
+        break;
+      case "remove": {
+        const result = removePlayer(game, message.player);
+        await this.apply(connection, result);
+        if (!result.ok) break;
+        // Their notes go with them, and every screen of theirs is told why.
+        this.notes = this.notes.filter((n) => n.author !== message.player);
+        await this.ctx.storage.put("notes", this.notes);
+        this.sendNotesToPlayers();
+        await this.countNotes();
+        for (const c of this.getConnections<ConnState>()) if (c.id === message.player) c.close(4403, "Removed");
+        break;
+      }
+      case "rename":
+        await this.apply(connection, renamePlayer(game, message.player, message.name));
         break;
       case "hint":
         await this.apply(connection, sendHint(game, message.team, message.text, Date.now()));

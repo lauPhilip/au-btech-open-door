@@ -59,6 +59,8 @@ export interface Game {
   hints: Partial<Record<TeamId, { text: string; at: number }>>;
   /** Teams that say they are done with this step, and who pressed the button. Cleared whenever the class moves on. */
   ready: Partial<Record<TeamId, { by: string; at: number }>>;
+  /** Ids of students the teacher removed. They cannot come back into this session. */
+  removed: string[];
 }
 
 export type GameError =
@@ -80,6 +82,8 @@ export type GameError =
   | "bad-note"
   | "too-many-notes"
   | "unknown-note"
+  | "removed"
+  | "bad-name"
   | "not-allowed";
 
 /** Plain-language text for each error, shown to the player. */
@@ -97,6 +101,8 @@ export const ERROR_TEXT: Record<GameError, string> = {
   "too-late": "Players can only change tables before the walk starts.",
   "not-debrief": "The debrief has not started yet.",
   "not-voting": "The vote has not started yet.",
+  removed: "The teacher removed you from this session.",
+  "bad-name": "A name needs at least one letter.",
   "unknown-option": "That choice is not on the list.",
   "paused": "The teacher paused the game. Wait a moment.",
   "bad-note": "A note needs a few words, at least one harm and at least one who.",
@@ -120,7 +126,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0, noteCounts: {}, hints: {}, ready: {} };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0, noteCounts: {}, hints: {}, ready: {}, removed: [] };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {
@@ -158,6 +164,7 @@ export function spawnPoint(scenario: Scenario, index: number): { x: number; y: n
  */
 export function join(game: Game, scenario: Scenario, id: string, name: string, face: number, now: number): Result<Game> {
   if (!isFace(face)) return fail("bad-face");
+  if (game.removed.includes(id)) return fail("removed");
   const clean = cleanName(name);
   const existing = findPlayer(game, id);
   if (existing) {
@@ -314,6 +321,21 @@ export function setPrompt(game: Game, scenario: Scenario, index: number): Result
 export function assignTeam(game: Game, id: string, team: TeamId): Result<Game> {
   if (game.phase !== "lobby" && game.phase !== "story") return fail("too-late");
   return chooseTeam(game, id, team);
+}
+
+/** The teacher removes a student: their seat, vote and place on the map go, and they cannot rejoin. */
+export function removePlayer(game: Game, id: string): Result<Game> {
+  if (!findPlayer(game, id)) return fail("not-joined");
+  const { [id]: _vote, ...votes } = game.votes;
+  return ok({ ...game, players: game.players.filter((p) => p.id !== id), votes, removed: [...game.removed, id] });
+}
+
+/** The teacher gives a student a new nickname. An empty name is refused rather than turned into "Guest". */
+export function renamePlayer(game: Game, id: string, name: string): Result<Game> {
+  const player = findPlayer(game, id);
+  if (!player) return fail("not-joined");
+  if (name.replace(/\s+/g, " ").trim().length === 0) return fail("bad-name");
+  return ok(replacePlayer(game, { ...player, name: cleanName(name) }));
 }
 
 /** A student tells the teacher their whole table is done with this step (or takes it back). Anyone at the table can press it. */

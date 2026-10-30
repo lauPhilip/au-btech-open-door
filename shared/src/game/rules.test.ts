@@ -13,6 +13,8 @@ import {
   MAX_PLAYERS,
   move,
   newGame,
+  removePlayer,
+  renamePlayer,
   setOnline,
   setPrompt,
   summaryPrompt,
@@ -298,5 +300,43 @@ describe("the debrief questions", () => {
   });
   it("only run during the debrief", () => {
     expect(setPrompt(withPlayers(1), scenario, 1)).toEqual({ ok: false, error: "not-debrief" });
+  });
+});
+
+describe("removing and renaming students", () => {
+  const scenario = scenarios["nordknit-black-friday"]!;
+  const base = () => {
+    let g = newGame("ABCD", scenario.id, 45, 0);
+    for (const id of ["player-one", "player-two"]) {
+      const joined = join(g, scenario, id, id, 0, 0);
+      if (joined.ok) g = joined.value;
+    }
+    return g;
+  };
+
+  it("removes a student with their vote, and keeps them out", () => {
+    let g = base();
+    g = { ...g, votes: { "player-one": 1, "player-two": 0 } };
+    const result = removePlayer(g, "player-one");
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.players.map((p) => p.id)).toEqual(["player-two"]);
+    expect(result.value.votes).toEqual({ "player-two": 0 });
+    const again = join(result.value, scenario, "player-one", "Back", 0, 1);
+    expect(again.ok).toBe(false);
+    if (!again.ok) expect(again.error).toBe("removed");
+  });
+
+  it("refuses to remove someone who is not there", () => {
+    const result = removePlayer(base(), "nobody-here");
+    expect(result.ok).toBe(false);
+  });
+
+  it("renames a student, and refuses an empty name", () => {
+    const renamed = renamePlayer(base(), "player-one", "  Ada   Lovelace ");
+    expect(renamed.ok && renamed.value.players.find((p) => p.id === "player-one")?.name).toBe("Ada Lovelace");
+    const empty = renamePlayer(base(), "player-one", "   ");
+    expect(empty.ok).toBe(false);
+    if (!empty.ok) expect(empty.error).toBe("bad-name");
   });
 });

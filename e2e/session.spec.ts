@@ -76,7 +76,7 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(screen.getByText(/[2-9] of 9 rooms/)).toBeVisible();
 
   // Laura walks up to Mei, talks to her, and her team learns what the company depends on.
-  await tapMap(laura, 340, 215);
+  await tapMap(laura, 400, 232);
   await laura.getByRole("button", { name: /Talk to Mei/ }).click({ timeout: 10_000 });
   const talk = laura.getByRole("dialog", { name: "Mei" });
   await expect(talk.getByText("Nine shops, one system.")).toBeVisible();
@@ -138,7 +138,7 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(laura.getByText("0 · private until shared")).toBeVisible();
 
   // A thing has a close-up too, with the technical layer hidden until asked for.
-  await tapMap(laura, 206, 160);
+  await tapMap(laura, 265, 175);
   await laura.getByRole("button", { name: /Look at Live order screen/ }).click({ timeout: 10_000 });
   const thing = laura.getByRole("dialog", { name: "Live order screen" });
   await expect(thing.getByText("Shows orders from all nine shops")).toBeVisible();
@@ -149,7 +149,7 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(thing).toBeHidden();
 
   // Too far away to talk: no prompt appears for a person across the building.
-  await tapMap(laura, 60, 60);
+  await tapMap(laura, 100, 70);
   await expect(laura.getByRole("button", { name: /Talk to Mei/ })).toBeHidden({ timeout: 10_000 });
 
   // Wei walks with the keyboard.

@@ -69,6 +69,7 @@ map:
     - { a: server,     b: hall-left, rect: [364, 420, 16, 34] }
     - { a: packing,    b: hall-left, rect: [322, 490, 30, 18] }
     - { a: warehouse,  b: packing,   rect: [418, 560, 26, 28] }
+    - { a: warehouse,  b: dock,      rect: [898, 580, 30, 36] }
 
   # Zones are the trust boundaries. Places outside the building are zones too.
   zones:
@@ -85,6 +86,7 @@ people:
     name: Karin
     role: CEO, fourth generation
     room: ceo
+    at: 0.78
     hello: The factory is angry. Without their clothes we have nothing to sell.
     topics:
       - ask: How big is the invoice?
@@ -98,6 +100,7 @@ people:
     name: Mei
     role: Webshop manager
     room: webshop
+    at: 0.8
     hello: I only sell the clothes. The money side is Elena's world.
     topics:
       - ask: Do you hear from the factory?
@@ -108,6 +111,7 @@ people:
     name: Ahmed
     role: Part-time IT
     room: server
+    at: 0.15
     hello: I'm here on Mondays and Thursdays. Today is Monday, so you are lucky.
     topics:
       - ask: How is the accounting mailbox protected?
@@ -121,6 +125,7 @@ people:
     name: Jana
     role: Packing lead
     room: packing
+    at: 0.18
     hello: Half of our new stock is stuck at the factory. I'm not happy.
     topics:
       - ask: What happens if the factory stops sending clothes?
@@ -131,6 +136,7 @@ people:
     name: Elena
     role: Accounting
     room: accounting
+    at: 0.86
     hello: I paid it yesterday. I even have the receipt from the bank.
     topics:
       - ask: Why did you pay it yesterday?
@@ -147,6 +153,7 @@ people:
     name: Tomas
     role: Driver, shipping partner
     room: dock
+    at: 0.3
     hello: Morning. Same route as always. A few letters for the office today.
     topics:
       - ask: Who takes the post?
@@ -158,29 +165,34 @@ things:
   - id: invoice-tray
     name: Invoice tray
     room: accounting
+    at: 0.66
     text: Paper and e-mail invoices waiting to be paid. On top lies the factory's big invoice.
     closer: The invoice carries the bank account. Nobody compares it with an earlier invoice.
 
   - id: mail-screen
     name: Accounting inbox
     room: accounting
+    at: 0.47
     text: Elena's e-mail. The newest message is from "the factory", about new bank details.
     closer: The sender address is nordknit-factory.com. The factory's real address ends in .lt.
 
   - id: visitor-book
     name: Visitor book
     room: reception
+    at: 0.36
     text: Visitors write their name and the time. Reception is empty before 8:30.
 
   - id: router
     name: Router and Wi-Fi
     room: server
+    at: 0.49
     text: Connects the office, the warehouse and the guest Wi-Fi to the internet.
     closer: The accounting mailbox has no second step when someone logs in from a new country.
 
   - id: order-screen
     name: Live order screen
     room: webshop
+    at: 0.38
     text: Shows orders from all nine shops as they come in.
 
 # ---------------------------------------------------------------- assets

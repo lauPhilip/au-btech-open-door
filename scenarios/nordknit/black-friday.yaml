@@ -68,6 +68,7 @@ map:
     - { a: server,     b: hall-left, rect: [364, 420, 16, 34] }
     - { a: packing,    b: hall-left, rect: [322, 490, 30, 18] }
     - { a: warehouse,  b: packing,   rect: [418, 560, 26, 28] }
+    - { a: warehouse,  b: dock,      rect: [898, 580, 30, 36] }
 
   # Zones are the trust boundaries. Places outside the building are zones too.
   zones:
@@ -84,6 +85,7 @@ people:
     name: Karin
     role: CEO, fourth generation
     room: ceo
+    at: 0.78
     hello: I care about one thing this week. Every parcel must leave on time.
     topics:
       - ask: What would hurt the company most?
@@ -97,6 +99,7 @@ people:
     name: Mei
     role: Webshop manager
     room: webshop
+    at: 0.8
     hello: Nine shops, one system. On Black Friday it gets very busy.
     topics:
       - ask: Where does the webshop run?
@@ -113,6 +116,7 @@ people:
     name: Ahmed
     role: Part-time IT
     room: server
+    at: 0.15
     hello: I'm here on Mondays and Thursdays. The rest of the week the IT runs itself. Mostly.
     topics:
       - ask: What is in this cupboard?
@@ -126,6 +130,7 @@ people:
     name: Jana
     role: Packing lead
     room: packing
+    at: 0.18
     hello: Orders come in, labels come out, parcels go on the truck. That's my day.
     topics:
       - ask: How do labels get printed?
@@ -139,6 +144,7 @@ people:
     name: Elena
     role: Accounting
     room: accounting
+    at: 0.86
     hello: Invoices, salaries, suppliers. If it costs money, it passes my desk.
     topics:
       - ask: How do you pay the factory?
@@ -149,6 +155,7 @@ people:
     name: Tomas
     role: Driver, shipping partner
     room: dock
+    at: 0.3
     hello: Morning. I just need the parcels and a coffee.
     topics:
       - ask: How do you get into the building?
@@ -160,29 +167,34 @@ things:
   - id: label-printer
     name: Label printer
     room: packing
+    at: 0.81
     text: Prints shipping labels for every order. A small screen shows its status.
     closer: Its admin page opens from any device on the guest Wi-Fi. The password is the factory default.
 
   - id: order-screen
     name: Live order screen
     room: webshop
+    at: 0.38
     text: Shows orders from all nine shops as they come in.
     closer: Orders arrive from the webshop provider over the internet.
 
   - id: router
     name: Router and Wi-Fi
     room: server
+    at: 0.49
     text: Connects the office, the warehouse and the guest Wi-Fi to the internet.
     closer: The guest and warehouse networks are not separated. Any guest device can reach the printer.
 
   - id: visitor-book
     name: Visitor book
     room: reception
+    at: 0.36
     text: Visitors write their name and the time. Reception is empty before 8:30.
 
   - id: invoice-tray
     name: Invoice tray
     room: accounting
+    at: 0.66
     text: Paper and e-mail invoices waiting to be paid.
 
 # ---------------------------------------------------------------- assets

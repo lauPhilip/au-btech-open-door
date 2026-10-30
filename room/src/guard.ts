@@ -19,9 +19,9 @@ const lookups = new RateLimiter(LIMITS.lookupPerMinute, 60_000);
 const misses = new RateLimiter(LIMITS.missesPerMinute, 60_000);
 const connects = new RateLimiter(LIMITS.connectPerMinute, 60_000);
 
-/** The caller's network address, as Cloudflare reports it. */
-export function clientKey(request: Request): string {
-  return request.headers.get("cf-connecting-ip") ?? "local";
+/** The caller's network address, as Cloudflare reports it. Missing only in local development and tests, which are not limited. */
+export function clientKey(request: Request): string | null {
+  return request.headers.get("cf-connecting-ip");
 }
 
 export function tooManyResponse(retryAfter: number): Response {
@@ -35,7 +35,9 @@ export function tooManyResponse(retryAfter: number): Response {
 
 /** Called when a code lookup finds no session. Returns a 429 once the caller has missed too often. */
 export function recordMiss(request: Request, now = Date.now()): Response | null {
-  const result = misses.hit(clientKey(request), now);
+  const key = clientKey(request);
+  if (!key) return null;
+  const result = misses.hit(key, now);
   return result.ok ? null : tooManyResponse(result.retryAfter);
 }
 
@@ -44,6 +46,7 @@ export type Kind = "create" | "lookup" | "connect";
 /** A response to send instead of doing the work, or null when the caller is within the limits. */
 export async function limitRequest(request: Request, kind: Kind, env: GuardEnv, now = Date.now()): Promise<Response | null> {
   const key = clientKey(request);
+  if (!key) return null;
   const checks =
     kind === "create" ? [createMinute.hit(key, now), createHour.hit(key, now)] : kind === "lookup" ? [lookups.hit(key, now)] : [connects.hit(key, now)];
   if (kind === "lookup" && misses.blocked(key, now)) return tooManyResponse(60);

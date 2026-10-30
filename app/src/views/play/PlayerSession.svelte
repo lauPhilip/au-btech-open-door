@@ -3,6 +3,7 @@
   import { isTeamId, scenarios, teamById } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import type { SavedPlayer } from "../../lib/saved";
+  import ConnectionNotice from "../../lib/ConnectionNotice.svelte";
   import Face from "../../lib/Face.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
   import Story from "../../lib/Story.svelte";
@@ -43,7 +44,7 @@
 {:else if !game || !scenario || !me}
   <main class="page"><div class="card"><p class="big">Joining session {code}…</p><StatusPill status={connection.status} /></div></main>
 {:else if !me.team || (changingTeam && game.phase === "lobby")}
-  <TeamPick {game} {me} error={connection.error} onpick={(t) => { connection.chooseTeam(t); changingTeam = false; }} />
+  <TeamPick {game} {me} error={null} onpick={(t) => { connection.chooseTeam(t); changingTeam = false; }} />
 {:else if game.phase === "walk" || game.phase === "day"}
   <Walk {connection} {game} {scenario} {me} />
 {:else if game.phase === "vote"}
@@ -77,6 +78,10 @@
       {/if}
     </div>
   </main>
+{/if}
+
+{#if game && !connection.ended && !connection.removed}
+  <ConnectionNotice {connection} />
 {/if}
 
 <style>

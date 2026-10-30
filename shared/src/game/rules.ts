@@ -31,6 +31,8 @@ export interface Player {
   visited: string[];
   online: boolean;
   joinedAt: number;
+  /** Joined after the tables were chosen, and was seated by the game at the smallest table. */
+  late?: boolean;
 }
 
 export interface Game {
@@ -174,7 +176,24 @@ export function join(game: Game, scenario: Scenario, id: string, name: string, f
   const { x, y } = spawnPoint(scenario, game.players.length);
   const room = roomAt(scenario, x, y)?.id ?? null;
   const player: Player = { id, name: clean, face, team: null, x, y, room, visited: room ? [room] : [], online: true, joinedAt: now };
+  // After the tables are chosen nobody waits at a pick screen: a late student sits at the smallest table.
+  if (game.phase !== "lobby" && game.phase !== "story") {
+    const team = smallestTable(game);
+    if (team) {
+      player.team = team;
+      player.late = true;
+    }
+  }
   return ok({ ...game, players: [...game.players, player] });
+}
+
+/** The table with the fewest students that still has room. Tables already in play come first; an empty table is the last choice. */
+export function smallestTable(game: Game): TeamId | null {
+  const counts = teamCounts(game);
+  const open = TEAMS.filter((t) => counts[t.id] < TEAM_MAX);
+  const playing = open.filter((t) => counts[t.id] > 0);
+  const pool = playing.length > 0 ? playing : open;
+  return pool.reduce<(typeof TEAMS)[number] | null>((best, t) => (best === null || counts[t.id] < counts[best.id] ? t : best), null)?.id ?? null;
 }
 
 /** How many players sit at each table. */

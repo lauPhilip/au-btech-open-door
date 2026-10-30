@@ -54,3 +54,30 @@ export function everyoneVoted(game: Game): boolean {
   const seated = game.players.filter((p) => p.team);
   return seated.length > 0 && seated.every((p) => game.votes?.[p.id] !== undefined);
 }
+
+export interface ClassVote {
+  /** Tables that agreed on one option, and tables that did not. */
+  decided: number;
+  split: number;
+  /** For each option, how many tables chose it. */
+  tables: number[];
+  /** The option most tables chose, or null on a tie or when no table decided. */
+  winner: number | null;
+  /** The best option of the scenario, if it names one. */
+  best: number | null;
+}
+
+/** What the whole class decided: each table counts once, with the option its students chose most. */
+export function classVote(game: Game, scenario: Scenario): ClassVote {
+  const options = scenario.day.final_choice.options;
+  const tables = options.map(() => 0);
+  let split = 0;
+  for (const v of allVotes(game, scenario)) {
+    if (v.winner === null) split++;
+    else tables[v.winner] = (tables[v.winner] ?? 0) + 1;
+  }
+  const top = Math.max(0, ...tables);
+  const leaders = tables.flatMap((c, i) => (c === top && top > 0 ? [i] : []));
+  const best = options.findIndex((o) => o.best);
+  return { decided: tables.reduce((a, b) => a + b, 0), split, tables, winner: leaders.length === 1 ? (leaders[0] ?? null) : null, best: best >= 0 ? best : null };
+}

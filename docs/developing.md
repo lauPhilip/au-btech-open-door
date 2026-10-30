@@ -44,3 +44,5 @@ GitHub Pages can only serve static files, so it cannot run the game. The live ga
 The demo GIF in `docs/media/` is a recording of a real session. To make a new one, play a session in a browser at 1280 by 720, capture it, and convert it with ffmpeg to a GIF of about 6 seconds and 960 pixels wide.
 
 Security: the public Worker limits how fast one address can create sessions, look up codes and connect, refuses connections from other sites, drops message floods and sends security headers (the limits are in `shared/src/limits.ts`, the checks in `room/src/guard.ts`, the page headers in `app/public/_headers`). The shared session limit is a Cloudflare rate-limit binding in `room/wrangler.jsonc`. What is stored and why is in [security.md](security.md).
+
+The walk screen is split into parts so each file stays small: `Walk.svelte` holds the movement, keyboard and the picture, `WalkHeader.svelte` the strip above it (team, place, countdown, "our table is done", day bar, hints), `WalkControls.svelte` what you can do under the picture, and `WalkSide.svelte` the side panel (goal, rooms, notes, found assets, teammates, chat and clues).

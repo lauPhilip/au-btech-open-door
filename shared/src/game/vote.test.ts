@@ -89,3 +89,28 @@ describe("matching notes with the answer key", () => {
     expect(m.find((x) => x.threat.id === "printer-guest-wifi")?.note).not.toBeNull();
   });
 });
+
+describe("classVote", () => {
+  it("counts each table once and names the winner and the best choice", async () => {
+    const { classVote } = await import("./vote");
+    const { scenarios } = await import("../scenarios.generated");
+    const { newGame, join, chooseTeam } = await import("./rules");
+    const scenario = Object.values(scenarios)[0]!;
+    let g = newGame("ABCD", scenario.id, 45, 0);
+    const seat = (id: string, team: "blue" | "red" | "green") => {
+      const j = join(g, scenario, id, id, 0, 0);
+      if (j.ok) g = j.value;
+      const c = chooseTeam(g, id, team);
+      if (c.ok) g = c.value;
+    };
+    seat("player-b1", "blue"); seat("player-b2", "blue"); seat("player-r1", "red"); seat("player-g1", "green");
+    g = { ...g, votes: { "player-b1": 1, "player-b2": 1, "player-r1": 1, "player-g1": 0 } };
+    const result = classVote(g, scenario);
+    expect(result.decided).toBe(3);
+    expect(result.split).toBe(0);
+    expect(result.tables[1]).toBe(2);
+    expect(result.tables[0]).toBe(1);
+    expect(result.winner).toBe(1);
+    expect(result.best).toBe(scenario.day.final_choice.options.findIndex((o) => o.best));
+  });
+});

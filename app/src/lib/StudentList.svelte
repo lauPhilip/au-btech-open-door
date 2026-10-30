@@ -40,7 +40,7 @@
               <button type="button" class="plain" onclick={() => (editing = null)}>Cancel</button>
             </form>
           {:else}
-            <span class="name"><strong>{p.name}</strong> <small>{p.team ? teamById(p.team).name : "no table yet"}{p.online ? "" : " · offline"}</small></span>
+            <span class="name"><strong>{p.name}</strong> <small>{p.team ? teamById(p.team).name : "no table yet"}{p.online ? "" : " · offline"}{p.late ? " · joined late" : ""}</small></span>
             <button type="button" aria-label="Rename {p.name}" onclick={() => startEdit(p)}>Rename</button>
             {#if confirming === p.id}
               <button type="button" class="danger" onclick={() => remove(p.id)}>Remove {p.name} for good?</button>

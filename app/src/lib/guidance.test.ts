@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { join, newGame, scenarios, setReady, chooseTeam, summaryPrompt, type Game } from "@open-door/shared";
-import { advanceWarnings, guidance } from "./guidance";
+import { advanceWarnings, guidance, type Say } from "./guidance";
+import { translate } from "./i18n";
+
+const en = (say: Say) => translate("en", say.key, say.vars);
+const da = (say: Say) => translate("da", say.key, say.vars);
 
 const scenario = scenarios["nordknit-black-friday"]!;
 
@@ -20,22 +24,22 @@ function classOf(...teams: Array<"blue" | "red" | null>): Game {
 
 describe("advanceWarnings", () => {
   it("warns about students without a table before the story", () => {
-    expect(advanceWarnings(classOf("blue", null, null))).toEqual(["2 students have no table yet."]);
+    expect(advanceWarnings(classOf("blue", null, null)).map(en)).toEqual(["2 students have no table yet."]);
     expect(advanceWarnings(classOf("blue"))).toEqual([]);
   });
 
   it("warns about tables that are not done during the walk, unless the time is up", () => {
     let g: Game = { ...classOf("blue", "red"), phase: "walk" };
-    expect(advanceWarnings(g)).toEqual(["2 tables are not done yet."]);
+    expect(advanceWarnings(g).map(en)).toEqual(["2 tables are not done yet."]);
     expect(advanceWarnings(g, 0)).toEqual([]);
     const done = setReady(g, "student-0-abcdef", true, 1);
     if (done.ok) g = done.value;
-    expect(advanceWarnings(g)).toEqual(["1 table is not done yet."]);
+    expect(advanceWarnings(g).map(en)).toEqual(["1 table is not done yet."]);
   });
 
   it("warns about missing votes", () => {
     const g = { ...classOf("blue", "blue"), phase: "vote" as const, votes: { "student-0-abcdef": 0 } };
-    expect(advanceWarnings(g)).toEqual(["1 student has not voted yet."]);
+    expect(advanceWarnings(g).map(en)).toEqual(["1 student has not voted yet."]);
   });
 });
 
@@ -44,15 +48,16 @@ describe("guidance", () => {
     const g = classOf("blue", "red");
     const phases = ["lobby", "story", "walk", "day", "vote", "debrief"] as const;
     for (const phase of phases) {
-      const { text } = guidance({ ...g, phase }, scenario);
+      const text = en(guidance({ ...g, phase }, scenario));
+      expect(da(guidance({ ...g, phase }, scenario)).length).toBeGreaterThan(10);
       expect(text.length).toBeGreaterThan(10);
       for (const sentence of text.split(/(?<=\.)\s+/)) expect(sentence.split(/\s+/).length).toBeLessThan(22);
     }
   });
 
   it("changes with progress", () => {
-    expect(guidance(classOf(), scenario).text).toContain("Waiting for students");
-    expect(guidance({ ...classOf("blue", "red"), phase: "walk" }, scenario).text).toContain("0 of 2 tables");
-    expect(guidance({ ...classOf("blue"), phase: "debrief", prompt: summaryPrompt(scenario) }, scenario).text).toContain("class summary");
+    expect(en(guidance(classOf(), scenario))).toContain("Waiting for students");
+    expect(en(guidance({ ...classOf("blue", "red"), phase: "walk" }, scenario))).toContain("0 of 2 tables");
+    expect(en(guidance({ ...classOf("blue"), phase: "debrief", prompt: summaryPrompt(scenario) }, scenario))).toContain("class summary");
   });
 });

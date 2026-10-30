@@ -2,7 +2,7 @@
   import type { Spot } from "@open-door/shared";
 
   /** Under the picture: what you can do right here (talk, look, write a note) and how to move. */
-  let { view, nearby, onopen, onnote }: { view: "map" | "room"; nearby: Spot[]; onopen: (spot: Spot) => void; onnote: (about: Spot | null) => void } = $props();
+  let { view, nearby, online, onopen, onnote }: { view: "map" | "room"; nearby: Spot[]; online: boolean; onopen: (spot: Spot) => void; onnote: (about: Spot | null) => void } = $props();
 </script>
 
 <div class="prompt" aria-live="polite">
@@ -16,7 +16,7 @@
   {:else}
     <span class="quiet">Walk up to a person or a thing to talk or look closer.</span>
   {/if}
-  <button class="action sticky" onclick={() => onnote(nearby[0] ?? null)}>Sticky note</button>
+  <button class="action sticky" disabled={!online} onclick={() => onnote(nearby[0] ?? null)}>Sticky note</button>
   </div>
   <p class="help">{view === "map" ? "Tap or click where you want to go." : "Tap a person or a thing, or a door to walk there."} On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
 
@@ -80,5 +80,9 @@
     grid-row: 3;
     margin: 0;
   }
+  }
+  .action:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 </style>

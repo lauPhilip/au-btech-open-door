@@ -202,7 +202,7 @@
       <RoomScene {scenario} roomId={here?.id ?? null} others={teammatesHere} you={{ face: me.face, color: teamById(me.team!).color, name: me.name }} {position} onspot={goToSpot} onroom={walkToRoom} onwalk={walkTo} />
     {/if}
     </div>
-    <WalkControls {view} {nearby} onopen={openCloseUp} onnote={startNote} />
+    <WalkControls {view} {nearby} online={connection.status === "connected"} onopen={openCloseUp} onnote={startNote} />
   </section>
 
   <WalkSide {connection} {game} {scenario} {me} {here} {visited} {found} {teammates} {spotsByRoom} {messages} {cluesFound} onroom={walkToRoom} onspot={walkToSpot} />

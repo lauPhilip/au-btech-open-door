@@ -104,7 +104,6 @@
         </ul>
       </section>
     {/if}
-    {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
   </aside>
 
 <style>
@@ -237,10 +236,6 @@
   }
   .mates .offline {
     opacity: 0.55;
-  }
-  .warn {
-    color: var(--alert-dark);
-    margin: 0;
   }
   .empty {
     color: var(--slate);

@@ -78,13 +78,18 @@
   /** Fit a room's name beside its badges: smaller type first, then two lines. */
   function title(name: string, width: number): { lines: string[]; size: number; w: number } {
     const room = width - 20 - (width > 160 ? 40 : 0); // padding, and the tick badge beside wider rooms
-    const fits = (text: string, size: number) => text.length * size * 0.56 <= room;
-    if (fits(name, 20)) return { lines: [name], size: 20, w: name.length * 20 * 0.56 + 16 };
+    const fits = (text: string, size: number) => text.length * size * 0.62 <= room;
+    if (fits(name, 20)) return { lines: [name], size: 20, w: name.length * 20 * 0.62 + 16 };
     const cut = name.lastIndexOf(" ");
     const lines = cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : [name];
     const longest = Math.max(...lines.map((l) => l.length));
-    const size = Math.max(width < 80 ? 11 : 13, Math.min(20, Math.floor(room / (longest * 0.56))));
-    return { lines, size, w: longest * size * 0.56 + 16 };
+    const size = Math.max(width < 80 ? 11 : 13, Math.min(20, Math.floor(room / (longest * 0.62))));
+    return { lines, size, w: longest * size * 0.62 + 16 };
+  }
+
+  /** How wide a room's name tag is: the name, and under it the network the room belongs to. */
+  function pillW(t: { w: number }, narrow: boolean, zoneName: string): number {
+    return Math.max(t.w, narrow ? 0 : zoneName.length * 8.4 + 22);
   }
 
   function initial(name: string): string {
@@ -119,11 +124,11 @@
     <g class="room zone-{room.zone}" class:art={!!mapArt} class:seen={visited.has(room.id)}>
       <rect {x} {y} width={w} height={h} rx="10" />
       {#if !narrow && !mapArt}<text x={x + 16} y={y + h - 12} class="zone-name">{zoneName}</text>{/if}
-      {#if mapArt}<rect x={x + 6} y={y + 8} width={Math.min(w - 12, Math.max(t.w, narrow ? 0 : zoneName.length * 8.4 + 20))} height={t.lines.length * (t.size + 2) + 8 + (narrow ? 0 : 20)} rx="8" class="label-bg" />{/if}
-      <text x={x + (narrow ? 12 : 16)} y={y + 8 + t.size + 2} class="room-name" style="font-size: {t.size}px">
-        {#each t.lines as line, i (i)}<tspan x={x + (narrow ? 12 : 16)} dy={i === 0 ? 0 : t.size + 2}>{line}</tspan>{/each}
+      {#if mapArt}<rect x={narrow ? x + w - pillW(t, narrow, zoneName) - 4 : x + 6} y={y + 6} width={pillW(t, narrow, zoneName)} height={t.lines.length * (t.size + 2) + 8 + (narrow ? 0 : 20)} rx="8" class="label-bg" />{/if}
+      <text x={narrow ? x + w - pillW(t, narrow, zoneName) + 4 : x + 16} y={y + 6 + t.size + 4} class="room-name" style="font-size: {t.size}px">
+        {#each t.lines as line, i (i)}<tspan x={narrow ? x + w - pillW(t, narrow, zoneName) + 4 : x + 16} dy={i === 0 ? 0 : t.size + 2}>{line}</tspan>{/each}
       </text>
-      {#if mapArt && !narrow}<text x={x + 16} y={y + 8 + t.lines.length * (t.size + 2) + 16} class="zone-line">{zoneName}</text>{/if}
+      {#if mapArt && !narrow}<text x={x + 16} y={y + 6 + t.lines.length * (t.size + 2) + 16} class="zone-line">{zoneName}</text>{/if}
       {#if clueRooms.includes(room.id)}
         <g transform="translate({narrow ? x + w - 28 : x + w - 68} {narrow ? y + h - 62 : y + 12})" aria-hidden="true">
           <circle cx="11" cy="11" r="11" class="clue-bg" />

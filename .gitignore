@@ -10,6 +10,9 @@ coverage/
 playwright-report/
 test-results/
 
+# Written from scenarios/**/*.yaml by `npm run scenarios`
+shared/src/scenarios.generated.ts
+
 # Environment and secrets
 .env
 .env.*

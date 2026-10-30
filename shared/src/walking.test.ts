@@ -53,6 +53,30 @@ describe.each(nordknit.map((s) => [s.id, s] as const))("walls and doors in %s", 
     }
   });
 
+  it("keeps every wall closed: two floors that touch must be joined by a door", () => {
+    const all = [...scenario.map.rooms.map((r) => ({ id: r.id, rect: r.rect })), ...(scenario.map.floors ?? [])];
+    const doors = scenario.map.doors ?? [];
+    const touch = (p: number[], q: number[]) => p[0]! <= q[0]! + q[2]! && q[0]! <= p[0]! + p[2]! && p[1]! <= q[1]! + q[3]! && q[1]! <= p[1]! + p[3]!;
+    for (const [i, a] of all.entries()) {
+      for (const b of all.slice(i + 1)) {
+        if (!touch(a.rect, b.rect)) continue;
+        const joined = doors.some((d) => (d.a === a.id && d.b === b.id) || (d.a === b.id && d.b === a.id));
+        expect(joined, `${a.id} and ${b.id} touch with no wall and no door`).toBe(true);
+      }
+    }
+  });
+
+  it("makes each door overlap the floor on both sides", () => {
+    const all = new Map([...scenario.map.rooms.map((r) => [r.id, r.rect] as const), ...(scenario.map.floors ?? []).map((f) => [f.id, f.rect] as const)]);
+    for (const d of scenario.map.doors ?? []) {
+      for (const side of [d.a, d.b]) {
+        const r = all.get(side)!;
+        const overlaps = d.rect[0] < r[0] + r[2] && r[0] < d.rect[0] + d.rect[2] && d.rect[1] < r[1] + r[3] && r[1] < d.rect[1] + d.rect[3];
+        expect(overlaps, `door ${d.a}/${d.b} does not reach ${side}`).toBe(true);
+      }
+    }
+  });
+
   it("sends a tap on a wall to the nearest floor", () => {
     const p = nearestWalkable(scenario, { x: 10, y: 10 });
     expect(walkable(scenario, p.x, p.y)).toBe(true);

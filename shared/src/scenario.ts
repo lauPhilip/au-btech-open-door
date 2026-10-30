@@ -20,6 +20,19 @@ export interface Room {
   start?: boolean;
 }
 
+/** A piece of hallway or other floor that is not a room. */
+export interface Floor {
+  id: string;
+  rect: [number, number, number, number];
+}
+
+/** A gap in a wall. It overlaps the floor on both sides, so walking through it joins them. */
+export interface Door {
+  a: string;
+  b: string;
+  rect: [number, number, number, number];
+}
+
 export interface Zone {
   id: string;
   name: string;
@@ -93,7 +106,7 @@ export interface Scenario {
   learning_goals?: string[];
   goal: string;
   story: Array<{ speaker: string; text: string }>;
-  map: { width: number; height: number; rooms: Room[]; zones: Zone[] };
+  map: { width: number; height: number; rooms: Room[]; zones: Zone[]; floors?: Floor[]; doors?: Door[] };
   people: PersonInScenario[];
   things: Thing[];
   assets: Asset[];
@@ -168,7 +181,7 @@ export function spots(scenario: Scenario): Spot[] {
     const [rx, ry, rw, rh] = room.rect;
     const here = scenario.things.filter((t) => t.room === room.id);
     here.forEach((thing, i) => {
-      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: rw < 120 ? ry + 50 : ry + rh - Math.min(112, Math.round(rh * 0.42)) });
+      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: rw < 120 ? ry + 50 : ry + rh - Math.min(112, Math.round(rh * 0.55)) });
     });
   }
   return result;

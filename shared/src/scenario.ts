@@ -50,6 +50,8 @@ export interface PersonInScenario {
   name: string;
   role: string;
   room: string;
+  /** Where in the room they stand, from 0.05 (left) to 0.95 (right). */
+  at?: number;
   hello: string;
   topics: Topic[];
 }
@@ -58,6 +60,8 @@ export interface Thing {
   id: string;
   name: string;
   room: string;
+  /** Where in the room it is, from 0.05 (left) to 0.95 (right). */
+  at?: number;
   text: string;
   closer?: string;
 }
@@ -175,13 +179,13 @@ export function spots(scenario: Scenario): Spot[] {
     const narrow = rw < 120; // a cupboard: stand in the middle, near the bottom
     result.push(narrow
       ? { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + Math.round(rw / 2), y: ry + rh - 16 - before * 56 }
-      : { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + rw - 40 - before * 56, y: ry + rh - 44 });
+      : { kind: "person", id: person.id, name: person.name, room: room.id, x: person.at !== undefined ? Math.round(rx + rw * person.at) + before * 56 : rx + rw - 40 - before * 56, y: ry + rh - 44 });
   });
   for (const room of scenario.map.rooms) {
     const [rx, ry, rw, rh] = room.rect;
     const here = scenario.things.filter((t) => t.room === room.id);
     here.forEach((thing, i) => {
-      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: rw < 120 ? ry + 50 : ry + rh - Math.min(112, Math.round(rh * 0.55)) });
+      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: thing.at !== undefined ? Math.round(rx + rw * thing.at) : Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: rw < 120 ? ry + 50 : ry + rh - Math.min(112, Math.round(rh * 0.55)) });
     });
   }
   return result;

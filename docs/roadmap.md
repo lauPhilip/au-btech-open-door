@@ -45,3 +45,5 @@ Every change to the main branch passes the same automated checks. Game rules hav
 | 2 · Design and architecture | Next. Starts with the “hello room” test on eduroam — milestone M1 |
 
 GitHub Pages publishes the `docs` folder automatically on every push that changes it, so the concept book can always be shared as a link.
+
+After version 1, the next improvements are planned in the [improvement roadmap](improvement-roadmap.md).

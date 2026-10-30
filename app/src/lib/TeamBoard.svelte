@@ -45,7 +45,7 @@
     border-radius: var(--radius-m);
     border-top: 6px solid var(--team);
     padding: 12px 14px;
-    box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06);
+    box-shadow: var(--shadow-1);
   }
   h3 {
     font-size: 18px;

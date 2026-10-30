@@ -39,7 +39,7 @@
     padding: 16px;
   }
   .wrap {
-    width: min(520px, 100%);
+    width: min(var(--column), 100%);
     display: flex;
     flex-direction: column;
     gap: 12px;

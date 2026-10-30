@@ -276,7 +276,8 @@
 
 <style>
   .scene { display: flex; flex-direction: column; gap: 10px; }
-  .frame { container-type: inline-size; position: relative; border-radius: var(--radius-l); overflow: hidden; background: #f6ebdc; box-shadow: 0 1px 2px rgba(28, 36, 48, 0.08), 0 8px 24px rgba(28, 36, 48, 0.1); cursor: pointer; }
+  .more { max-width: var(--fit-room, none); width: 100%; margin-inline: auto; }
+  .frame { container-type: inline-size; width: 100%; max-width: var(--fit-room, none); margin-inline: auto; position: relative; border-radius: var(--radius-l); overflow: hidden; background: #f6ebdc; box-shadow: 0 1px 2px rgba(28, 36, 48, 0.08), 0 8px 24px rgba(28, 36, 48, 0.1); cursor: pointer; }
   svg { display: block; width: 100%; height: auto; }
   .hot {
     position: absolute; transform: translate(-50%, -50%); min-width: 44px; min-height: 44px; padding: 0; border: none; background: transparent;

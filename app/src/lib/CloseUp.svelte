@@ -119,7 +119,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    z-index: 20;
+    z-index: var(--z-modal);
     display: grid;
     place-items: center;
     padding: 16px;
@@ -135,7 +135,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    box-shadow: 0 20px 60px rgb(28 36 48 / 0.35);
+    box-shadow: var(--shadow-3);
   }
   header {
     display: flex;

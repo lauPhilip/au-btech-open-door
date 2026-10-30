@@ -5,6 +5,7 @@ import {
   assignTeam,
   castVote,
   sendHint,
+  setReady,
   gradeAll,
   setPrompt,
   TEAMS,
@@ -86,6 +87,7 @@ export class GameRoom extends Server {
       this.game.results ??= {};
       this.game.noteCounts ??= {};
       this.game.hints ??= {};
+      this.game.ready ??= {};
       this.game.prompt ??= 0;
       this.game.clues ??= {};
       this.game.timer ??= null;
@@ -210,6 +212,9 @@ export class GameRoom extends Server {
         break;
       case "vote":
         await this.apply(connection, castVote(game, scenario, connection.id, message.option));
+        break;
+      case "ready":
+        await this.apply(connection, setReady(game, connection.id, message.ready, Date.now()));
         break;
       case "timer":
         await this.apply(connection, adjustTimer(game, message.action, Date.now()));

@@ -47,6 +47,9 @@
   const clueRooms = $derived(cluesFound.map((i) => scenario.day.clues[i]?.room).filter((r): r is string => !!r));
 
   const team = $derived(teamById(me.team!));
+  /** Your table has told the teacher it is done with this step. */
+  const tableReady = $derived(game.ready?.[me.team!] ?? null);
+  const nextStepName = $derived(game.phase === "walk" ? "the day" : "the vote");
   /** The teacher's latest hint for this team, until the student closes it. */
   const hint = $derived(game.hints?.[me.team!]);
   let closedHint = $state(0);
@@ -201,8 +204,14 @@
       {#if game.phase === "walk" && game.timer}
         <span class="left" class:over={left === 0} role="timer">{left === 0 ? "Time is up" : `Walk and spot · ${formatLeft(left)} left`}</span>
       {/if}
+      <button class="done-btn" class:on={!!tableReady} aria-pressed={!!tableReady} disabled={paused} onclick={() => connection.ready(!tableReady)}>
+        <span aria-hidden="true">{tableReady ? "✓" : "☐"}</span>{tableReady ? "Table is done" : "Our table is done"}
+      </button>
       <StatusPill status={connection.status} />
     </header>
+    {#if tableReady}
+      <p class="ready-note" role="status">{tableReady.by === me.name ? "You told" : `${tableReady.by} told`} your teacher your table is ready for {nextStepName}. Keep writing notes if you think of more, or tap the button again to say you are not done.</p>
+    {/if}
     {#if isDay}
       <DayBar {scenario} {minute} found={cluesFound.length} total={scenario.day.clues.length} latest={messages.at(-1) ? { from: scenario.people.find((p) => p.id === messages.at(-1)!.from)?.name ?? "", text: messages.at(-1)!.text } : undefined} />
     {/if}
@@ -222,11 +231,13 @@
       <button aria-pressed={view === "map"} onclick={() => (view = "map")}>Map</button>
       <button aria-pressed={view === "room"} onclick={() => (view = "room")}>Room view</button>
     </div>
+    <div class="stage">
     {#if view === "map"}
       <OfficeMap {scenario} players={game.players} you={me.id} myTeam={me.team} yourPosition={position} {visited} {clueRooms} notes={connection.notes} near={nearby.map((n) => n.id)} onpoint={walkTo} />
     {:else}
       <RoomScene {scenario} roomId={here?.id ?? null} others={teammatesHere} you={{ face: me.face, color: teamById(me.team!).color, name: me.name }} {position} onspot={goToSpot} onroom={walkToRoom} onwalk={walkTo} />
     {/if}
+    </div>
     <div class="prompt" aria-live="polite">
       {#if nearby.length > 0}
         {#each nearby as spot (spot.kind + spot.id)}
@@ -330,7 +341,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
     grid-template-rows: auto 1fr;
-    max-width: 1700px;
+    max-width: var(--page);
     margin: 0 auto;
     gap: 12px 20px;
     padding: 12px 16px 24px;
@@ -356,12 +367,12 @@
   .paused {
     position: fixed;
     inset: 0;
-    z-index: 40;
+    z-index: var(--z-overlay);
     display: grid;
     place-items: center;
     padding: 24px;
     text-align: center;
-    background: rgb(28 36 48 / 0.8);
+    background: var(--scrim);
     color: #fff;
   }
   .paused .big {
@@ -393,6 +404,39 @@
   .where {
     flex: 1;
     color: var(--slate);
+  }
+  .done-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 2px solid var(--blue);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--blue-dark);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .done-btn:hover {
+    background: var(--blue-soft);
+  }
+  .done-btn.on {
+    background: var(--safe-dark);
+    border-color: var(--safe-dark);
+    color: #fff;
+  }
+  .done-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .ready-note {
+    margin: 0;
+    padding: 8px 14px;
+    border-radius: var(--radius-m);
+    background: var(--safe-soft);
+    color: var(--safe-dark);
+    font-weight: 600;
   }
   .where strong {
     color: var(--ink);
@@ -432,7 +476,7 @@
     color: var(--ink);
   }
   .action.sticky:hover {
-    background: #f5d450;
+    background: var(--sticky-hover);
   }
   .action:hover {
     background: var(--blue-dark);
@@ -594,12 +638,65 @@
       grid-template-columns: 1fr;
     }
   }
+  /* Laptops and big screens: the whole game fits the window. The picture takes whatever height is left
+     (it never grows past it), the side panel scrolls by itself, and the page itself does not scroll. */
+  @media (min-width: 861px) and (min-height: 600px) {
+    .walk {
+      height: 100dvh;
+      overflow: hidden;
+      grid-template-rows: auto minmax(0, 1fr);
+      padding-bottom: var(--space-3);
+    }
+    .map {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr) auto auto;
+      gap: var(--space-2) var(--space-3);
+      min-height: 0;
+    }
+    .stage {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      min-height: 0;
+      container-type: size;
+      overflow: auto;
+      display: grid;
+      place-items: center;
+      /* The widest the picture may be so that it still fits the height: map 1206 by 770, room 800 by 450 plus its door list. */
+      --fit-map: calc(100cqh * 1.566);
+      --fit-room: calc((100cqh - 56px) * 1.7778);
+    }
+    .stage > :global(*) {
+      width: 100%;
+    }
+    .views {
+      grid-column: 1;
+      grid-row: 2;
+      margin: 0;
+    }
+    .prompt {
+      grid-column: 2;
+      grid-row: 2;
+      margin: 0;
+    }
+    .help {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      margin: 0;
+    }
+    aside {
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: var(--space-1);
+    }
+  }
   .hint {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    background: #ffe27a;
+    background: var(--sticky);
     color: var(--ink);
     border-radius: var(--radius-m);
     padding: 10px 14px;

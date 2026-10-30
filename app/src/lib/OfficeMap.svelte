@@ -195,7 +195,8 @@
     display: block;
     width: 100%;
     height: auto;
-    max-height: 100%;
+    max-width: var(--fit-map, none);
+    margin-inline: auto;
     user-select: none;
     touch-action: manipulation;
   }

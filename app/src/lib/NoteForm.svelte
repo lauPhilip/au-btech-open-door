@@ -121,7 +121,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    z-index: 30;
+    z-index: var(--z-modal);
     display: grid;
     place-items: center;
     padding: 16px;
@@ -131,11 +131,11 @@
     width: min(620px, 100%);
     max-height: 100%;
     overflow-y: auto;
-    background: #fff9d6;
+    background: var(--sticky-paper);
     border-top: 10px solid var(--sticky);
     border-radius: var(--radius-m);
     padding: 18px 20px 20px;
-    box-shadow: 0 20px 60px rgb(28 36 48 / 0.35);
+    box-shadow: var(--shadow-3);
   }
   form {
     display: flex;

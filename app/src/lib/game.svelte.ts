@@ -107,6 +107,11 @@ export class GameConnection {
     this.send({ t: "prompt", index });
   }
 
+  /** Tell the teacher your table is done with this step (or take it back). */
+  ready(ready: boolean): void {
+    this.send({ t: "ready", ready });
+  }
+
   /** Vote for an option of the final choice. */
   vote(option: number): void {
     this.send({ t: "vote", option });

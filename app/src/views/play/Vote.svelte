@@ -50,7 +50,7 @@
 
 <style>
   .page { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
-  .card { width: min(560px, 100%); display: flex; flex-direction: column; gap: 14px; }
+  .card { width: min(var(--column), 100%); display: flex; flex-direction: column; gap: 14px; }
   header { display: flex; justify-content: space-between; align-items: center; }
   .me { display: flex; align-items: center; gap: 10px; }
   .eyebrow { margin: 0; color: var(--slate); font-weight: 600; }

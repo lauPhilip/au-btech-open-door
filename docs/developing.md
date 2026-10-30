@@ -39,6 +39,6 @@ The code is split into three parts: `shared/` holds the message format and game 
 
 The documentation site (the landing page, the concept book, the teaching material and the demo GIF) is published by GitHub Pages straight from the `docs` folder of the `main` branch. There is no workflow to run: merge to `main` and the site updates by itself. Set it up once under Settings, Pages, Build and deployment, with the source set to "Deploy from a branch", the branch `main` and the folder `/docs`.
 
-GitHub Pages can only serve static files, so it cannot run the game. The live game (the app and the session rooms) is one Cloudflare Worker: `npm run deploy` builds and publishes it after a one-time `npx wrangler login`. When the Worker has an address, put it in `docs/site.js` and the "Play it" button on the landing page appears.
+GitHub Pages can only serve static files, so it cannot run the game. The live game (the app and the session rooms) is one Cloudflare Worker: `npm run deploy` builds and publishes it after a one-time `npx wrangler login`. The live game is at <https://open-door.aubtech.workers.dev/>; the "Play the game" button on the landing page (`docs/index.html`) links to it, so change that link if the address ever changes.
 
 The demo GIF in `docs/media/` is a recording of a real session. To make a new one, play a session in a browser at 1280 by 720, capture it, and convert it with ffmpeg to a GIF of about 6 seconds and 960 pixels wide.

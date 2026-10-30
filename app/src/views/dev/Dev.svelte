@@ -257,6 +257,31 @@
   .wide iframe {
     height: 620px;
   }
+  /* The simulator fits the window: the header keeps its height, the panes share what is left, and only the pane area scrolls if there are many students. */
+  @media (min-height: 600px) {
+    .dev {
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .frames {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      align-items: stretch;
+      grid-auto-rows: minmax(320px, 1fr);
+      padding-bottom: var(--space-1);
+    }
+    .frame {
+      min-height: 0;
+    }
+    iframe,
+    .wide iframe {
+      flex: 1;
+      min-height: 0;
+      height: auto;
+    }
+  }
   @media (max-width: 900px) {
     .frame.wide {
       grid-column: span 1;

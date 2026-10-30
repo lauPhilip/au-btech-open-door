@@ -1,3 +1,4 @@
+import { moveOn } from "./helpers";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 
@@ -122,20 +123,20 @@ for (const size of SIZES) {
     await check(ada, "student", "3-look");
     await ada.getByRole("button", { name: "Back" }).click();
 
-    await teacher.getByRole("button", { name: "Start the day" }).click();
+    await moveOn(teacher, "Start the day");
     await expect(ada.getByText(/Orders have stopped printing/).first()).toBeVisible();
     await check(ada, "student", "4-day");
     await check(teacher, "teacher", "4-day");
     if (projector) await check(projector, "screen", "4-day");
 
-    await teacher.getByRole("button", { name: "Start the vote" }).click();
+    await moveOn(teacher, "Start the vote");
     await expect(ada.getByText(/what do we do right now/i)).toBeVisible();
     await check(ada, "student", "5-vote");
     await check(teacher, "teacher", "5-vote");
     if (projector) await check(projector, "screen", "5-vote");
     await ada.getByRole("radio").first().click();
 
-    await teacher.getByRole("button", { name: "Show the result" }).click();
+    await moveOn(teacher, "Show the result");
     await check(ada, "student", "6-finish");
     await check(teacher, "teacher", "6-debrief");
     if (projector) await check(projector, "screen", "6-debrief");

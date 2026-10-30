@@ -6,9 +6,12 @@
 //   3. that the texts are easy to read (Flesch Reading Ease 60+, no sentence of 20+ words).
 //
 //   node scripts/build-scenarios.mjs           # check and write shared/src/scenarios.generated.ts
-//   node scripts/build-scenarios.mjs --check   # check, and fail if the generated file is out of date
+//   node scripts/build-scenarios.mjs --check   # only check; write nothing
+//
+// The generated file is not kept in git (it is in .gitignore). `npm run dev`, `build`, `check`, `test`
+// and `test:e2e` all write it first, so it is always up to date when it is used.
 
-import { readFileSync, writeFileSync, readdirSync, existsSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
@@ -71,12 +74,7 @@ const output =
   `export const scenarios: Record<string, Scenario> = ${JSON.stringify(scenarios, null, 2)};\n`;
 
 if (checkOnly) {
-  const current = existsSync(outFile) ? readFileSync(outFile, "utf8") : "";
-  if (current !== output) {
-    console.error("\n✗ shared/src/scenarios.generated.ts is out of date. Run: npm run scenarios");
-    process.exit(1);
-  }
-  console.log("✓ generated scenarios are up to date");
+  console.log("✓ scenarios are valid");
 } else {
   writeFileSync(outFile, output);
   console.log(`Wrote ${relative(root, outFile)} with ${Object.keys(scenarios).length} scenario(s).`);

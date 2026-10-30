@@ -18,10 +18,10 @@
     "paper-kit": "node scripts/build-paper-kit.mjs",
     "dev": "npm run scenarios && npm run build -w app && concurrently -n room,app -c blue,green \"npm run dev -w room\" \"npm run dev -w app\"",
     "build": "npm run scenarios && npm run build -w app",
-    "check": "node scripts/build-scenarios.mjs --check && npm run check --workspaces --if-present",
-    "test": "vitest run",
+    "check": "npm run scenarios && npm run check --workspaces --if-present",
+    "test": "npm run scenarios && vitest run",
     "deploy": "npm run build && npm run deploy -w room",
-    "test:e2e": "playwright test"
+    "test:e2e": "npm run build && playwright test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",

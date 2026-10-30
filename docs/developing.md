@@ -42,3 +42,5 @@ The documentation site (the landing page, the concept book, the teaching materia
 GitHub Pages can only serve static files, so it cannot run the game. The live game (the app and the session rooms) is one Cloudflare Worker: `npm run deploy` builds and publishes it after a one-time `npx wrangler login`. The live game is at <https://open-door.aubtech.workers.dev/>; the "Play the game" button on the landing page (`docs/index.html`) links to it, so change that link if the address ever changes.
 
 The demo GIF in `docs/media/` is a recording of a real session. To make a new one, play a session in a browser at 1280 by 720, capture it, and convert it with ffmpeg to a GIF of about 6 seconds and 960 pixels wide.
+
+Security: the public Worker limits how fast one address can create sessions, look up codes and connect, refuses connections from other sites, drops message floods and sends security headers (the limits are in `shared/src/limits.ts`, the checks in `room/src/guard.ts`, the page headers in `app/public/_headers`). The shared session limit is a Cloudflare rate-limit binding in `room/wrangler.jsonc`. What is stored and why is in [security.md](security.md).

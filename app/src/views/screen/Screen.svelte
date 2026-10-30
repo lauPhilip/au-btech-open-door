@@ -184,6 +184,8 @@
     padding: 24px;
     text-align: center;
     box-shadow: var(--shadow-1);
+    min-width: 0;
+    container-type: inline-size;
   }
   .qr :global(svg) {
     width: 100%;
@@ -192,14 +194,17 @@
   }
   .go {
     margin: 12px 0 0;
+    overflow-wrap: anywhere;
   }
   .code {
     margin: 0;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 96px;
-    letter-spacing: 0.08em;
+    /* Four letters always fit the card, from a small simulator pane to a projector. */
+    font-size: clamp(32px, 21cqw, 96px);
+    letter-spacing: 0.05em;
     line-height: 1.1;
+    white-space: nowrap;
   }
   .teams {
     display: flex;

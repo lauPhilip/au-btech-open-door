@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "../../lib/i18n.svelte";
   import { TEAM_MAX, TEAMS, teamCounts, type Game, type Player, type TeamId } from "@open-door/shared";
   import Face from "../../lib/Face.svelte";
 
@@ -9,8 +10,8 @@
 
 <main class="page">
   <div class="wrap">
-    <h1>Sit at a team table</h1>
-    <p>Sit with the people next to you. Up to {TEAM_MAX} at each table.</p>
+    <h1>{t("team.title")}</h1>
+    <p>{t("team.text", { max: TEAM_MAX })}</p>
     <div class="tables">
       {#each TEAMS as team (team.id)}
         {@const members = game.players.filter((p) => p.team === team.id)}
@@ -19,7 +20,7 @@
           <span class="door" aria-hidden="true"></span>
           <span class="info">
             <strong>{team.name}</strong>
-            <small>{full ? "Full" : `${counts[team.id]} of ${TEAM_MAX}`}</small>
+            <small>{full ? t("team.full") : t("team.count", { n: counts[team.id], max: TEAM_MAX })}</small>
           </span>
           <span class="faces" aria-label={members.map((m) => m.name).join(", ") || "Empty"}>
             {#each members as m (m.id)}<Face face={m.face} size={28} />{/each}
@@ -28,7 +29,7 @@
       {/each}
     </div>
     {#if counts && TEAMS.every((t) => counts[t.id] >= TEAM_MAX)}
-      <p class="warn" role="alert">Every table is full. Ask your teacher to make room.</p>
+      <p class="warn" role="alert">{t("team.allFull")}</p>
     {/if}
     {#if error}<p class="warn" role="alert">{error}</p>{/if}
   </div>

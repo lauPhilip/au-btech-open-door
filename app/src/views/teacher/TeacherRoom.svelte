@@ -5,6 +5,8 @@
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
   import StudentList from "../../lib/StudentList.svelte";
+  import { t } from "../../lib/i18n.svelte";
+  import LanguageSwitch from "../../lib/LanguageSwitch.svelte";
   import ConfirmDialog from "../../lib/ConfirmDialog.svelte";
   import { advanceWarnings, guidance } from "../../lib/guidance";
   import TeamOverview from "../../lib/TeamOverview.svelte";
@@ -52,7 +54,7 @@
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
 
   const warnings = $derived(game ? advanceWarnings(game, game.phase === "walk" && timer ? left : null) : []);
-  const hint = $derived(game && scenario ? guidance(game, scenario).text : "");
+  const hint = $derived(game && scenario ? guidance(game, scenario) : null);
   /** Which question is open: moving on with gaps, or ending the session. */
   let asking = $state<null | "advance" | "end">(null);
   let withNames = $state(false);
@@ -132,6 +134,7 @@
 <main class="teacher">
   <header>
     <Brand size={30} />
+    <LanguageSwitch />
     <StatusPill status={connection.status} />
   </header>
 
@@ -141,7 +144,7 @@
     <section class="panel"><h1>Teacher key not accepted</h1><p>Paste your teacher link on <a href="/teacher?code={code}&paste=1">the continue page</a>, or <a href="/teacher">start a new session</a>.</p></section>
   {:else}
     {#if hint}
-      <p class="strip" role="status"><span class="label">Now</span> {hint}</p>
+      <p class="strip" role="status"><span class="label">{t("guide.now")}</span> {t(hint.key, hint.vars)}</p>
     {/if}
     <section class="top">
       <div class="code-block">
@@ -250,14 +253,14 @@
 
     <ConfirmDialog
       open={asking === "advance"}
-      title="Move on now?"
-      safe="Wait"
-      risky="Move on anyway"
+      title={t("move.title")}
+      safe={t("move.wait")}
+      risky={t("move.anyway")}
       onsafe={() => (asking = null)}
       onrisky={confirmAdvance}
     >
-      {#each warnings as w (w)}<p>{w}</p>{/each}
-      <p>Students who are not finished will lose the time they still had.</p>
+      {#each warnings as w (w.key)}<p>{t(w.key, w.vars)}</p>{/each}
+      <p>{t("move.loss")}</p>
     </ConfirmDialog>
     <ConfirmDialog
       open={asking === "end"}

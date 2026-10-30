@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from "../../lib/i18n.svelte";
+  import LanguageSwitch from "../../lib/LanguageSwitch.svelte";
   import { normaliseCode } from "@open-door/shared";
   import { findSession } from "../../lib/api";
   import { loadPlayer, type SavedPlayer } from "../../lib/saved";
@@ -54,10 +56,11 @@
   <main class="page">
     <div class="card">
       <Brand />
+      <LanguageSwitch />
       {#if !code}
-        <h1>Join your class</h1>
+        <h1>{t("join.title")}</h1>
         <form onsubmit={submitCode}>
-          <label for="code">Code from the big screen</label>
+          <label for="code">{t("join.codeLabel")}</label>
           <input
             id="code"
             bind:value={typed}
@@ -68,14 +71,14 @@
             enterkeyhint="go"
             placeholder="HXQ4"
           />
-          <button type="submit" disabled={checking}>{checking ? "Checking…" : "Next"}</button>
+          <button type="submit" disabled={checking}>{checking ? t("join.checking") : t("join.next")}</button>
         </form>
         {#if problem}<p class="warn" role="alert">{problem}</p>{/if}
-        <p class="note">Your teacher can also show a QR code to scan. Testing the network? <a href="/network-test">Open the network test</a>.</p>
+        <p class="note">{t("join.note")} <a href="/network-test">{t("join.networkTest")}</a>.</p>
       {:else if exists === false}
-        <h1>Session not found</h1>
-        <p>There is no session with the code <strong>{code}</strong>. It may have ended.</p>
-        <button onclick={() => router.go("/")}>Type another code</button>
+        <h1>{t("notfound.title")}</h1>
+        <p>{t("notfound.text", { code })}</p>
+        <button onclick={() => router.go("/")}>{t("notfound.again")}</button>
       {:else}
         <Profile {code} onready={(p) => (player = p)} />
       {/if}

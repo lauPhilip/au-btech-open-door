@@ -17,6 +17,8 @@ describe("limitRequest", () => {
   it("does not limit local development, where there is no client address", async () => {
     const local = new Request("http://localhost/api/sessions");
     for (let i = 0; i < 50; i++) expect(await limitRequest(local, "create", {}, 1)).toBeNull();
+    const loopback = req("127.0.0.1");
+    for (let i = 0; i < 50; i++) expect(await limitRequest(loopback, "create", {}, 1)).toBeNull();
   });
 
   it("lets a class of 60 connect from one address", async () => {

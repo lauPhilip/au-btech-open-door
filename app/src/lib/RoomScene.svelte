@@ -44,8 +44,8 @@
     accounting: { feet: 384, scale: 0.9 },
     ceo: { feet: 380, scale: 1 },
     server: { feet: 400, scale: 1.12 },
-    packing: { feet: 398, scale: 1.3 },
-    dock: { feet: 334, scale: 1.12 },
+    packing: { feet: 414, scale: 1.45 },
+    dock: { feet: 358, scale: 1.12 },
   };
   /** How high up the wall or table each thing sits in its painted room (scene units); across the room comes from the scenario's `at`. */
   const ART_Y: Record<string, number> = { "order-screen": 135, "invoice-tray": 205, "mail-screen": 176, "visitor-book": 238, router: 219, "label-printer": 224 };

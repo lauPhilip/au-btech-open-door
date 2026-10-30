@@ -3,15 +3,13 @@
   import { clampToMap, dayMinute, eventsBy, formatLeft, isPaused, leftMs, roomAt, route, slide, spots, spotsNear, teamById, teamClues, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
-  import Chat from "../../lib/Chat.svelte";
-  import ClueList from "../../lib/ClueList.svelte";
   import CloseUp from "../../lib/CloseUp.svelte";
-  import DayBar from "../../lib/DayBar.svelte";
   import RoomScene from "../../lib/RoomScene.svelte";
   import NoteForm from "../../lib/NoteForm.svelte";
-  import NotesPanel from "../../lib/NotesPanel.svelte";
   import OfficeMap from "../../lib/OfficeMap.svelte";
-  import StatusPill from "../../lib/StatusPill.svelte";
+  import WalkControls from "./WalkControls.svelte";
+  import WalkHeader from "./WalkHeader.svelte";
+  import WalkSide from "./WalkSide.svelte";
   import { Ticker } from "../../lib/ticker.svelte";
 
   let { connection, game, scenario, me }: { connection: GameConnection; game: Game; scenario: Scenario; me: Player } = $props();
@@ -47,12 +45,6 @@
   const clueRooms = $derived(cluesFound.map((i) => scenario.day.clues[i]?.room).filter((r): r is string => !!r));
 
   const team = $derived(teamById(me.team!));
-  /** Your table has told the teacher it is done with this step. */
-  const tableReady = $derived(game.ready?.[me.team!] ?? null);
-  const nextStepName = $derived(game.phase === "walk" ? "the day" : "the vote");
-  /** The teacher's latest hint for this team, until the student closes it. */
-  const hint = $derived(game.hints?.[me.team!]);
-  let closedHint = $state(0);
   const visited = $derived(teamVisited(game, me.team!));
   const here = $derived(roomAt(scenario, position.x, position.y));
   const teammates = $derived(game.players.filter((p) => p.team === me.team && p.id !== me.id));
@@ -67,7 +59,6 @@
   const teammatesHere = $derived(game.players.filter((p) => p.team === me.team && p.id !== me.id && p.room === here?.id));
   /** The note form is open; `about` is who or what it is about. */
   let noting = $state<{ about: Spot | null } | null>(null);
-  const roomName = (id: string | null) => scenario.map.rooms.find((r) => r.id === id)?.name ?? "Corridor";
 
   function tick(now: number) {
     frame = 0;
@@ -197,34 +188,7 @@
 <svelte:window onkeydown={keydown} onkeyup={keyup} onblur={blur} />
 
 <main class="walk">
-  <div class="top">
-    <header>
-      <span class="team" style="--team: {team.color}"><span class="door" aria-hidden="true"></span>{team.name}</span>
-      <span class="where" aria-live="polite">You are in: <strong>{here?.name ?? "the corridor"}</strong></span>
-      {#if game.phase === "walk" && game.timer}
-        <span class="left" class:over={left === 0} role="timer">{left === 0 ? "Time is up" : `Walk and spot · ${formatLeft(left)} left`}</span>
-      {/if}
-      <button class="done-btn" class:on={!!tableReady} aria-pressed={!!tableReady} disabled={paused} onclick={() => connection.ready(!tableReady)}>
-        <span aria-hidden="true">{tableReady ? "✓" : "☐"}</span>{tableReady ? "Table is done" : "Our table is done"}
-      </button>
-      <StatusPill status={connection.status} />
-    </header>
-    {#if tableReady}
-      <p class="ready-note" role="status">{tableReady.by === me.name ? "You told" : `${tableReady.by} told`} your teacher your table is ready for {nextStepName}. Keep writing notes if you think of more, or tap the button again to say you are not done.</p>
-    {/if}
-    {#if isDay}
-      <DayBar {scenario} {minute} found={cluesFound.length} total={scenario.day.clues.length} latest={messages.at(-1) ? { from: scenario.people.find((p) => p.id === messages.at(-1)!.from)?.name ?? "", text: messages.at(-1)!.text } : undefined} />
-    {/if}
-    {#if hint && hint.at !== closedHint}
-      <div class="hint" role="status">
-        <span><strong>Hint from your teacher:</strong> {hint.text}</span>
-        <button class="close" aria-label="Close the hint" onclick={() => (closedHint = hint.at)}>×</button>
-      </div>
-    {/if}
-    {#if game.phase === "walk" && left === 0 && !paused}
-      <p class="timeup" role="status">Time is up. Finish your note and wait for your teacher to start the day.</p>
-    {/if}
-  </div>
+  <WalkHeader {connection} {game} {scenario} {me} {here} {left} {paused} {minute} {messages} {cluesFound} />
 
   <section class="map">
     <div class="views" role="group" aria-label="View">
@@ -238,88 +202,10 @@
       <RoomScene {scenario} roomId={here?.id ?? null} others={teammatesHere} you={{ face: me.face, color: teamById(me.team!).color, name: me.name }} {position} onspot={goToSpot} onroom={walkToRoom} onwalk={walkTo} />
     {/if}
     </div>
-    <div class="prompt" aria-live="polite">
-      {#if nearby.length > 0}
-        {#each nearby as spot (spot.kind + spot.id)}
-          <button class="action" onclick={() => openCloseUp(spot)}>
-            {spot.kind === "person" ? "Talk to" : "Look at"} {spot.name}
-            {#if spot === nearby[0]}<kbd>E</kbd>{/if}
-          </button>
-        {/each}
-      {:else}
-        <span class="quiet">Walk up to a person or a thing to talk or look closer.</span>
-      {/if}
-      <button class="action sticky" onclick={() => startNote(nearby[0] ?? null)}>Sticky note</button>
-    </div>
-    <p class="help">{view === "map" ? "Tap or click where you want to go." : "Tap a person or a thing, or a door to walk there."} On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
+    <WalkControls {view} {nearby} onopen={openCloseUp} onnote={startNote} />
   </section>
 
-  <aside>
-    {#if isDay}
-      <section><Chat {scenario} events={messages} /></section>
-      <section><ClueList {scenario} found={cluesFound} /></section>
-    {/if}
-    <section class="goal">
-      <p class="eyebrow">Your goal</p>
-      <p>{scenario.goal}</p>
-    </section>
-
-    <section>
-      <h2>Rooms <small>{visited.size} of {scenario.map.rooms.length} visited by your team</small></h2>
-      <ul class="rooms">
-        {#each scenario.map.rooms as room (room.id)}
-          <li class:done={visited.has(room.id)} class:here={here?.id === room.id}>
-            <button class="room" onclick={() => walkToRoom(room.id)} aria-label="Walk to {room.name}, {visited.has(room.id) ? 'visited' : 'not visited yet'}{here?.id === room.id ? ', you are here' : ''}">
-              <span class="box" aria-hidden="true">{visited.has(room.id) ? "✓" : ""}</span>
-              {room.name}
-              {#if here?.id === room.id}<small aria-hidden="true">you are here</small>{/if}
-            </button>
-            {#if spotsByRoom.get(room.id)}
-              <ul class="in-room">
-                {#each spotsByRoom.get(room.id) ?? [] as spot (spot.kind + spot.id)}
-                  <li><button class="spot" onclick={() => walkToSpot(spot)} aria-label="Walk to {spot.name}">{spot.name}</button></li>
-                {/each}
-              </ul>
-            {/if}
-          </li>
-        {/each}
-      </ul>
-    </section>
-
-    <NotesPanel
-      notes={connection.notes}
-      players={game.players}
-      me={me.id}
-      onshare={(id, shared) => connection.shareNote(id, shared)}
-      onmerge={(keep, drop) => connection.mergeNotes(keep, drop)}
-      ondelete={(id) => connection.removeNote(id)}
-    />
-
-    <section>
-      <h2>Worth protecting <small>{found.length} of {scenario.assets.length} found by your team</small></h2>
-      {#if found.length > 0}
-        <ul class="found">
-          {#each found as id (id)}
-            <li>{scenario.assets.find((a) => a.id === id)?.name ?? id}</li>
-          {/each}
-        </ul>
-      {:else}
-        <p class="empty">Ask people questions to find out what data this company depends on.</p>
-      {/if}
-    </section>
-
-    {#if teammates.length > 0}
-      <section>
-        <h2>Your team</h2>
-        <ul class="mates">
-          {#each teammates as p (p.id)}
-            <li class:offline={!p.online}><strong>{p.name}</strong> <small>{p.online ? roomName(p.room) : "offline"}</small></li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
-    {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
-  </aside>
+  <WalkSide {connection} {game} {scenario} {me} {here} {visited} {found} {teammates} {spotsByRoom} {messages} {cluesFound} onroom={walkToRoom} onspot={walkToSpot} />
 </main>
 
 {#if paused}
@@ -346,24 +232,6 @@
     gap: 12px 20px;
     padding: 12px 16px 24px;
   }
-  .top {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .left {
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-  .left.over,
-  .timeup {
-    color: var(--alert-dark);
-  }
-  .timeup {
-    margin: 0;
-    font-weight: 600;
-  }
   .paused {
     position: fixed;
     inset: 0;
@@ -381,251 +249,8 @@
     font-weight: 700;
     margin: 0;
   }
-  header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .team {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 20px;
-  }
-  .door {
-    width: 14px;
-    height: 22px;
-    border-radius: 3px;
-    background: var(--team);
-  }
-  .where {
-    flex: 1;
-    color: var(--slate);
-  }
-  .done-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 16px;
-    border: 2px solid var(--blue);
-    border-radius: 999px;
-    background: var(--paper);
-    color: var(--blue-dark);
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .done-btn:hover {
-    background: var(--blue-soft);
-  }
-  .done-btn.on {
-    background: var(--safe-dark);
-    border-color: var(--safe-dark);
-    color: #fff;
-  }
-  .done-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-  .ready-note {
-    margin: 0;
-    padding: 8px 14px;
-    border-radius: var(--radius-m);
-    background: var(--safe-soft);
-    color: var(--safe-dark);
-    font-weight: 600;
-  }
-  .where strong {
-    color: var(--ink);
-  }
   .map {
     min-width: 0;
-  }
-  .prompt {
-    margin-top: 10px;
-    min-height: 52px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-  }
-  .quiet,
-  .empty {
-    color: var(--slate);
-    font-size: 14px;
-    margin: 6px 0 0;
-  }
-  .action {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 8px 16px;
-    border: 0;
-    border-radius: var(--radius-m);
-    background: var(--blue);
-    color: #fff;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .action.sticky {
-    background: var(--sticky);
-    color: var(--ink);
-  }
-  .action.sticky:hover {
-    background: var(--sticky-hover);
-  }
-  .action:hover {
-    background: var(--blue-dark);
-  }
-  kbd {
-    font: inherit;
-    font-size: 13px;
-    padding: 0 7px;
-    border-radius: 6px;
-    background: rgb(255 255 255 / 0.25);
-  }
-  .found {
-    margin-top: 8px;
-  }
-  .found li::before {
-    content: "✓ ";
-    color: var(--safe);
-    font-weight: 700;
-  }
-  .help {
-    margin: 8px 0 0;
-    font-size: 14px;
-    color: var(--slate);
-  }
-  aside {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  aside section {
-    background: var(--paper);
-    border-radius: var(--radius-m);
-    padding: 14px 16px;
-  }
-  .goal {
-    border-left: 6px solid var(--sticky);
-  }
-  .goal p:last-child {
-    margin: 2px 0 0;
-    font-weight: 600;
-  }
-  .eyebrow {
-    margin: 0;
-    color: var(--slate);
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  h2 {
-    font-size: 18px;
-    display: flex;
-    flex-direction: column;
-  }
-  h2 small {
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--slate);
-  }
-  ul {
-    list-style: none;
-    margin: 10px 0 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .rooms > li {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .room {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    min-height: 44px;
-    padding: 4px 6px;
-    border: 0;
-    border-radius: var(--radius-s);
-    background: none;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-  .room:hover,
-  .spot:hover {
-    background: var(--blue-soft);
-  }
-  .here .room {
-    font-weight: 700;
-  }
-  .in-room {
-    margin: 0 0 4px 38px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .spot {
-    min-height: 44px;
-    padding: 4px 10px;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--paper);
-    color: var(--blue-dark);
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .rooms small {
-    margin-left: auto;
-    color: var(--blue);
-    font-weight: 600;
-  }
-  .box {
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    border: 2px solid var(--line);
-    display: grid;
-    place-items: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: #fff;
-  }
-  .done .box {
-    background: var(--safe);
-    border-color: var(--safe);
-  }
-  .here {
-    font-weight: 700;
-  }
-  .mates li {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .mates small {
-    color: var(--slate);
-  }
-  .mates .offline {
-    opacity: 0.55;
-  }
-  .warn {
-    color: var(--alert-dark);
-    margin: 0;
   }
   @media (min-width: 1500px) {
     .walk {
@@ -674,42 +299,6 @@
       grid-row: 2;
       margin: 0;
     }
-    .prompt {
-      grid-column: 2;
-      grid-row: 2;
-      margin: 0;
-    }
-    .help {
-      grid-column: 1 / -1;
-      grid-row: 3;
-      margin: 0;
-    }
-    aside {
-      min-height: 0;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      padding-right: var(--space-1);
-    }
-  }
-  .hint {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    background: var(--sticky);
-    color: var(--ink);
-    border-radius: var(--radius-m);
-    padding: 10px 14px;
-    font-size: 18px;
-  }
-  .hint .close {
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 26px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--ink);
   }
   .views {
     display: inline-flex;

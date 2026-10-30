@@ -301,11 +301,13 @@ export function teamRevealed(game: Game, team: TeamId): readonly string[] {
   return game.revealed?.[team] ?? [];
 }
 
-/** The teacher moves to another debrief question. */
+/** The prompt number that means "the questions are done, show the class summary": one past the last question. */
+export const summaryPrompt = (scenario: Scenario): number => scenario.debrief.prompts.length;
+
+/** The teacher moves to another debrief question, or one past the last to show the class summary. */
 export function setPrompt(game: Game, scenario: Scenario, index: number): Result<Game> {
   if (game.phase !== "debrief") return fail("not-debrief");
-  const last = scenario.debrief.prompts.length - 1;
-  return ok({ ...game, prompt: Math.max(0, Math.min(last, Math.trunc(index))) });
+  return ok({ ...game, prompt: Math.max(0, Math.min(summaryPrompt(scenario), Math.trunc(index))) });
 }
 
 /** The teacher moves a student to another table, before the walk starts (issue #10). */

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { classTable, debriefTable, fileName, THREAT_COLUMNS, toCsv, teamTable, teamById, TEAMS, dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
+  import { classTable, debriefTable, fileName, THREAT_COLUMNS, toCsv, teamTable, teamById, TEAMS, summaryPrompt, dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
@@ -141,6 +141,15 @@
           {/if}
         </div>
         <button class="primary" onclick={() => connection.setPhase(nextStep.phase)}>{nextStep.action}</button>
+      {:else if game && scenario && game.prompt >= summaryPrompt(scenario)}
+        <div>
+          <h2>Class summary is on the big screen</h2>
+          <p>Every team's result and what each team decided. Download the tables below before you end the session, because ending it deletes all notes and names.</p>
+        </div>
+        <div class="prompts">
+          <button class="secondary" onclick={() => connection.prompt(game.prompt - 1)}>Back to the questions</button>
+          <button class="primary" onclick={() => confirm("End the session for everyone and delete all data? Download the tables first. This cannot be undone.") && connection.closeSession()}>End the session</button>
+        </div>
       {:else if game && scenario}
         <div>
           <h2>Debrief: question {game.prompt + 1} of {scenario.debrief.prompts.length}</h2>
@@ -149,7 +158,11 @@
         </div>
         <div class="prompts">
           <button class="secondary" disabled={game.prompt === 0} onclick={() => connection.prompt(game.prompt - 1)}>Previous question</button>
-          <button class="primary" disabled={game.prompt >= scenario.debrief.prompts.length - 1} onclick={() => connection.prompt(game.prompt + 1)}>Next question</button>
+          {#if game.prompt >= scenario.debrief.prompts.length - 1}
+            <button class="primary" onclick={() => connection.prompt(game.prompt + 1)}>Show the class summary</button>
+          {:else}
+            <button class="primary" onclick={() => connection.prompt(game.prompt + 1)}>Next question</button>
+          {/if}
         </div>
       {/if}
     </section>

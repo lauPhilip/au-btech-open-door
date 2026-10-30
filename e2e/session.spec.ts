@@ -521,3 +521,38 @@ test("a table tells the teacher it is done, and the teacher sees it until the cl
   await expect(teacher.getByText(/Says it is done/)).toBeHidden();
   await expect(ana.getByRole("button", { name: "Our table is done" })).toBeVisible();
 });
+
+test("after the last debrief question the teacher shows the class summary and then ends the session", async ({ page }) => {
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const screen = page.frameLocator('iframe[title="Projector"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  page.once("dialog", (d) => d.accept());
+  await teacher.getByRole("button", { name: "End now and show summary" }).click();
+  await expect(teacher.getByText(/Debrief: question 1 of/)).toBeVisible();
+
+  // Questions go on one by one; on the last one the next step is the class summary, not another question.
+  await expect(teacher.getByRole("button", { name: "Show the class summary" })).toBeHidden();
+  const total = Number((await teacher.getByRole("heading", { name: /Debrief: question 1 of/ }).textContent())!.match(/of (\d+)/)![1]);
+  for (let n = 2; n <= total; n++) {
+    await teacher.getByRole("button", { name: "Next question" }).click();
+    await expect(teacher.getByRole("heading", { name: `Debrief: question ${n} of ${total}` })).toBeVisible();
+  }
+  await expect(teacher.getByRole("button", { name: "Next question" })).toBeHidden();
+  await expect(screen.getByText("Question for the class")).toBeVisible();
+  await teacher.getByRole("button", { name: "Show the class summary" }).click();
+  await expect(screen.getByText("Class summary", { exact: true })).toBeVisible();
+  await expect(screen.getByText(/Your teacher will end the session soon/)).toBeVisible();
+  await expect(teacher.getByRole("heading", { name: "Class summary is on the big screen" })).toBeVisible();
+
+  // Back to the questions works, and ending the session closes it everywhere.
+  await teacher.getByRole("button", { name: "Back to the questions" }).click();
+  await expect(screen.getByText("Question for the class")).toBeVisible();
+  await teacher.getByRole("button", { name: "Show the class summary" }).click();
+  page.once("dialog", (d) => d.accept());
+  await teacher.getByRole("button", { name: "End the session" }).click();
+  await expect(teacher.getByRole("heading", { name: "This session has ended" })).toBeVisible();
+});

@@ -38,6 +38,10 @@
 
   let svg = $state<SVGSVGElement | undefined>();
 
+  // The picture of the building behind the room outlines (drawn once, with no text; names are added here).
+  const art = import.meta.glob("../assets/art/map.webp", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
+  const mapArt = Object.values(art)[0] ?? null;
+
   const { width, height, rooms } = $derived(scenario.map);
 
   /** Where each person and thing stands (see `spots` in the shared package). */
@@ -72,14 +76,15 @@
   );
 
   /** Fit a room's name beside its badges: smaller type first, then two lines. */
-  function title(name: string, width: number): { lines: string[]; size: number } {
-    const room = width - 16 - 40; // left padding and the tick badge
+  function title(name: string, width: number): { lines: string[]; size: number; w: number } {
+    const room = width - 20 - (width > 160 ? 40 : 0); // padding, and the tick badge beside wider rooms
     const fits = (text: string, size: number) => text.length * size * 0.56 <= room;
-    if (fits(name, 22)) return { lines: [name], size: 22 };
+    if (fits(name, 20)) return { lines: [name], size: 20, w: name.length * 20 * 0.56 + 16 };
     const cut = name.lastIndexOf(" ");
     const lines = cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : [name];
     const longest = Math.max(...lines.map((l) => l.length));
-    return { lines, size: Math.max(16, Math.min(22, Math.floor(room / (longest * 0.56)))) };
+    const size = Math.max(13, Math.min(20, Math.floor(room / (longest * 0.56))));
+    return { lines, size, w: longest * size * 0.56 + 16 };
   }
 
   function initial(name: string): string {
@@ -105,24 +110,29 @@
   onpointerdown={handlePointer}
 >
   <rect x="0" y="0" {width} {height} rx="18" class="corridor" />
+  {#if mapArt}<image href={mapArt} x="0" y="0" {width} {height} preserveAspectRatio="none" class="art" aria-hidden="true" />{/if}
   {#each rooms as room (room.id)}
     {@const [x, y, w, h] = room.rect}
     {@const t = title(room.name, w)}
-    <g class="room zone-{room.zone}" class:seen={visited.has(room.id)}>
+    {@const narrow = w < 120}
+    {@const zoneName = scenario.map.zones.find((z) => z.id === room.zone)?.name ?? ""}
+    <g class="room zone-{room.zone}" class:art={!!mapArt} class:seen={visited.has(room.id)}>
       <rect {x} {y} width={w} height={h} rx="10" />
-      <text x={x + 16} y={y + h - 12} class="zone-name">{scenario.map.zones.find((z) => z.id === room.zone)?.name ?? ""}</text>
-      <text x={x + 16} y={y + 32} class="room-name" style="font-size: {t.size}px">
-        {#each t.lines as line, i (i)}<tspan x={x + 16} dy={i === 0 ? 0 : t.size + 2}>{line}</tspan>{/each}
+      {#if !narrow && !mapArt}<text x={x + 16} y={y + h - 12} class="zone-name">{zoneName}</text>{/if}
+      {#if mapArt}<rect x={x + 6} y={y + 8} width={Math.min(w - 12, Math.max(t.w, narrow ? 0 : zoneName.length * 8.4 + 20))} height={t.lines.length * (t.size + 2) + 8 + (narrow ? 0 : 20)} rx="8" class="label-bg" />{/if}
+      <text x={x + (narrow ? 12 : 16)} y={y + 8 + t.size + 2} class="room-name" style="font-size: {t.size}px">
+        {#each t.lines as line, i (i)}<tspan x={x + (narrow ? 12 : 16)} dy={i === 0 ? 0 : t.size + 2}>{line}</tspan>{/each}
       </text>
+      {#if mapArt && !narrow}<text x={x + 16} y={y + 8 + t.lines.length * (t.size + 2) + 16} class="zone-line">{zoneName}</text>{/if}
       {#if clueRooms.includes(room.id)}
-        <g transform="translate({x + w - 68} {y + 12})" aria-hidden="true">
+        <g transform="translate({narrow ? x + w - 28 : x + w - 68} {narrow ? y + h - 62 : y + 12})" aria-hidden="true">
           <circle cx="11" cy="11" r="11" class="clue-bg" />
           <circle cx="9.5" cy="9.5" r="4.5" class="clue-lens" />
           <path d="M13 13 L17 17" class="clue-lens" />
         </g>
       {/if}
       {#if visited.has(room.id)}
-        <g transform="translate({x + w - 34} {y + 12})" aria-hidden="true">
+        <g transform="translate({narrow ? x + w - 28 : x + w - 34} {narrow ? y + h - 34 : y + 12})" aria-hidden="true">
           <circle cx="11" cy="11" r="11" class="tick-bg" />
           <path d="M6 11.5 L9.5 15 L16 8" class="tick" />
         </g>
@@ -208,6 +218,13 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
+  .room.art rect:first-child { fill: transparent; stroke: rgba(255, 255, 255, 0.0); }
+  .room.art.zone-guest rect:first-child { fill: #6fbf5a; fill-opacity: 0.08; }
+  .room.art.zone-warehouse rect:first-child { fill: #4a6fa5; fill-opacity: 0.07; }
+  .room.art.seen rect:first-child { fill: #2f9e6e; fill-opacity: 0.16; stroke: #2f9e6e; stroke-opacity: 0.8; stroke-width: 3; }
+  .room.art rect.label-bg { fill: #fffaf0; fill-opacity: 0.94; stroke: none; }
+  .zone-line { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; fill: #6b5a44; }
+  .room.art .zone-name { fill: #3b2f21; stroke: #fffaf0; stroke-width: 4px; paint-order: stroke; }
   .room.seen rect {
     fill-opacity: 0.7;
   }

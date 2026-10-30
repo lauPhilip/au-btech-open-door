@@ -43,15 +43,15 @@ map:
   width: 1206
   height: 770
   rooms:
-    - { id: webshop,    name: Webshop team,    rect: [85, 54, 379, 238],   zone: office }
-    - { id: accounting, name: Accounting,      rect: [469, 54, 217, 238],  zone: office }
-    - { id: ceo,        name: CEO office,      rect: [690, 54, 201, 238],  zone: office }
-    - { id: meeting,    name: Meeting room,    rect: [897, 54, 219, 273],  zone: office, start: true }
-    - { id: reception,  name: Reception,       rect: [90, 332, 238, 139],  zone: guest }
-    - { id: server,     name: Server cupboard, rect: [330, 332, 77, 137], zone: office }
-    - { id: packing,    name: Packing station, rect: [90, 475, 379, 211],  zone: warehouse }
-    - { id: warehouse,  name: Warehouse,       rect: [469, 333, 362, 353], zone: warehouse }
-    - { id: dock,       name: Loading dock,    rect: [895, 333, 221, 353], zone: guest }
+    - { id: webshop,    name: Webshop team,    rect: [77, 62, 392, 216],   zone: office }
+    - { id: accounting, name: Accounting,      rect: [480, 62, 167, 216],  zone: office }
+    - { id: ceo,        name: CEO office,      rect: [655, 62, 164, 216],  zone: office }
+    - { id: meeting,    name: Meeting room,    rect: [828, 62, 299, 216],  zone: office, start: true }
+    - { id: reception,  name: Reception,       rect: [78, 286, 219, 207],  zone: guest }
+    - { id: server,     name: Server cupboard, rect: [365, 361, 61, 130], zone: office }
+    - { id: packing,    name: Packing station, rect: [78, 499, 349, 210],  zone: warehouse }
+    - { id: warehouse,  name: Warehouse,       rect: [433, 361, 479, 343], zone: warehouse }
+    - { id: dock,       name: Loading dock,    rect: [916, 280, 214, 426], zone: guest }
 
   # Zones are the trust boundaries. Places outside the building are zones too.
   zones:

@@ -83,7 +83,7 @@
     const cut = name.lastIndexOf(" ");
     const lines = cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : [name];
     const longest = Math.max(...lines.map((l) => l.length));
-    const size = Math.max(13, Math.min(20, Math.floor(room / (longest * 0.56))));
+    const size = Math.max(width < 80 ? 11 : 13, Math.min(20, Math.floor(room / (longest * 0.56))));
     return { lines, size, w: longest * size * 0.56 + 16 };
   }
 

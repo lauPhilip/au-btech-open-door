@@ -38,12 +38,12 @@
   for (const [path, url] of Object.entries(pictures)) art[path.split("/").pop()!.replace(".webp", "")] = url;
   /** Where the things worth looking at are in each painted room (scene units). */
   const ART_SPOTS: Record<string, { x: number; y: number }> = {
-    "order-screen": { x: 311, y: 135 },
-    "invoice-tray": { x: 461, y: 205 },
-    "mail-screen": { x: 316, y: 176 },
-    "visitor-book": { x: 305, y: 236 },
-    router: { x: 391, y: 219 },
-    "label-printer": { x: 559, y: 224 },
+    "order-screen": { x: 324, y: 133 },
+    "invoice-tray": { x: 496, y: 207 },
+    "mail-screen": { x: 383, y: 176 },
+    "visitor-book": { x: 313, y: 238 },
+    router: { x: 395, y: 219 },
+    "label-printer": { x: 590, y: 205 },
   };
   // Fetch the other pictures quietly so a door opens without a pause.
   $effect(() => {

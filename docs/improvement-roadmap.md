@@ -13,6 +13,17 @@ After the first complete version, an audit of the teacher and student experience
 
 The walk-screen split (#102) is listed under R4 on GitHub but is scheduled at the start of R3, because three of the student features would otherwise make a 740-line file larger.
 
+## Status
+
+All four iterations are built, tested and merged: issues #88 to #102 are closed. Every change passed the unit tests and the browser tests (26 at the last run) before it was merged. What is left is people work and a few follow-ups.
+
+| Follow-up | Why |
+|---|---|
+| Translate the rest of the interface (debrief, finish screen, teacher panels, close-ups) | The first Danish pass covers the join flow, walk screen, notices and the teacher's "Now" strip |
+| Translate the scenario texts | Content work, separate from the interface |
+| Deploy with `npm run deploy` and check the rate-limit binding on the live Worker | The binding in `room/wrangler.jsonc` is only exercised on Cloudflare |
+| Try the changes in a real class | The pilot is still the real test |
+
 ## Why this order
 
 The threat model comes first because it decides which limits are worth building. Rate limits and hardening come before any new feature, since the game is already public at its live address. Teacher resume closes the worst failure a teacher can meet during a lesson. The guidance features follow, because a teacher who is lost affects thirty students at once, while a lost student affects one.

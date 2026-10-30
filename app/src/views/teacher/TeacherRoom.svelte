@@ -4,10 +4,12 @@
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
+  import StudentList from "../../lib/StudentList.svelte";
   import TeamOverview from "../../lib/TeamOverview.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
   import { download, printTables } from "../../lib/exporting";
   import { Ticker } from "../../lib/ticker.svelte";
+  import { teacherLink } from "../../lib/teacherLink";
 
   let { code, teacherKey }: { code: string; teacherKey: string } = $props();
 
@@ -85,6 +87,18 @@
     }
   }
 
+  const teacherLinkText = $derived(teacherLink(window.location.origin, code, teacherKey));
+  let teacherCopied = $state(false);
+  async function copyTeacherLink() {
+    try {
+      await navigator.clipboard.writeText(teacherLinkText);
+      teacherCopied = true;
+      setTimeout(() => (teacherCopied = false), 2500);
+    } catch {
+      window.prompt("Copy your private teacher link", teacherLinkText);
+    }
+  }
+
   function openScreen() {
     window.open(`/screen/${code}`, `open-door-screen-${code}`);
   }
@@ -99,7 +113,7 @@
   {#if connection.ended}
     <section class="panel"><h1>This session has ended</h1><p>Sessions are deleted six hours after they start, or when you close them. <a href="/teacher">Start a new session</a>.</p></section>
   {:else if notTeacher}
-    <section class="panel"><h1>Teacher key not accepted</h1><p>Open the teacher page in the browser that created session {code}, or <a href="/teacher">start a new session</a>.</p></section>
+    <section class="panel"><h1>Teacher key not accepted</h1><p>Paste your teacher link on <a href="/teacher?code={code}&paste=1">the continue page</a>, or <a href="/teacher">start a new session</a>.</p></section>
   {:else}
     <section class="top">
       <div class="code-block">
@@ -112,6 +126,8 @@
         <p class="hint">Show it on the projector. Students join from there.</p>
         <button class="secondary" onclick={copyLink}>{copied ? "Link copied" : "Copy the join link"}</button>
         <p class="hint link">No projector? Send students <strong>{joinLink.replace(/^https?:\/\//, "")}</strong></p>
+        <button class="secondary" onclick={copyTeacherLink}>{teacherCopied ? "Teacher link copied" : "Copy my teacher link"}</button>
+        <p class="hint">Keep it private. It lets you continue from another device if this one stops.</p>
       </div>
     </section>
 
@@ -225,6 +241,7 @@
         <h2 class="section-title">Teams</h2>
         <TeamBoard {players} onmove={game && (game.phase === "lobby" || game.phase === "story") ? (id, team) => connection.assign(id, team) : undefined} />
       {/if}
+      <StudentList {players} onrename={(id, name) => connection.rename(id, name)} onremove={(id) => connection.remove(id)} />
     </section>
   {/if}
 </main>

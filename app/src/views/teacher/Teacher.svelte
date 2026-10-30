@@ -2,13 +2,43 @@
   import { scenarios, type Minutes } from "@open-door/shared";
   import { createSession } from "../../lib/api";
   import { loadTeacherKey, saveTeacherKey } from "../../lib/saved";
+  import { keyFromHash, parseTeacherLink } from "../../lib/teacherLink";
   import { router } from "../../lib/router.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeacherRoom from "./TeacherRoom.svelte";
 
   let { code }: { code: string | null } = $props();
 
-  const key = $derived(code ? loadTeacherKey(code) : null);
+  // A teacher link carries the key after the "#". Keep it, then take it out of the address bar.
+  function keyFor(forCode: string | null): string | null {
+    if (!forCode) return null;
+    const fromLink = keyFromHash(window.location.hash);
+    if (fromLink) {
+      saveTeacherKey(forCode, fromLink);
+      history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
+    // ?paste=1 means the saved key was refused, so ask for the link instead of trying it again.
+    if (new URL(window.location.href).searchParams.has("paste")) return null;
+    return fromLink ?? loadTeacherKey(forCode);
+  }
+  // svelte-ignore state_referenced_locally
+  let key = $state(keyFor(code));
+  let pasted = $state("");
+  let pasteProblem = $state<string | null>(null);
+
+  function usePasted(event: SubmitEvent) {
+    event.preventDefault();
+    const link = parseTeacherLink(pasted);
+    if (!link) {
+      pasteProblem = "That is not a teacher link. It looks like open-door…/teacher?code=ABCD#key=…";
+      return;
+    }
+    saveTeacherKey(link.code, link.key);
+    pasted = "";
+    pasteProblem = null;
+    router.go(`/teacher?code=${link.code}`);
+    key = link.key;
+  }
 
   const choices = Object.values(scenarios);
   let scenarioId = $state(choices[0]?.id ?? "");
@@ -23,6 +53,7 @@
     try {
       const session = await createSession(scenarioId, minutes);
       saveTeacherKey(session.code, session.teacherKey);
+      key = session.teacherKey;
       router.go(`/teacher?code=${session.code}`);
     } catch (error) {
       problem = error instanceof Error ? error.message : "Something went wrong.";
@@ -34,14 +65,23 @@
 
 {#if code && key}
   <TeacherRoom {code} teacherKey={key} />
+{:else if code}
+  <main class="page">
+    <form class="card" onsubmit={usePasted}>
+      <Brand />
+      <h1>Continue session {code}</h1>
+      <p>This device does not have the teacher key. Paste the teacher link you copied when you started the class.</p>
+      <label class="paste"><span>Teacher link</span><input type="text" bind:value={pasted} autocomplete="off" spellcheck="false" placeholder="https://…/teacher?code=…#key=…" /></label>
+      {#if pasteProblem}<p class="warn" role="alert">{pasteProblem}</p>{/if}
+      <button type="submit" disabled={!pasted.trim()}>Continue as teacher</button>
+      <p class="note">No link? <a href="/teacher">Start a new session</a> instead.</p>
+    </form>
+  </main>
 {:else}
   <main class="page">
     <form class="card" onsubmit={create}>
       <Brand />
       <h1>Start a class session</h1>
-      {#if code}
-        <p class="warn">This browser does not have the teacher key for session {code}. Start a new session, or open the teacher page in the browser that created it.</p>
-      {/if}
       <fieldset>
         <legend>Scenario</legend>
         {#each choices as s (s.id)}
@@ -160,6 +200,8 @@
     margin: 0;
     color: var(--alert-dark);
   }
+  .paste { display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
+  .paste input { min-height: 48px; padding: 0 12px; font: inherit; font-weight: 400; border: 1px solid var(--line); border-radius: var(--radius-m); }
   .note {
     margin: 0;
     font-size: 14px;

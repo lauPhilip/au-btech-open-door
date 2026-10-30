@@ -51,10 +51,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "webshop",
           "name": "Webshop team",
           "rect": [
-            16,
-            16,
-            380,
-            250
+            85,
+            54,
+            379,
+            238
           ],
           "zone": "office"
         },
@@ -62,10 +62,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "accounting",
           "name": "Accounting",
           "rect": [
-            404,
-            16,
-            250,
-            250
+            469,
+            54,
+            217,
+            238
           ],
           "zone": "office"
         },
@@ -73,10 +73,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "ceo",
           "name": "CEO office",
           "rect": [
-            662,
-            16,
-            200,
-            250
+            690,
+            54,
+            201,
+            238
           ],
           "zone": "office"
         },
@@ -84,10 +84,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "meeting",
           "name": "Meeting room",
           "rect": [
-            870,
-            16,
-            336,
-            250
+            897,
+            54,
+            219,
+            273
           ],
           "zone": "office",
           "start": true
@@ -96,10 +96,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "reception",
           "name": "Reception",
           "rect": [
-            16,
-            338,
-            270,
-            200
+            90,
+            332,
+            238,
+            139
           ],
           "zone": "guest"
         },
@@ -107,10 +107,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "server",
           "name": "Server cupboard",
           "rect": [
-            294,
-            338,
-            140,
-            200
+            330,
+            332,
+            77,
+            137
           ],
           "zone": "office"
         },
@@ -118,10 +118,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "packing",
           "name": "Packing station",
           "rect": [
-            16,
-            546,
-            418,
-            220
+            90,
+            475,
+            379,
+            211
           ],
           "zone": "warehouse"
         },
@@ -129,10 +129,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "warehouse",
           "name": "Warehouse",
           "rect": [
-            442,
-            338,
-            540,
-            428
+            469,
+            333,
+            362,
+            353
           ],
           "zone": "warehouse"
         },
@@ -140,10 +140,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "dock",
           "name": "Loading dock",
           "rect": [
-            990,
-            338,
-            216,
-            428
+            895,
+            333,
+            221,
+            353
           ],
           "zone": "guest"
         }
@@ -678,10 +678,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "webshop",
           "name": "Webshop team",
           "rect": [
-            16,
-            16,
-            380,
-            250
+            85,
+            54,
+            379,
+            238
           ],
           "zone": "office"
         },
@@ -689,10 +689,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "accounting",
           "name": "Accounting",
           "rect": [
-            404,
-            16,
-            250,
-            250
+            469,
+            54,
+            217,
+            238
           ],
           "zone": "office"
         },
@@ -700,10 +700,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "ceo",
           "name": "CEO office",
           "rect": [
-            662,
-            16,
-            200,
-            250
+            690,
+            54,
+            201,
+            238
           ],
           "zone": "office"
         },
@@ -711,10 +711,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "meeting",
           "name": "Meeting room",
           "rect": [
-            870,
-            16,
-            336,
-            250
+            897,
+            54,
+            219,
+            273
           ],
           "zone": "office",
           "start": true
@@ -723,10 +723,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "reception",
           "name": "Reception",
           "rect": [
-            16,
-            338,
-            270,
-            200
+            90,
+            332,
+            238,
+            139
           ],
           "zone": "guest"
         },
@@ -734,10 +734,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "server",
           "name": "Server cupboard",
           "rect": [
-            294,
-            338,
-            140,
-            200
+            330,
+            332,
+            77,
+            137
           ],
           "zone": "office"
         },
@@ -745,10 +745,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "packing",
           "name": "Packing station",
           "rect": [
-            16,
-            546,
-            418,
-            220
+            90,
+            475,
+            379,
+            211
           ],
           "zone": "warehouse"
         },
@@ -756,10 +756,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "warehouse",
           "name": "Warehouse",
           "rect": [
-            442,
-            338,
-            540,
-            428
+            469,
+            333,
+            362,
+            353
           ],
           "zone": "warehouse"
         },
@@ -767,10 +767,10 @@ export const scenarios: Record<string, Scenario> = {
           "id": "dock",
           "name": "Loading dock",
           "rect": [
-            990,
-            338,
-            216,
-            428
+            895,
+            333,
+            221,
+            353
           ],
           "zone": "guest"
         }

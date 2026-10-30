@@ -32,6 +32,24 @@
     onwalk?: (x: number, y: number) => void;
   } = $props();
 
+  // Painted pictures of the rooms (one per room id). A room without a picture falls back to the drawn scene below.
+  const pictures = import.meta.glob("../assets/art/*.webp", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
+  const art: Record<string, string> = {};
+  for (const [path, url] of Object.entries(pictures)) art[path.split("/").pop()!.replace(".webp", "")] = url;
+  /** Where the things worth looking at are in each painted room (scene units). */
+  const ART_SPOTS: Record<string, { x: number; y: number }> = {
+    "order-screen": { x: 311, y: 135 },
+    "invoice-tray": { x: 461, y: 205 },
+    "mail-screen": { x: 316, y: 176 },
+    "visitor-book": { x: 305, y: 236 },
+    router: { x: 391, y: 219 },
+    "label-printer": { x: 559, y: 224 },
+  };
+  // Fetch the other pictures quietly so a door opens without a pause.
+  $effect(() => {
+    for (const url of Object.values(art)) new Image().src = url;
+  });
+
   const W = 800;
   const H = 450;
   const SIDE = 90; // floor margin at each side of the scene
@@ -75,6 +93,8 @@
   const THING_Y: Record<string, number> = { "label-printer": 290, "order-screen": 200, router: 215, "visitor-book": 290, "invoice-tray": 295, "mail-screen": 205 };
   function place(spot: Spot): Point {
     const x = toScene({ x: spot.x, y: spot.y }).x;
+    const painted = spot.kind === "thing" && shownId && art[shownId] ? ART_SPOTS[spot.id] : undefined;
+    if (painted) return painted;
     return { x, y: spot.kind === "thing" ? (THING_Y[spot.id] ?? 290) : 280 };
   }
   const placed = $derived(here.map((spot) => ({ spot, ...place(spot) })));
@@ -127,6 +147,9 @@
       <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
       <div class="frame" onclick={floorTap} in:fly={{ x: reduceMotion ? 0 : slide * 90, duration: reduceMotion ? 0 : 320 }}>
         <svg viewBox="0 0 {W} {H}" role="img" aria-label="Illustration of the {room.name}">
+          {#if shownId && art[shownId]}
+            <image href={art[shownId]} x="0" y="0" width={W} height={H} preserveAspectRatio="xMidYMid slice" />
+          {:else}
           <defs>
             <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBF3E6" /><stop offset="1" stop-color="#F1E2CC" /></linearGradient>
             <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9BF98" /><stop offset="1" stop-color="#C4A47A" /></linearGradient>
@@ -193,6 +216,7 @@
         {/if}
 
           </g>
+          {/if}
           {#each placed as p (p.spot.kind + p.spot.id)}
             {#if p.spot.kind === "person"}<ellipse cx={p.x} cy={p.y + 66} rx="48" ry="9" fill="#000" opacity="0.16" />{/if}
           {/each}

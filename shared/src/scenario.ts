@@ -161,14 +161,14 @@ export function spots(scenario: Scenario): Spot[] {
     const before = scenario.people.slice(0, i).filter((p) => p.room === person.room).length;
     const narrow = rw < 120; // a cupboard: stand in the middle, near the bottom
     result.push(narrow
-      ? { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + Math.round(rw / 2), y: ry + rh - 18 - before * 56 }
+      ? { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + Math.round(rw / 2), y: ry + rh - 16 - before * 56 }
       : { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + rw - 40 - before * 56, y: ry + rh - 44 });
   });
   for (const room of scenario.map.rooms) {
     const [rx, ry, rw, rh] = room.rect;
     const here = scenario.things.filter((t) => t.room === room.id);
     here.forEach((thing, i) => {
-      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: rw < 120 ? ry + 60 : ry + rh - Math.min(112, Math.round(rh * 0.42)) });
+      result.push({ kind: "thing", id: thing.id, name: thing.name, room: room.id, x: Math.round(rx + (rw * (i + 1)) / (here.length + 1)), y: rw < 120 ? ry + 50 : ry + rh - Math.min(112, Math.round(rh * 0.42)) });
     });
   }
   return result;

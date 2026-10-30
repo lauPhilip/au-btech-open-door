@@ -33,7 +33,6 @@
   .demo { margin:-36px auto 0; position:relative; z-index:1; }
   .demo img { display:block; width:100%; height:auto; border-radius:16px; border:2px solid var(--line); box-shadow:0 12px 40px rgb(28 36 48 / .25); background:var(--paper); }
   .demo figcaption { text-align:center; color:var(--slate); font-size:16px; margin-top:10px; }
-  #play[hidden] { display:none; }
   footer { padding:32px 0 48px; color:var(--slate); font-size:16px; }
 </style>
 </head>
@@ -43,8 +42,8 @@
   <h1>Open Door</h1>
   <p class="lead">Walk the company, spot the risks. A browser game where student teams find what could go wrong, then compare their view with what really happened.</p>
   <div class="buttons">
-    <a class="btn primary" id="play" href="#" hidden>Play it</a>
-    <a class="btn primary" id="source" href="https://github.com/lauPhilip/au-btech-open-door">Source code on GitHub</a>
+    <a class="btn primary" id="play" href="https://open-door.aubtech.workers.dev/">Play the game</a>
+    <a class="btn ghost" id="source" href="https://github.com/lauPhilip/au-btech-open-door">Source code on GitHub</a>
     <a class="btn ghost" href="concept-book/">Read the concept book</a>
   </div>
 </div></header>
@@ -103,7 +102,5 @@
   <p>Learning content builds on the CyPro project, “Cybersecure manufacturing in Denmark”, by Aarhus University, the Alexandra Institute, DAMRC, UGLA Insights and FORCE Technology, funded by the Danish Industry Foundation. All companies, people and incidents are fictional.</p>
   <p><a href="https://github.com/lauPhilip/au-btech-open-door">GitHub</a> · <a href="concept-book/">Concept book</a> · <a href="https://github.com/lauPhilip/au-btech-open-door/blob/main/CONTRIBUTING.md">Contribute</a></p>
 </div></footer>
-<script src="site.js"></script>
-<script>if (window.OPEN_DOOR_PLAY_URL) { var b = document.getElementById("play"); b.href = window.OPEN_DOOR_PLAY_URL; b.hidden = false; document.getElementById("source").className = "btn ghost"; }</script>
 </body>
 </html>

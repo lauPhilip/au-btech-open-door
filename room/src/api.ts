@@ -5,8 +5,9 @@
 import { getServerByName } from "partyserver";
 import { makeCode, normaliseCode, scenarios, type Minutes } from "@open-door/shared";
 import type { GameRoom } from "./game-room";
+import { limitRequest, recordMiss, type GuardEnv } from "./guard";
 
-export interface ApiEnv {
+export interface ApiEnv extends GuardEnv {
   GameRoom: DurableObjectNamespace<GameRoom>;
 }
 
@@ -40,6 +41,8 @@ export async function handleApi(request: Request, env: ApiEnv): Promise<Response
 
   if (url.pathname === "/api/sessions") {
     if (request.method !== "POST") return json({ error: "Use POST" }, 405);
+    const refused = await limitRequest(request, "create", env);
+    if (refused) return refused;
     let body: Record<string, unknown> = {};
     try {
       const text = await request.text();
@@ -64,10 +67,12 @@ export async function handleApi(request: Request, env: ApiEnv): Promise<Response
   const match = /^\/api\/sessions\/([^/]+)$/.exec(url.pathname);
   if (match) {
     if (request.method !== "GET") return json({ error: "Use GET" }, 405);
+    const refused = await limitRequest(request, "lookup", env);
+    if (refused) return refused;
     const code = normaliseCode(decodeURIComponent(match[1]!));
-    if (!code) return json({ error: "Not a session code" }, 404);
+    if (!code) return recordMiss(request) ?? json({ error: "Not a session code" }, 404);
     const info = await (await getServerByName(env.GameRoom, code)).info();
-    if (!info.exists) return json({ error: "No such session" }, 404);
+    if (!info.exists) return recordMiss(request) ?? json({ error: "No such session" }, 404);
     return json({ code, scenario: info.scenario, phase: info.phase });
   }
 

@@ -25,6 +25,8 @@ export type GameClientMessage =
   | { t: "summary" }
   | { t: "close" }
   | { t: "assign"; player: string; team: TeamId }
+  | { t: "remove"; player: string }
+  | { t: "rename"; player: string; name: string }
   | { t: "hint"; team: TeamId; text: string }
   | { t: "timer"; action: TimerAction };
 
@@ -42,6 +44,7 @@ export type GameServerMessage =
   | { t: "error"; code: GameError; text: string };
 
 const isNoteId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9_-]{4,32}$/.test(v);
+const isPlayerId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9_-]{8,64}$/.test(v);
 const finite = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 
 /** Parse and validate a message from a client. Anything malformed returns null. */
@@ -84,6 +87,10 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return isNoteId(m.keep) && isNoteId(m.drop) ? { t: "merge", keep: m.keep, drop: m.drop } : null;
     case "assign":
       return isNoteId(m.player) && isTeamId(m.team) ? { t: "assign", player: m.player, team: m.team } : null;
+    case "remove":
+      return isPlayerId(m.player) ? { t: "remove", player: m.player } : null;
+    case "rename":
+      return isPlayerId(m.player) && typeof m.name === "string" && m.name.length <= 60 ? { t: "rename", player: m.player, name: m.name } : null;
     case "hint":
       return isTeamId(m.team) && typeof m.text === "string" && m.text.length <= 200 ? { t: "hint", team: m.team, text: m.text } : null;
     case "summary":
@@ -105,7 +112,7 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
   }
 }
 
-const TEACHER_ONLY: ReadonlyArray<GameClientMessage["t"]> = ["phase", "timer", "prompt", "assign", "hint", "summary", "close"];
+const TEACHER_ONLY: ReadonlyArray<GameClientMessage["t"]> = ["phase", "timer", "prompt", "assign", "remove", "rename", "hint", "summary", "close"];
 
 /** Which messages each role may send. The projector only watches. */
 export function mayRoleSend(role: Role, message: GameClientMessage): boolean {

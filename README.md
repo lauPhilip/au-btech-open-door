@@ -50,6 +50,7 @@ Version 0.x, playable from start to finish, with two scenarios: *Black Friday* a
 | [`scenarios/`](scenarios/) | The game content as plain text files, and [how to write a new scenario](docs/scenario-format.md) without coding |
 | [`docs/concept-book/`](docs/concept-book/index.html) | The concept book: target group, journey, core loop, design system and mockups |
 | [`docs/design-system.md`](docs/design-system.md) | Colours, spacing, type and layout rules the screens follow |
+| [`docs/security.md`](docs/security.md) | What the game stores, how it is protected, and the threat model of Open Door itself |
 | [`docs/decisions/`](docs/decisions/) | Short records of the main decisions and why they were made |
 | [`docs/roadmap.md`](docs/roadmap.md), [`docs/backlog.md`](docs/backlog.md) | Where the project is going |
 | `app/`, `room/`, `shared/` | The code: the browser app, the Cloudflare Worker that hosts live sessions, and the rules and messages both share |

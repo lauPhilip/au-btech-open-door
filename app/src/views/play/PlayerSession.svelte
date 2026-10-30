@@ -36,7 +36,9 @@
   let changingTeam = $state(false);
 </script>
 
-{#if connection.ended}
+{#if connection.removed}
+  <main class="page"><div class="card"><h1>You were removed</h1><p>The teacher removed you from this session. If this was a mistake, ask your teacher for help.</p></div></main>
+{:else if connection.ended}
   <main class="page"><div class="card"><h1>This session has ended</h1><p>Thanks for playing. <a href="/">Join another session</a>.</p></div></main>
 {:else if !game || !scenario || !me}
   <main class="page"><div class="card"><p class="big">Joining session {code}…</p><StatusPill status={connection.status} /></div></main>

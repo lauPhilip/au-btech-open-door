@@ -19,3 +19,17 @@ describe("saying the table is done", () => {
     expect(mayRoleSend("screen", { t: "ready", ready: true })).toBe(false);
   });
 });
+
+describe("removing and renaming students", () => {
+  it("parses both messages and keeps them for the teacher only", () => {
+    expect(parseGameMessage('{"t":"remove","player":"abcdefgh12345"}')).toEqual({ t: "remove", player: "abcdefgh12345" });
+    expect(parseGameMessage('{"t":"rename","player":"abcdefgh12345","name":"Ada"}')).toEqual({ t: "rename", player: "abcdefgh12345", name: "Ada" });
+    expect(parseGameMessage('{"t":"remove","player":"x"}')).toBeNull();
+    expect(parseGameMessage('{"t":"rename","player":"abcdefgh12345","name":5}')).toBeNull();
+    for (const m of [{ t: "remove", player: "abcdefgh12345" }, { t: "rename", player: "abcdefgh12345", name: "A" }] as const) {
+      expect(mayRoleSend("teacher", m)).toBe(true);
+      expect(mayRoleSend("player", m)).toBe(false);
+      expect(mayRoleSend("screen", m)).toBe(false);
+    }
+  });
+});

@@ -29,6 +29,8 @@ export class GameConnection {
   resumedAt = $state(0);
   /** True when the room closed the connection for good (no session, or it ended). */
   ended = $state(false);
+  /** True when the teacher removed this student from the session. */
+  removed = $state(false);
 
   private socket: PartySocket;
   private openedOnce = false;
@@ -97,6 +99,16 @@ export class GameConnection {
     this.send({ t: "assign", player, team });
   }
 
+  /** Take a student out of the session for good (teacher only). */
+  remove(player: string): void {
+    this.send({ t: "remove", player });
+  }
+
+  /** Give a student a new nickname (teacher only). */
+  rename(player: string, name: string): void {
+    this.send({ t: "rename", player, name });
+  }
+
   /** Send a hint to one team (teacher only). */
   hint(team: TeamId, text: string): void {
     this.send({ t: "hint", team, text });
@@ -149,6 +161,11 @@ export class GameConnection {
 
   private handleClose = (event: CloseEvent) => {
     // 4404: no such session. 4410: the session ended and was deleted. Stop retrying.
+    if (event.code === 4403) {
+      this.removed = true;
+      this.socket.close();
+      return;
+    }
     if (event.code === 4404 || event.code === 4410) {
       this.ended = true;
       this.socket.close();

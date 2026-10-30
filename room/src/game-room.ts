@@ -3,6 +3,8 @@ import {
   addNote,
   adjustTimer,
   assignTeam,
+  removePlayer,
+  renamePlayer,
   castVote,
   sendHint,
   setReady,
@@ -19,6 +21,8 @@ import {
   ERROR_TEXT,
   findPlayer,
   isCode,
+  LIMITS,
+  RateLimiter,
   join,
   mayRoleSend,
   move,
@@ -47,6 +51,10 @@ const SAVE_POSITIONS_MS = 5000;
 const MAX_CONNECTIONS = 60;
 /** Player ids come from the browser: a random id kept per session code. */
 export const PLAYER_ID = /^[A-Za-z0-9_-]{8,64}$/;
+
+/** Messages per connection per second; extra ones are dropped, and a connection that keeps flooding is closed. */
+const messageRate = new RateLimiter(LIMITS.messagesPerSecond, 1000);
+const floodDrops = new Map<string, number>();
 
 interface ConnState {
   role: Role;
@@ -88,6 +96,7 @@ export class GameRoom extends Server {
       this.game.noteCounts ??= {};
       this.game.hints ??= {};
       this.game.ready ??= {};
+      this.game.removed ??= [];
       this.game.prompt ??= 0;
       this.game.clues ??= {};
       this.game.timer ??= null;
@@ -127,6 +136,10 @@ export class GameRoom extends Server {
       connection.close(4400, "Bad player id");
       return;
     }
+    if (role === "player" && this.game.removed.includes(connection.id)) {
+      connection.close(4403, "Removed");
+      return;
+    }
     connection.setState({ role });
     this.send(connection, { t: "you", id: connection.id, role });
     if (role === "player") this.send(connection, { t: "notes", notes: visibleNotes(this.notes, this.game, connection.id) });
@@ -143,6 +156,12 @@ export class GameRoom extends Server {
     const game = this.game;
     const role = connection.state?.role;
     if (!game || !role || typeof raw !== "string") return;
+    if (!messageRate.hit(`${this.name}:${connection.id}`, Date.now()).ok) {
+      const drops = (floodDrops.get(connection.id) ?? 0) + 1;
+      floodDrops.set(connection.id, drops);
+      if (drops > LIMITS.floodDropsBeforeClose) connection.close(1008, "Too many messages");
+      return;
+    }
     const message = parseGameMessage(raw);
     if (!message) return;
     if (!mayRoleSend(role, message)) {
@@ -204,6 +223,21 @@ export class GameRoom extends Server {
       case "assign":
         await this.apply(connection, assignTeam(game, message.player, message.team));
         break;
+      case "remove": {
+        const result = removePlayer(game, message.player);
+        await this.apply(connection, result);
+        if (!result.ok) break;
+        // Their notes go with them, and every screen of theirs is told why.
+        this.notes = this.notes.filter((n) => n.author !== message.player);
+        await this.ctx.storage.put("notes", this.notes);
+        this.sendNotesToPlayers();
+        await this.countNotes();
+        for (const c of this.getConnections<ConnState>()) if (c.id === message.player) c.close(4403, "Removed");
+        break;
+      }
+      case "rename":
+        await this.apply(connection, renamePlayer(game, message.player, message.name));
+        break;
       case "hint":
         await this.apply(connection, sendHint(game, message.team, message.text, Date.now()));
         break;
@@ -241,6 +275,8 @@ export class GameRoom extends Server {
   }
 
   onClose(connection: Connection<ConnState>): void {
+    floodDrops.delete(connection.id);
+    messageRate.forget(`${this.name}:${connection.id}`);
     this.leave(connection);
   }
 

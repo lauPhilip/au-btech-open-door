@@ -14,7 +14,9 @@ The game follows the CyPro method from the [Digital Business Development toolbox
 
 ## Try it
 
-You need [Node.js 22](https://nodejs.org) or newer. In a terminal:
+The game is live at <https://open-door.aubtech.workers.dev/>. A teacher opens `/teacher` on that address, creates a session and shows the code on the projector; students join from the link or the QR code.
+
+To run it on your own computer instead, you need [Node.js 22](https://nodejs.org) or newer. In a terminal:
 
 ```
 npm install

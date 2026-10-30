@@ -55,7 +55,7 @@ map:
 
   # The hallway is not a room. Walls are the gaps between floors; a door is a patch that overlaps the floor on both sides.
   floors:
-    - { id: hall-top,  rect: [300, 294, 612, 67] }
+    - { id: hall-top,  rect: [300, 294, 612, 60] }
     - { id: hall-left, rect: [304, 355, 66, 140] }
   doors:
     - { a: webshop,    b: hall-top,  rect: [422, 272, 32, 26] }
@@ -63,7 +63,7 @@ map:
     - { a: ceo,        b: hall-top,  rect: [767, 272, 32, 26] }
     - { a: meeting,    b: hall-top,  rect: [844, 272, 32, 26] }
     - { a: dock,       b: hall-top,  rect: [902, 306, 28, 30] }
-    - { a: hall-top,   b: hall-left, rect: [304, 355, 66, 6] }
+    - { a: hall-top,   b: hall-left, rect: [304, 350, 66, 10] }
     - { a: reception,  b: hall-left, rect: [286, 370, 24, 32] }
     - { a: server,     b: hall-left, rect: [364, 420, 16, 34] }
     - { a: packing,    b: hall-left, rect: [322, 490, 30, 18] }

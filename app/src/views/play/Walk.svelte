@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { clampToMap, dayMinute, eventsBy, formatLeft, isPaused, leftMs, roomAt, spots, spotsNear, teamById, teamClues, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
+  import { clampToMap, dayMinute, eventsBy, formatLeft, isPaused, leftMs, roomAt, route, slide, spots, spotsNear, teamById, teamClues, teamRevealed, teamVisited, type Game, type Player, type Scenario, type Spot } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import { heldDirection, keyDirection, step, type Point } from "../../lib/movement";
   import Chat from "../../lib/Chat.svelte";
@@ -23,6 +23,8 @@
   // svelte-ignore state_referenced_locally
   let position = $state<Point>({ x: me.x, y: me.y });
   let target: Point | null = null;
+  /** The rest of the way: through doors, never through walls. */
+  let rest: Point[] = [];
   const held = new Set<string>();
   let lastSent = 0;
   // svelte-ignore state_referenced_locally
@@ -68,8 +70,16 @@
     frame = 0;
     const seconds = lastFrame ? (now - lastFrame) / 1000 : 0;
     lastFrame = now;
-    const { at, arrived } = step(position, target, heldDirection(held), seconds);
+    const keys = heldDirection(held);
+    const { at: free, arrived: reached } = step(position, target, keys, seconds);
+    // Keys cannot push through walls; a route already goes through the doors.
+    const at = keys.dx !== 0 || keys.dy !== 0 ? slide(scenario, position, free) : free;
     const next = clampToMap(scenario, at.x, at.y);
+    let arrived = reached;
+    if (reached && rest.length) {
+      target = rest.shift()!;
+      arrived = false;
+    }
     if (arrived) {
       target = null;
       if (pendingOpen) {
@@ -127,7 +137,10 @@
 
   function walkTo(x: number, y: number) {
     pendingOpen = null;
-    target = clampToMap(scenario, x, y);
+    const goal = clampToMap(scenario, x, y);
+    const path = route(scenario, position, goal);
+    target = path[0] ?? goal;
+    rest = path.slice(1);
     wake();
   }
 
@@ -135,6 +148,7 @@
     // Stop walking while the window is open, so the avatar does not drift away.
     held.clear();
     target = null;
+    rest = [];
     open = spot;
   }
 
@@ -145,6 +159,7 @@
   function startNote(about: Spot | null) {
     held.clear();
     target = null;
+    rest = [];
     open = null;
     noting = { about };
   }
@@ -161,6 +176,7 @@
     event.preventDefault();
     held.add(event.key.length === 1 ? event.key.toLowerCase() : event.key);
     target = null;
+    rest = [];
     wake();
   }
 

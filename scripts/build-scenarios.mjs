@@ -101,6 +101,28 @@ function checkReferences(d) {
     const [x, y, w, h] = r.rect;
     if (x < 0 || y < 0 || x + w > d.map.width || y + h > d.map.height) errs.push(`room ${r.id} is outside the map`);
   }
+  const floors = new Set((d.map.floors ?? []).map((f) => f.id));
+  for (const f of d.map.floors ?? []) {
+    const [x, y, w, h] = f.rect;
+    if (x < 0 || y < 0 || x + w > d.map.width || y + h > d.map.height) errs.push(`floor ${f.id} is outside the map`);
+    if (rooms.has(f.id)) errs.push(`floor ${f.id} has the same id as a room`);
+  }
+  const places2 = new Set([...rooms, ...floors]);
+  for (const door of d.map.doors ?? []) {
+    need(places2, door.a, "door side a");
+    need(places2, door.b, "door side b");
+  }
+  if ((d.map.doors ?? []).length) {
+    const start = d.map.rooms.find((r) => r.start)?.id ?? d.map.rooms[0].id;
+    const seen = new Set([start]);
+    for (let grew = true; grew; ) {
+      grew = false;
+      for (const door of d.map.doors) {
+        for (const [from, to] of [[door.a, door.b], [door.b, door.a]]) if (seen.has(from) && !seen.has(to)) (seen.add(to), (grew = true));
+      }
+    }
+    for (const r of rooms) if (!seen.has(r)) errs.push(`room ${r} cannot be reached through the doors from the start room`);
+  }
   for (const s of d.story) need(people, s.speaker, "story speaker");
   for (const p of d.people) {
     need(rooms, p.room, `room of ${p.id}`);

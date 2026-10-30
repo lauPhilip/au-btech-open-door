@@ -138,7 +138,7 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(laura.getByText("0 · private until shared")).toBeVisible();
 
   // A thing has a close-up too, with the technical layer hidden until asked for.
-  await tapMap(laura, 265, 175);
+  await tapMap(laura, 284, 185);
   await laura.getByRole("button", { name: /Look at Live order screen/ }).click({ timeout: 10_000 });
   const thing = laura.getByRole("dialog", { name: "Live order screen" });
   await expect(thing.getByText("Shows orders from all nine shops")).toBeVisible();
@@ -149,15 +149,15 @@ test("a class joins, hears the story and walks the office together", async ({ br
   await expect(thing).toBeHidden();
 
   // Too far away to talk: no prompt appears for a person across the building.
-  await tapMap(laura, 100, 70);
+  await tapMap(laura, 110, 105);
   await expect(laura.getByRole("button", { name: /Talk to Mei/ })).toBeHidden({ timeout: 10_000 });
 
   // Wei walks with the keyboard.
   await wei.keyboard.down("ArrowDown");
-  await wei.waitForTimeout(1200);
+  await wei.waitForTimeout(1500);
   await wei.keyboard.up("ArrowDown");
-  // He has left the meeting room (where he ends up depends on where he started).
-  await expect(wei.getByText("You are in: Meeting room")).toBeHidden();
+  // The wall stops him: the only way out of the meeting room is its door.
+  await expect(wei.getByText("You are in: Meeting room")).toBeVisible();
 
   // The room list is a second way to walk, for keyboards and screen readers: no map needed.
   await wei.getByRole("button", { name: "Walk to Server cupboard, not visited yet" }).click();

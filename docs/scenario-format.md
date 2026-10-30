@@ -20,6 +20,10 @@ A scenario follows the same order as a class: first the company and the story, t
 | `day` | The clock, chat messages, clues in rooms, and the final team decision | The day happens |
 | `debrief` | Questions for the class and a bridge to the next lesson | The projector after the day |
 
+## Walls and doors
+
+The picture of the building is only a picture; what stops a student walking through a wall is the map in the scenario file. Each room's `rect` is its floor. The hallway is not a room, so its pieces are listed under `floors`, each as a plain rectangle with an id. Everything between two floors is wall. A `door` joins two floors (`a` and `b`, room ids or floor ids) with a small `rect` that overlaps the floor on both sides, so walking through it moves you from one to the other. Tapping a far room makes the avatar walk through the doors on the shortest way. The scenario check fails if any room cannot be reached from the start room. A scenario with no `doors` has no walls and everyone walks freely.
+
 ## Zones are trust boundaries
 
 Every room belongs to one zone, and places outside the building, such as the webshop provider or a factory abroad, are zones too. A zone marked `inside: false` is outside the company’s control. When a flow goes from one zone to another, it crosses a trust boundary — exactly the places CyPro asks students to look at first. Students never see the word “zone”; they experience it as walking from the office into the warehouse, or as a cable that leaves the building.

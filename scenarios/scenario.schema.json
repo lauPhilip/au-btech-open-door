@@ -55,6 +55,14 @@
             }
           }
         },
+        "floors": {
+          "type": "array",
+          "items": { "type": "object", "required": ["id", "rect"], "properties": { "id": { "$ref": "#/$defs/id" }, "rect": { "type": "array", "items": { "type": "integer" }, "minItems": 4, "maxItems": 4 } } }
+        },
+        "doors": {
+          "type": "array",
+          "items": { "type": "object", "required": ["a", "b", "rect"], "properties": { "a": { "$ref": "#/$defs/id" }, "b": { "$ref": "#/$defs/id" }, "rect": { "type": "array", "items": { "type": "integer" }, "minItems": 4, "maxItems": 4 } } }
+        },
         "zones": {
           "type": "array", "minItems": 2,
           "items": { "type": "object", "required": ["id", "name", "inside"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "inside": { "type": "boolean" } } }

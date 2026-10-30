@@ -14,6 +14,7 @@ import {
   move,
   newGame,
   removePlayer,
+  smallestTable,
   renamePlayer,
   setOnline,
   setPrompt,
@@ -338,5 +339,53 @@ describe("removing and renaming students", () => {
     const empty = renamePlayer(base(), "player-one", "   ");
     expect(empty.ok).toBe(false);
     if (!empty.ok) expect(empty.error).toBe("bad-name");
+  });
+});
+
+describe("students who join late", () => {
+  const scenario = scenarios["nordknit-black-friday"]!;
+  const seat = (g: Game, id: string, team: "blue" | "red") => {
+    const joined = join(g, scenario, id, id, 0, 0);
+    if (!joined.ok) throw new Error(joined.error);
+    const seated = chooseTeam(joined.value, id, team);
+    if (!seated.ok) throw new Error(seated.error);
+    return seated.value;
+  };
+
+  it("still pick their own table in the lobby", () => {
+    const g = join(newGame("ABCD", scenario.id, 45, 0), scenario, "early-bird", "Eve", 0, 0);
+    expect(g.ok && g.value.players[0]?.team).toBeNull();
+    expect(g.ok && g.value.players[0]?.late).toBeUndefined();
+  });
+
+  it("are seated at the smallest table in play once the walk has started", () => {
+    let g = newGame("ABCD", scenario.id, 45, 0);
+    g = seat(g, "player-a1", "blue");
+    g = seat(g, "player-a2", "blue");
+    g = seat(g, "player-b1", "red");
+    g = { ...g, phase: "walk" };
+    const late = join(g, scenario, "player-late", "Lena", 0, 5);
+    expect(late.ok).toBe(true);
+    if (!late.ok) return;
+    const me = late.value.players.find((p) => p.id === "player-late")!;
+    expect(me.team).toBe("red");
+    expect(me.late).toBe(true);
+  });
+
+  it("never picks a full table, and leaves the student unseated if every table is full", () => {
+    let g = newGame("ABCD", scenario.id, 45, 0);
+    for (let i = 0; i < 5; i++) g = seat(g, `player-blue${i}`, "blue");
+    g = { ...g, phase: "day" };
+    expect(smallestTable(g)).not.toBe("blue");
+    expect(smallestTable({ ...g, players: [] })).not.toBeNull();
+  });
+
+  it("does not seat a returning student a second time", () => {
+    let g = newGame("ABCD", scenario.id, 45, 0);
+    g = seat(g, "player-a1", "blue");
+    g = { ...g, phase: "walk" };
+    const back = join(g, scenario, "player-a1", "Renamed", 0, 9);
+    expect(back.ok && back.value.players[0]?.team).toBe("blue");
+    expect(back.ok && back.value.players[0]?.late).toBeUndefined();
   });
 });

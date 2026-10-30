@@ -15,6 +15,6 @@ This folder holds everything written about Open Door so far. The concept book is
 | [Decision 0002 · Licensing](decisions/0002-licensing.md) | Why the code is MIT and the content is CC BY-SA 4.0 |
 | [Decision 0003 · SVG office map](decisions/0003-svg-office-map.md) | Why the walkable office is drawn with SVG in Svelte instead of PixiJS |
 
-The concept book is a single HTML file. Open it directly in a browser, or read the published version on GitHub Pages once it is turned on. It was designed at 1920 × 1080 per board and scales to any screen width.
+The concept book is a single HTML file. Open it directly in a browser, or read the published version on GitHub Pages (it updates from the `docs` folder of `main`, see [developing.md](developing.md)). It was designed at 1920 × 1080 per board and scales to any screen width.
 
 New decisions are added as numbered files in `decisions/`, each one short: the context, the decision, and what follows from it.

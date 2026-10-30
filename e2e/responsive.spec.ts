@@ -63,7 +63,7 @@ async function join(browser: Browser, code: string, size: (typeof SIZES)[number]
 
 for (const size of SIZES) {
   test(`nothing breaks at ${size.name} (${size.width}×${size.height})`, async ({ browser }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(240_000);
     mkdirSync(SHOTS, { recursive: true });
     const found: string[] = [];
     const check = async (page: Page, who: string, step: string) => {
@@ -101,6 +101,21 @@ for (const size of SIZES) {
     await ada.getByRole("button", { name: "Room view" }).click();
     await expect(ada.getByRole("button", { name: /^Door to / }).first()).toBeVisible();
     await check(ada, "student", "3-walk-room");
+
+    // Through the doors to the packing station: a person to talk to and a thing to look at.
+    await ada.getByRole("button", { name: "Map" }).click();
+    await ada.getByRole("button", { name: /Walk to Packing station/ }).click();
+    await expect(ada.getByText("You are in: Packing station")).toBeVisible({ timeout: 25_000 });
+    await ada.getByRole("button", { name: "Room view" }).click();
+    await check(ada, "student", "3-walk-room-people");
+    await ada.getByRole("button", { name: /Talk to Jana/ }).click();
+    await expect(ada.getByRole("dialog", { name: "Jana" })).toBeVisible({ timeout: 15_000 });
+    await check(ada, "student", "3-talk");
+    await ada.getByRole("button", { name: "Back" }).click({ timeout: 10_000 });
+    await ada.getByRole("button", { name: /Look at Label printer/ }).first().click({ timeout: 10_000 });
+    await expect(ada.getByRole("dialog", { name: "Label printer" })).toBeVisible({ timeout: 15_000 });
+    await check(ada, "student", "3-look");
+    await ada.getByRole("button", { name: "Back" }).click();
 
     await teacher.getByRole("button", { name: "Start the day" }).click();
     await expect(ada.getByText(/Orders have stopped printing/).first()).toBeVisible();

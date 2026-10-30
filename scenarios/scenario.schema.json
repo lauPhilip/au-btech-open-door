@@ -78,6 +78,7 @@
           "name": { "type": "string" },
           "role": { "type": "string" },
           "room": { "$ref": "#/$defs/id" },
+          "at": { "type": "number", "minimum": 0.05, "maximum": 0.95 },
           "hello": { "$ref": "#/$defs/text" },
           "topics": {
             "type": "array", "minItems": 1, "maxItems": 3,
@@ -88,7 +89,8 @@
     },
     "things": {
       "type": "array",
-      "items": { "type": "object", "required": ["id", "name", "room", "text"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "room": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" }, "closer": { "$ref": "#/$defs/text" } } }
+      "items": { "type": "object", "required": ["id", "name", "room", "text"], "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string" }, "room": { "$ref": "#/$defs/id" },
+          "at": { "type": "number", "minimum": 0.05, "maximum": 0.95 }, "text": { "$ref": "#/$defs/text" }, "closer": { "$ref": "#/$defs/text" } } }
     },
     "assets": {
       "type": "array",
@@ -129,7 +131,8 @@
         },
         "clues": {
           "type": "array", "minItems": 1, "maxItems": 5,
-          "items": { "type": "object", "required": ["room", "text", "points_to"], "properties": { "room": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" }, "points_to": { "$ref": "#/$defs/id" } } }
+          "items": { "type": "object", "required": ["room", "text", "points_to"], "properties": { "room": { "$ref": "#/$defs/id" },
+          "at": { "type": "number", "minimum": 0.05, "maximum": 0.95 }, "text": { "$ref": "#/$defs/text" }, "points_to": { "$ref": "#/$defs/id" } } }
         },
         "final_choice": {
           "type": "object", "required": ["question", "options"],

@@ -36,15 +36,10 @@
   const pictures = import.meta.glob("../assets/art/*.webp", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
   const art: Record<string, string> = {};
   for (const [path, url] of Object.entries(pictures)) art[path.split("/").pop()!.replace(".webp", "")] = url;
-  /** Where the things worth looking at are in each painted room (scene units). */
-  const ART_SPOTS: Record<string, { x: number; y: number }> = {
-    "order-screen": { x: 324, y: 133 },
-    "invoice-tray": { x: 496, y: 207 },
-    "mail-screen": { x: 383, y: 176 },
-    "visitor-book": { x: 313, y: 238 },
-    router: { x: 395, y: 219 },
-    "label-printer": { x: 590, y: 205 },
-  };
+  /** A standing figure of a person in the story, if there is one. */
+  const figure = (id: string) => art[`person-${id}`];
+  /** How high up the wall or table each thing sits in its painted room (scene units); across the room comes from the scenario's `at`. */
+  const ART_Y: Record<string, number> = { "order-screen": 135, "invoice-tray": 205, "mail-screen": 176, "visitor-book": 238, router: 219, "label-printer": 224 };
   // Fetch the other pictures quietly so a door opens without a pause.
   $effect(() => {
     for (const url of Object.values(art)) new Image().src = url;
@@ -93,11 +88,12 @@
   const THING_Y: Record<string, number> = { "label-printer": 290, "order-screen": 200, router: 215, "visitor-book": 290, "invoice-tray": 295, "mail-screen": 205 };
   function place(spot: Spot): Point {
     const x = toScene({ x: spot.x, y: spot.y }).x;
-    const painted = spot.kind === "thing" && shownId && art[shownId] ? ART_SPOTS[spot.id] : undefined;
-    if (painted) return painted;
-    return { x, y: spot.kind === "thing" ? (THING_Y[spot.id] ?? 290) : 280 };
+    const paintedY = spot.kind === "thing" && shownId && art[shownId] ? ART_Y[spot.id] : undefined;
+    if (paintedY !== undefined) return { x, y: paintedY };
+    return { x, y: spot.kind === "thing" ? (THING_Y[spot.id] ?? 290) : figure(spot.id) ? 346 : 280 };
   }
-  const placed = $derived(here.map((spot) => ({ spot, ...place(spot) })));
+  // Things first, then people, so a person standing in front of a thing is the one you tap.
+  const placed = $derived(here.map((spot) => ({ spot, ...place(spot) })).sort((a, b) => Number(a.spot.kind === "person") - Number(b.spot.kind === "person")));
 
   const pct = (v: number, of: number) => `${(v / of) * 100}%`;
   const me = $derived(position ? toScene(position) : null);
@@ -218,7 +214,7 @@
           </g>
           {/if}
           {#each placed as p (p.spot.kind + p.spot.id)}
-            {#if p.spot.kind === "person"}<ellipse cx={p.x} cy={p.y + 66} rx="48" ry="9" fill="#000" opacity="0.16" />{/if}
+            {#if p.spot.kind === "person"}<ellipse cx={p.x} cy={figure(p.spot.id) ? p.y - 2 : p.y + 66} rx="48" ry="9" fill="#000" opacity="0.16" />{/if}
           {/each}
           <rect width={W} height={H} fill="url(#vignette)" pointer-events="none" />
         </svg>
@@ -231,7 +227,9 @@
             aria-label={p.spot.kind === "person" ? `Talk to ${p.spot.name}` : `Look at ${p.spot.name}`}
             onclick={() => onspot(p.spot)}
           >
-            {#if p.spot.kind === "person"}<span class="bust"><Bust id={p.spot.id} size={92} /></span>{:else}<span class="ring" aria-hidden="true"></span>{/if}
+            {#if p.spot.kind === "person"}
+              {#if figure(p.spot.id)}<img class="figure" src={figure(p.spot.id)} alt="" draggable="false" />{:else}<span class="bust"><Bust id={p.spot.id} size={92} /></span>{/if}
+            {:else}<span class="ring" aria-hidden="true"></span>{/if}
             <span class="name">{p.spot.name}</span>
           </button>
         {/each}
@@ -243,8 +241,13 @@
           <span class="me" style="left: {pct(me.x, W)}; top: {pct(me.y, H)}; --team: {you.color}"><span class="avatar"><Face face={you.face} size={60} /></span><span class="tag you">You</span></span>
         {/if}
 
-        {#each doors as d (d.dir)}
-          <button class="door {d.dir}" onclick={() => onroom(d.room.id)} aria-label="Door to {d.room.name}"><span aria-hidden="true">{arrow[d.dir]}</span> {d.room.name}</button>
+        <div class="doors-top">
+          {#each doors.filter((d) => d.dir !== "down") as d (d.dir)}
+            <button class="door {d.dir}" onclick={() => onroom(d.room.id)} aria-label="Door to {d.room.name}"><span aria-hidden="true">{arrow[d.dir]}</span> {d.room.name}</button>
+          {/each}
+        </div>
+        {#each doors.filter((d) => d.dir === "down") as d (d.dir)}
+          <button class="door down" onclick={() => onroom(d.room.id)} aria-label="Door to {d.room.name}"><span aria-hidden="true">{arrow[d.dir]}</span> {d.room.name}</button>
         {/each}
       </div>
     {/key}
@@ -270,6 +273,9 @@
     position: absolute; transform: translate(-50%, -50%); min-width: 44px; min-height: 44px; padding: 0; border: none; background: transparent;
     display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font: inherit;
   }
+  .hot.person { transform: translate(-50%, calc(-100% + 30px)); }
+  .figure { height: clamp(92px, 26cqw, 230px); width: auto; filter: drop-shadow(0 6px 6px rgba(28, 36, 48, 0.28)); pointer-events: none; }
+  .hot:hover .figure, .hot:focus-visible .figure { filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 6px var(--blue)); }
   .bust { border-radius: 50%; box-shadow: 0 3px 10px rgba(28, 36, 48, 0.25); line-height: 0; border: 3px solid #fff; }
   .bust :global(svg) { width: clamp(52px, 11cqw, 92px); height: auto; }
   .ring { width: clamp(44px, 8cqw, 64px); height: clamp(44px, 8cqw, 64px); border-radius: 50%; border: 3px dashed var(--blue); background: rgba(255, 255, 255, 0.35); }
@@ -282,15 +288,15 @@
   .mate :global(svg) { width: clamp(26px, 5.4cqw, 44px); height: auto; border-radius: 50%; box-shadow: 0 3px 8px rgba(28, 36, 48, 0.25); }
   .tag { margin-top: 3px; background: rgba(255, 255, 255, 0.92); color: var(--ink); border-radius: 999px; padding: 1px 8px; font-weight: 700; font-size: clamp(10px, 1.8cqw, 13px); }
   .tag.you { background: var(--blue); color: #fff; }
+  .doors-top { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; pointer-events: none; }
   .door {
-    position: absolute; min-height: 44px; max-width: 44%; padding: 6px 14px; border: 2px solid rgba(255, 255, 255, 0.9); border-radius: 999px;
-    background: rgba(30, 64, 168, 0.92); color: #fff; font: inherit; font-weight: 700; font-size: clamp(12px, 2.1cqw, 15px); cursor: pointer; box-shadow: 0 3px 10px rgba(28, 36, 48, 0.3);
+    pointer-events: auto; min-height: 44px; max-width: 34%; padding: 4px 12px; border: 2px solid rgba(255, 255, 255, 0.9); border-radius: 999px; line-height: 1.15; text-align: left;
+    background: rgba(30, 64, 168, 0.92); color: #fff; font: inherit; font-weight: 700; font-size: clamp(11px, 2.1cqw, 15px); cursor: pointer; box-shadow: 0 3px 10px rgba(28, 36, 48, 0.3);
   }
   .door:hover, .door:focus-visible { background: var(--blue); }
-  .door.left { left: 8px; top: 24%; }
-  .door.right { right: 8px; top: 24%; }
-  .door.up { left: 50%; top: 6px; transform: translateX(-50%); }
-  .door.down { left: 50%; bottom: 8px; transform: translateX(-50%); }
+  .door.up { order: 1; }
+  .door.right { order: 2; margin-left: auto; }
+  .door.down { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); }
   .corridor { background: var(--paper); border-radius: var(--radius-l); padding: 40px 24px; text-align: center; }
   .corridor .big { font-size: 24px; font-weight: 700; margin: 0; }
   .more summary { cursor: pointer; font-weight: 600; color: var(--slate); min-height: 44px; display: flex; align-items: center; }

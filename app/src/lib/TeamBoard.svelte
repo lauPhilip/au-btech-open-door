@@ -21,6 +21,7 @@
               <Face face={p.face} size={large ? 40 : 28} />
               <span>{p.name}</span>
               {#if !p.online}<small>offline</small>{/if}
+              {#if p.late}<small>joined late</small>{/if}
               {#if onmove}
                 <select aria-label="Move {p.name} to another table" value={p.team ?? ""} onchange={(e) => onmove(p.id, e.currentTarget.value as TeamId)}>
                   {#each TEAMS as t (t.id)}<option value={t.id} disabled={t.id !== p.team && full(t.id)}>{t.name}{t.id !== p.team && full(t.id) ? " (full)" : ""}</option>{/each}

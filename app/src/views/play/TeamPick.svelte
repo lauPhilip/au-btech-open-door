@@ -27,6 +27,9 @@
         </button>
       {/each}
     </div>
+    {#if counts && TEAMS.every((t) => counts[t.id] >= TEAM_MAX)}
+      <p class="warn" role="alert">Every table is full. Ask your teacher to make room.</p>
+    {/if}
     {#if error}<p class="warn" role="alert">{error}</p>{/if}
   </div>
 </main>

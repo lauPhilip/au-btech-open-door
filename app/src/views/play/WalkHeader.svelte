@@ -62,6 +62,9 @@
       <button class="help-btn" aria-label="How to play" aria-expanded={showHelp} onclick={() => (showHelp = !showHelp)}>?</button>
       <StatusPill status={connection.status} />
     </header>
+    {#if me.late}
+      <p class="ready-note late" role="status">You joined late, so you sit at the {team.name} table. Say hello and ask what they have found.</p>
+    {/if}
     {#if showHelp}
       <HowToPlay onclose={closeHelp} />
     {/if}

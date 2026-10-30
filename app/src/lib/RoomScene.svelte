@@ -38,6 +38,15 @@
   for (const [path, url] of Object.entries(pictures)) art[path.split("/").pop()!.replace(".webp", "")] = url;
   /** A standing figure of a person in the story, if there is one. */
   const figure = (id: string) => art[`person-${id}`];
+  /** Where the feet of a person touch the painted floor in each room, and how big they look there (the camera is closer in some rooms). */
+  const FLOOR: Record<string, { feet: number; scale: number }> = {
+    webshop: { feet: 372, scale: 0.95 },
+    accounting: { feet: 384, scale: 0.9 },
+    ceo: { feet: 380, scale: 1 },
+    server: { feet: 400, scale: 1.12 },
+    packing: { feet: 398, scale: 1.3 },
+    dock: { feet: 334, scale: 1.12 },
+  };
   /** How high up the wall or table each thing sits in its painted room (scene units); across the room comes from the scenario's `at`. */
   const ART_Y: Record<string, number> = { "order-screen": 135, "invoice-tray": 205, "mail-screen": 176, "visitor-book": 238, router: 219, "label-printer": 224 };
   // Fetch the other pictures quietly so a door opens without a pause.
@@ -90,7 +99,7 @@
     const x = toScene({ x: spot.x, y: spot.y }).x;
     const paintedY = spot.kind === "thing" && shownId && art[shownId] ? ART_Y[spot.id] : undefined;
     if (paintedY !== undefined) return { x, y: paintedY };
-    return { x, y: spot.kind === "thing" ? (THING_Y[spot.id] ?? 290) : figure(spot.id) ? 346 : 280 };
+    return { x, y: spot.kind === "thing" ? (THING_Y[spot.id] ?? 290) : figure(spot.id) ? (FLOOR[spot.room]?.feet ?? 346) : 280 };
   }
   // Things first, then people, so a person standing in front of a thing is the one you tap.
   const placed = $derived(here.map((spot) => ({ spot, ...place(spot) })).sort((a, b) => Number(a.spot.kind === "person") - Number(b.spot.kind === "person")));
@@ -228,7 +237,7 @@
             onclick={() => onspot(p.spot)}
           >
             {#if p.spot.kind === "person"}
-              {#if figure(p.spot.id)}<img class="figure" src={figure(p.spot.id)} alt="" draggable="false" />{:else}<span class="bust"><Bust id={p.spot.id} size={92} /></span>{/if}
+              {#if figure(p.spot.id)}<img class="figure" style="--scale: {FLOOR[p.spot.room]?.scale ?? 1}" src={figure(p.spot.id)} alt="" draggable="false" />{:else}<span class="bust"><Bust id={p.spot.id} size={92} /></span>{/if}
             {:else}<span class="ring" aria-hidden="true"></span>{/if}
             <span class="name">{p.spot.name}</span>
           </button>
@@ -274,7 +283,7 @@
     display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font: inherit;
   }
   .hot.person { transform: translate(-50%, calc(-100% + 30px)); }
-  .figure { height: clamp(92px, 26cqw, 230px); width: auto; filter: drop-shadow(0 6px 6px rgba(28, 36, 48, 0.28)); pointer-events: none; }
+  .figure { height: calc(clamp(92px, 26cqw, 230px) * var(--scale, 1)); width: auto; filter: drop-shadow(0 6px 6px rgba(28, 36, 48, 0.28)); pointer-events: none; }
   .hot:hover .figure, .hot:focus-visible .figure { filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 6px var(--blue)); }
   .bust { border-radius: 50%; box-shadow: 0 3px 10px rgba(28, 36, 48, 0.25); line-height: 0; border: 3px solid #fff; }
   .bust :global(svg) { width: clamp(52px, 11cqw, 92px); height: auto; }

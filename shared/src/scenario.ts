@@ -178,7 +178,7 @@ export function spots(scenario: Scenario): Spot[] {
     const before = scenario.people.slice(0, i).filter((p) => p.room === person.room).length;
     const narrow = rw < 120; // a cupboard: stand in the middle, near the bottom
     result.push(narrow
-      ? { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + Math.round(rw / 2), y: ry + rh - 16 - before * 56 }
+      ? { kind: "person", id: person.id, name: person.name, room: room.id, x: rx + Math.round(rw * (person.at ?? 0.5)), y: ry + rh - 16 - before * 56 }
       : { kind: "person", id: person.id, name: person.name, room: room.id, x: person.at !== undefined ? Math.round(rx + rw * person.at) + before * 56 : rx + rw - 40 - before * 56, y: ry + rh - 44 });
   });
   for (const room of scenario.map.rooms) {

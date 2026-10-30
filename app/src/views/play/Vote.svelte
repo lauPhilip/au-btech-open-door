@@ -44,7 +44,6 @@
         {#if allIn}Everyone at your table has voted. Wait for the result.{:else}{tally.voted} of {tally.members} at your table {tally.voted === 1 ? "has" : "have"} voted.{/if}
       </p>
     {/if}
-    {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
   </div>
 </main>
 
@@ -71,5 +70,4 @@
   .chosen .mark { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff; }
   .count { font-size: 14px; color: var(--slate); font-weight: 600; }
   .status { margin: 0; font-weight: 600; }
-  .warn { color: #b93a25; margin: 0; }
 </style>

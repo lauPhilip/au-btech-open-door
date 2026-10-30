@@ -406,7 +406,9 @@ test("a student who loses the network or reloads keeps their name, team, place a
   // The network drops: she sees "Reconnecting…", then it comes back and nothing is lost.
   (live as unknown as { close: (o?: { code?: number }) => void }).close({ code: 1006 });
   await expect(page.getByText("Reconnecting…")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("The connection dropped. Trying again. Your notes are safe.")).toBeVisible();
   await expect(page.getByText("Connected")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText("Back online. Your notes are safe.")).toBeVisible();
   await expect(page.getByText("You are in: Packing station")).toBeVisible();
 
   // A full reload brings back team, place and notes too.

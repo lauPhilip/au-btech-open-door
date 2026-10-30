@@ -29,16 +29,22 @@ export class GameConnection {
   resumedAt = $state(0);
   /** True when the room closed the connection for good (no session, or it ended). */
   ended = $state(false);
+  /** True for a few seconds after the connection came back from a drop. */
+  reconnected = $state(false);
   /** True when the teacher removed this student from the session. */
   removed = $state(false);
 
   private socket: PartySocket;
   private openedOnce = false;
   private errorTimer: ReturnType<typeof setTimeout> | undefined;
+  private reconnectedTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Students keep an error on screen until they close it; the teacher's screen clears it by itself. */
+  private readonly keepErrors: boolean;
   /** Sent again after every reconnect, so a player who drops comes back as themselves. */
   private onOpenMessage: GameClientMessage | null = null;
 
   constructor(code: string, who: Who) {
+    this.keepErrors = who.as === "player";
     const query: Record<string, string> = who.as === "teacher" ? { key: who.key } : who.as === "screen" ? { role: "screen" } : {};
     this.socket = new PartySocket({
       host: window.location.host,
@@ -148,12 +154,25 @@ export class GameConnection {
     this.send({ t: "phase", phase });
   }
 
+  /** Close the error message. */
+  dismissError(): void {
+    clearTimeout(this.errorTimer);
+    this.error = null;
+  }
+
   close(): void {
     clearTimeout(this.errorTimer);
+    clearTimeout(this.reconnectedTimer);
     this.socket.close();
   }
 
   private handleOpen = () => {
+    if (this.openedOnce) {
+      // The connection came back after a drop. The room keeps everything, so tell the student that.
+      this.reconnected = true;
+      clearTimeout(this.reconnectedTimer);
+      this.reconnectedTimer = setTimeout(() => (this.reconnected = false), 5000);
+    }
     this.openedOnce = true;
     this.status = "connected";
     if (this.onOpenMessage) this.send(this.onOpenMessage);
@@ -216,7 +235,7 @@ export class GameConnection {
       case "error":
         this.error = message.text;
         clearTimeout(this.errorTimer);
-        this.errorTimer = setTimeout(() => (this.error = null), 4000);
+        if (!this.keepErrors) this.errorTimer = setTimeout(() => (this.error = null), 4000);
         break;
     }
   };

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "../../lib/i18n.svelte";
   import type { Spot } from "@open-door/shared";
 
   /** Under the picture: what you can do right here (talk, look, write a note) and how to move. */
@@ -9,16 +10,16 @@
   {#if nearby.length > 0}
     {#each nearby as spot (spot.kind + spot.id)}
       <button class="action" onclick={() => onopen(spot)}>
-        {spot.kind === "person" ? "Talk to" : "Look at"} {spot.name}
+        {spot.kind === "person" ? t("walk.talkTo") : t("walk.lookAt")} {spot.name}
         {#if spot === nearby[0]}<kbd>E</kbd>{/if}
       </button>
     {/each}
   {:else}
-    <span class="quiet">Walk up to a person or a thing to talk or look closer.</span>
+    <span class="quiet">{t("walk.quiet")}</span>
   {/if}
-  <button class="action sticky" disabled={!online} onclick={() => onnote(nearby[0] ?? null)}>Sticky note</button>
+  <button class="action sticky" disabled={!online} onclick={() => onnote(nearby[0] ?? null)}>{t("walk.sticky")}</button>
   </div>
-  <p class="help">{view === "map" ? "Tap or click where you want to go." : "Tap a person or a thing, or a door to walk there."} On a keyboard: arrow keys or W A S D, and E to talk or look.</p>
+  <p class="help">{view === "map" ? t("walk.helpMap") : t("walk.helpRoom")} {t("walk.helpKeys")}</p>
 
 <style>
   .prompt {

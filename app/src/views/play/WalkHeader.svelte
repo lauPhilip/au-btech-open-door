@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "../../lib/i18n.svelte";
   import { formatLeft, teamById, type DayEvent, type Game, type Player, type Room, type Scenario } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import DayBar from "../../lib/DayBar.svelte";
@@ -52,18 +53,18 @@
   <div class="top">
     <header>
       <span class="team" style="--team: {team.color}"><span class="door" aria-hidden="true"></span>{team.name}</span>
-      <span class="where" aria-live="polite">You are in: <strong>{here?.name ?? "the corridor"}</strong></span>
+      <span class="where" aria-live="polite">{t("walk.youAreIn")} <strong>{here?.name ?? t("walk.corridor")}</strong></span>
       {#if game.phase === "walk" && game.timer}
-        <span class="left" class:over={left === 0} role="timer">{left === 0 ? "Time is up" : `Walk and spot · ${formatLeft(left)} left`}</span>
+        <span class="left" class:over={left === 0} role="timer">{left === 0 ? t("walk.timeUp") : t("walk.timeLeft", { time: formatLeft(left) })}</span>
       {/if}
       <button class="done-btn" class:on={!!tableReady} aria-pressed={!!tableReady} disabled={paused || connection.status !== "connected"} onclick={() => connection.ready(!tableReady)}>
-        <span aria-hidden="true">{tableReady ? "✓" : "☐"}</span>{tableReady ? "Table is done" : "Our table is done"}
+        <span aria-hidden="true">{tableReady ? "✓" : "☐"}</span>{tableReady ? t("walk.doneOn") : t("walk.done")}
       </button>
-      <button class="help-btn" aria-label="How to play" aria-expanded={showHelp} onclick={() => (showHelp = !showHelp)}>?</button>
+      <button class="help-btn" aria-label={t("walk.help")} aria-expanded={showHelp} onclick={() => (showHelp = !showHelp)}>?</button>
       <StatusPill status={connection.status} />
     </header>
     {#if me.late}
-      <p class="ready-note late" role="status">You joined late, so you sit at the {team.name} table. Say hello and ask what they have found.</p>
+      <p class="ready-note late" role="status">{t("walk.late", { team: team.name })}</p>
     {/if}
     {#if showHelp}
       <HowToPlay onclose={closeHelp} />

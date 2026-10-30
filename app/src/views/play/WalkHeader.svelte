@@ -2,6 +2,8 @@
   import { formatLeft, teamById, type DayEvent, type Game, type Player, type Room, type Scenario } from "@open-door/shared";
   import type { GameConnection } from "../../lib/game.svelte";
   import DayBar from "../../lib/DayBar.svelte";
+  import HowToPlay from "../../lib/HowToPlay.svelte";
+  import { readStored, writeStored } from "../../lib/room.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
 
   /** The strip above the picture: team, place, countdown, "our table is done", the day bar, hints and notices. */
@@ -37,6 +39,14 @@
   /** The teacher's latest hint for this team, until the student closes it. */
   const hint = $derived(game.hints?.[me.team!]);
   let closedHint = $state(0);
+
+  /** The how-to-play card shows once for each student in each session; the "?" button brings it back. */
+  const helpKey = () => `open-door:howto:${game.code}`;
+  let showHelp = $state(readStored(helpKey()) === null);
+  function closeHelp() {
+    showHelp = false;
+    writeStored(helpKey(), "seen");
+  }
 </script>
 
   <div class="top">
@@ -46,11 +56,15 @@
       {#if game.phase === "walk" && game.timer}
         <span class="left" class:over={left === 0} role="timer">{left === 0 ? "Time is up" : `Walk and spot · ${formatLeft(left)} left`}</span>
       {/if}
-      <button class="done-btn" class:on={!!tableReady} aria-pressed={!!tableReady} disabled={paused} onclick={() => connection.ready(!tableReady)}>
+      <button class="done-btn" class:on={!!tableReady} aria-pressed={!!tableReady} disabled={paused || connection.status !== "connected"} onclick={() => connection.ready(!tableReady)}>
         <span aria-hidden="true">{tableReady ? "✓" : "☐"}</span>{tableReady ? "Table is done" : "Our table is done"}
       </button>
+      <button class="help-btn" aria-label="How to play" aria-expanded={showHelp} onclick={() => (showHelp = !showHelp)}>?</button>
       <StatusPill status={connection.status} />
     </header>
+    {#if showHelp}
+      <HowToPlay onclose={closeHelp} />
+    {/if}
     {#if tableReady}
       <p class="ready-note" role="status">{tableReady.by === me.name ? "You told" : `${tableReady.by} told`} your teacher your table is ready for {nextStepName}. Keep writing notes if you think of more, or tap the button again to say you are not done.</p>
     {/if}
@@ -69,6 +83,8 @@
   </div>
 
 <style>
+  .help-btn { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); color: var(--blue-dark); font: inherit; font-size: 20px; font-weight: 700; cursor: pointer; }
+  .help-btn:hover { background: var(--blue-soft); }
   .top {
     grid-column: 1 / -1;
     display: flex;

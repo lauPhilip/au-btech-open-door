@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { classTable, debriefTable, fileName, THREAT_COLUMNS, toCsv, teamTable, teamById, TEAMS, summaryPrompt, dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
+  import { classRecord, classTable, debriefTable, fileName, THREAT_COLUMNS, toCsv, teamTable, teamById, TEAMS, summaryPrompt, dayMinute, eventsBy, formatLeft, isPaused, leftMs, minutesToClock, nextPhase, scenarios, type Phase } from "@open-door/shared";
   import { GameConnection } from "../../lib/game.svelte";
   import Brand from "../../lib/Brand.svelte";
   import TeamBoard from "../../lib/TeamBoard.svelte";
   import StudentList from "../../lib/StudentList.svelte";
+  import ConfirmDialog from "../../lib/ConfirmDialog.svelte";
+  import { advanceWarnings, guidance } from "../../lib/guidance";
   import TeamOverview from "../../lib/TeamOverview.svelte";
   import StatusPill from "../../lib/StatusPill.svelte";
   import { download, printTables } from "../../lib/exporting";
@@ -48,6 +50,29 @@
   const everyoneReady = $derived(playingTeams.length > 0 && readyTeams.length === playingTeams.length);
   const nextStep = $derived(STEPS.find((s) => s.phase === next));
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
+
+  const warnings = $derived(game ? advanceWarnings(game, game.phase === "walk" && timer ? left : null) : []);
+  const hint = $derived(game && scenario ? guidance(game, scenario).text : "");
+  /** Which question is open: moving on with gaps, or ending the session. */
+  let asking = $state<null | "advance" | "end">(null);
+  let withNames = $state(false);
+  function advance() {
+    if (!nextStep) return;
+    if (warnings.length > 0) asking = "advance";
+    else connection.setPhase(nextStep.phase);
+  }
+  function confirmAdvance() {
+    asking = null;
+    if (nextStep) connection.setPhase(nextStep.phase);
+  }
+  function downloadRecord() {
+    if (!game || !scenario) return;
+    download(`${summaryBase}-class-record.csv`, toCsv(classRecord(scenario, game, connection.allNotes, new Date().toISOString().slice(0, 10), withNames)));
+  }
+  function endSession() {
+    asking = null;
+    connection.closeSession();
+  }
 
   // The class summary needs everyone's notes; ask for them when the day is over.
   $effect(() => {
@@ -115,6 +140,9 @@
   {:else if notTeacher}
     <section class="panel"><h1>Teacher key not accepted</h1><p>Paste your teacher link on <a href="/teacher?code={code}&paste=1">the continue page</a>, or <a href="/teacher">start a new session</a>.</p></section>
   {:else}
+    {#if hint}
+      <p class="strip" role="status"><span class="label">Now</span> {hint}</p>
+    {/if}
     <section class="top">
       <div class="code-block">
         <p class="eyebrow">{scenario ? `${scenario.company.name} · ${scenario.title}` : "Loading…"}{game ? ` · ${game.minutes} min` : ""}</p>
@@ -156,7 +184,7 @@
             <p class="warn">{withoutTeam.length} {withoutTeam.length === 1 ? "student has" : "students have"} not picked a team yet: {withoutTeam.map((p) => p.name).join(", ")}.</p>
           {/if}
         </div>
-        <button class="primary" onclick={() => connection.setPhase(nextStep.phase)}>{nextStep.action}</button>
+        <button class="primary" onclick={advance}>{nextStep.action}</button>
       {:else if game && scenario && game.prompt >= summaryPrompt(scenario)}
         <div>
           <h2>Class summary is on the big screen</h2>
@@ -164,7 +192,7 @@
         </div>
         <div class="prompts">
           <button class="secondary" onclick={() => connection.prompt(game.prompt - 1)}>Back to the questions</button>
-          <button class="primary" onclick={() => confirm("End the session for everyone and delete all data? Download the tables first. This cannot be undone.") && connection.closeSession()}>End the session</button>
+          <button class="primary" onclick={() => (asking = "end")}>End the session</button>
         </div>
       {:else if game && scenario}
         <div>
@@ -214,11 +242,38 @@
         <summary>Finished with this session?</summary>
         <div class="end">
           <p>Close it for everyone and delete all notes and names. Download the tables first, because they cannot be brought back.</p>
-          <button class="secondary" onclick={() => confirm("Close the session for everyone and delete all data? This cannot be undone.") && connection.closeSession()}>Close the session</button>
+          <button class="secondary" onclick={() => (asking = "end")}>Close the session</button>
         </div>
       </details>
     {/if}
     {#if connection.error}<p class="warn" role="alert">{connection.error}</p>{/if}
+
+    <ConfirmDialog
+      open={asking === "advance"}
+      title="Move on now?"
+      safe="Wait"
+      risky="Move on anyway"
+      onsafe={() => (asking = null)}
+      onrisky={confirmAdvance}
+    >
+      {#each warnings as w (w)}<p>{w}</p>{/each}
+      <p>Students who are not finished will lose the time they still had.</p>
+    </ConfirmDialog>
+    <ConfirmDialog
+      open={asking === "end"}
+      title="End the session?"
+      safe="Keep the session"
+      risky="End it and delete everything"
+      onsafe={() => (asking = null)}
+      onrisky={endSession}
+    >
+      <p>This deletes all notes and names for everyone. It cannot be undone.</p>
+      <p>Save the class record first if you want to keep it.</p>
+      {#snippet extra()}
+        <button class="primary" onclick={downloadRecord}>Download the class record</button>
+        <label class="names"><input type="checkbox" bind:checked={withNames} /> Include student names</label>
+      {/snippet}
+    </ConfirmDialog>
 
     {#if summaryReady}
       <section class="panel" aria-label="Class summary">
@@ -247,6 +302,9 @@
 </main>
 
 <style>
+  .names { flex-basis: 100%; display: flex; align-items: center; gap: 8px; font-size: 15px; }
+  .strip { position: sticky; top: 0; z-index: 5; margin: 0; padding: 10px 14px; display: flex; gap: 10px; align-items: baseline; background: var(--blue-soft); color: var(--blue-dark); border: 1px solid var(--blue); border-radius: var(--radius-m); font-weight: 600; box-shadow: var(--shadow-1); }
+  .strip .label { text-transform: uppercase; font-size: 12px; letter-spacing: 0.06em; background: var(--blue); color: #fff; padding: 2px 8px; border-radius: 999px; flex: none; }
   .end {
     display: flex;
     align-items: center;

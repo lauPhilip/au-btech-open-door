@@ -57,6 +57,46 @@ export function debriefTable(scenario: Scenario, game: Game): string[][] {
   ];
 }
 
+/** How many votes each choice got, in the order of the scenario. */
+export function voteTable(scenario: Scenario, game: Game): string[][] {
+  const counts = scenario.day.final_choice.options.map(() => 0);
+  for (const option of Object.values(game.votes)) if (counts[option] !== undefined) counts[option]++;
+  return [["Choice", "Votes", "Best choice"], ...scenario.day.final_choice.options.map((o, i) => [o.text, String(counts[i]), o.best ? "yes" : ""])];
+}
+
+/** How many clues each team found, out of all clues in the scenario. */
+export function clueTable(scenario: Scenario, game: Game): string[][] {
+  const total = String(scenario.day.clues.length);
+  const teams = TEAMS.filter((t) => game.players.some((p) => p.team === t.id));
+  return [["Team", "Clues found", "Clues in total"], ...teams.map((t) => [t.name, String(game.clues[t.id]?.length ?? 0), total])];
+}
+
+/**
+ * One file with everything worth keeping from a class: every team's notes, the vote, the clues and the
+ * debrief table. Student names are left out unless `withNames` is true.
+ */
+export function classRecord(scenario: Scenario, game: Game, notes: readonly Note[], date: string, withNames = false): string[][] {
+  const gap: string[][] = [[""]];
+  // "Noted by" is the last column; without names it is cut off.
+  const keep = (row: string[]) => (withNames ? row : row.slice(0, -1));
+  return [
+    ["Open Door class record", `${scenario.company.name}: ${scenario.title}`, date],
+    ...gap,
+    ["Notes from every team (CyPro threat table)"],
+    keep(["Team", ...THREAT_COLUMNS]),
+    ...classTable(scenario, game, notes).map(keep),
+    ...gap,
+    ["The final vote"],
+    ...voteTable(scenario, game),
+    ...gap,
+    ["Clues found"],
+    ...clueTable(scenario, game),
+    ...gap,
+    ["Who saw which problem coming"],
+    ...debriefTable(scenario, game),
+  ];
+}
+
 /** A cell that starts with = + - or @ would run as a formula in a spreadsheet, so it gets a leading quote. */
 function safe(cell: string): string {
   return /^[=+\-@\t\r]/.test(cell) ? `'${cell}` : cell;

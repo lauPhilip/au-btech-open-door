@@ -19,9 +19,11 @@ const lookups = new RateLimiter(LIMITS.lookupPerMinute, 60_000);
 const misses = new RateLimiter(LIMITS.missesPerMinute, 60_000);
 const connects = new RateLimiter(LIMITS.connectPerMinute, 60_000);
 
-/** The caller's network address, as Cloudflare reports it. Missing only in local development and tests, which are not limited. */
+/** The caller's network address, as Cloudflare reports it. Missing or loopback only in local development and tests, which are not limited. */
 export function clientKey(request: Request): string | null {
-  return request.headers.get("cf-connecting-ip");
+  const ip = request.headers.get("cf-connecting-ip");
+  // wrangler dev reports the loopback address; real visitors never have one.
+  return !ip || ip === "127.0.0.1" || ip === "::1" ? null : ip;
 }
 
 export function tooManyResponse(retryAfter: number): Response {

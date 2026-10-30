@@ -1,5 +1,6 @@
 // Accessibility checks with axe on every main screen (issue #39): no serious or critical problems.
 import AxeBuilder from "@axe-core/playwright";
+import { moveOn } from "./helpers";
 import { expect, test, type Page } from "@playwright/test";
 
 async function expectNoSeriousProblems(page: Page, name: string) {
@@ -60,18 +61,18 @@ test("every main screen has no serious or critical accessibility problems", asyn
   await phone.getByRole("button", { name: "Map" }).click();
   await expectNoSeriousProblems(screen, "projector walk");
 
-  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await moveOn(teacher, "Start the day");
   await expect(phone.getByRole("alert").getByText("Orders have stopped printing.")).toBeVisible();
   await expectNoSeriousProblems(phone, "day");
   await expectNoSeriousProblems(screen, "projector day");
 
-  await teacher.getByRole("button", { name: "Start the vote" }).click();
+  await moveOn(teacher, "Start the vote");
   await expect(phone.getByRole("radio").first()).toBeVisible();
   await expectNoSeriousProblems(phone, "vote");
   await expectNoSeriousProblems(screen, "projector vote");
   await phone.getByRole("radio").first().click();
 
-  await teacher.getByRole("button", { name: "Show the result" }).click();
+  await moveOn(teacher, "Show the result");
   await expect(phone.getByRole("heading", { name: /You saw it coming/ })).toBeVisible();
   await expectNoSeriousProblems(phone, "finish");
   await expectNoSeriousProblems(screen, "projector debrief");

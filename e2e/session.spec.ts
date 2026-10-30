@@ -1,3 +1,4 @@
+import { moveOn } from "./helpers";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 
 const MAP_WIDTH = 1206; // Nordknit map, from scenarios/nordknit/black-friday.yaml
@@ -261,7 +262,7 @@ test("the teacher runs the walk and the day: pause, start, clues and messages", 
   await teacher.getByRole("button", { name: "+5 minutes" }).click();
 
   // The day starts: alert, clock and a clue counter.
-  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await moveOn(teacher, "Start the day");
   await expect(ana.getByRole("alert").getByText("Orders have stopped printing.")).toBeVisible();
   await expect(ana.getByRole("timer", { name: /Game clock 07:5\d/ })).toBeVisible();
   await expect(ana.getByLabel("Clues found: 0 of 4")).toBeVisible();
@@ -293,8 +294,8 @@ test("the class votes on what the CEO should do and sees what their notes predic
   await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
   await teacher.getByRole("button", { name: "Start the story" }).click();
   await teacher.getByRole("button", { name: "Start walking" }).click();
-  await teacher.getByRole("button", { name: "Start the day" }).click();
-  await teacher.getByRole("button", { name: "Start the vote" }).click();
+  await moveOn(teacher, "Start the day");
+  await moveOn(teacher, "Start the vote");
 
   // Everyone sees the question with three choices.
   await expect(ana.getByRole("heading", { name: /what do we do right now/ })).toBeVisible();
@@ -311,7 +312,7 @@ test("the class votes on what the CEO should do and sees what their notes predic
   await expect(teacher.getByText("3 of 3 students have voted.")).toBeVisible();
 
   // The result: the table's decision and the answer key.
-  await teacher.getByRole("button", { name: "Show the result" }).click();
+  await moveOn(teacher, "Show the result");
   await expect(ana.getByText("Labels print from 09:05. The truck leaves full at 10:00.")).toBeVisible();
   await expect(ana.getByText(/the best choice/)).toBeVisible();
   await expect(ana.getByRole("heading", { name: /You saw it coming: 0 of 6/ })).toBeVisible();
@@ -360,9 +361,9 @@ test("the teacher moves a student, sees a stuck team and sends a hint", async ({
   await expect(teacher.getByRole("button", { name: "End now and show summary" })).toBeHidden();
 
   // Finished for good: closing the session ends it on every screen and deletes the data.
-  page.once("dialog", (d) => d.accept());
   await teacher.getByText("Finished with this session?").click();
   await teacher.getByRole("button", { name: "Close the session" }).click();
+  await teacher.getByRole("button", { name: "End it and delete everything" }).click();
   await expect(teacher.getByRole("heading", { name: "This session has ended" })).toBeVisible();
   await expect(ana.getByRole("heading", { name: "This session has ended" })).toBeVisible();
 });
@@ -465,10 +466,10 @@ test("a team downloads its notes as a CyPro table and the teacher downloads the 
   await form.getByRole("checkbox", { name: /A visitor or driver/ }).check();
   await form.getByRole("radio", { name: /Seen at firms like us/ }).check();
   await form.getByRole("button", { name: /Stick it on/ }).click();
-  await teacher.getByRole("button", { name: "Start the day" }).click();
-  await teacher.getByRole("button", { name: "Start the vote" }).click();
+  await moveOn(teacher, "Start the day");
+  await moveOn(teacher, "Start the vote");
   await page.getByRole("radio").first().click();
-  await teacher.getByRole("button", { name: "Show the result" }).click();
+  await moveOn(teacher, "Show the result");
 
   // The student's table: CyPro columns, the note, and formulas defused.
   const [file] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Download CSV" }).click()]);
@@ -517,7 +518,7 @@ test("a table tells the teacher it is done, and the teacher sees it until the cl
   // It is cleared when the class moves on, so each step starts fresh.
   await ana.getByRole("button", { name: "Our table is done" }).click();
   await expect(teacher.getByText(/Says it is done · Ana/)).toBeVisible();
-  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await moveOn(teacher, "Start the day");
   await expect(teacher.getByText(/Says it is done/)).toBeHidden();
   await expect(ana.getByRole("button", { name: "Our table is done" })).toBeVisible();
 });
@@ -552,7 +553,7 @@ test("after the last debrief question the teacher shows the class summary and th
   await teacher.getByRole("button", { name: "Back to the questions" }).click();
   await expect(screen.getByText("Question for the class")).toBeVisible();
   await teacher.getByRole("button", { name: "Show the class summary" }).click();
-  page.once("dialog", (d) => d.accept());
   await teacher.getByRole("button", { name: "End the session" }).click();
+  await teacher.getByRole("button", { name: "End it and delete everything" }).click();
   await expect(teacher.getByRole("heading", { name: "This session has ended" })).toBeVisible();
 });

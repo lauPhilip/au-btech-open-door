@@ -83,7 +83,7 @@
     background: var(--paper);
     border-radius: var(--radius-l);
     padding: 24px;
-    box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06), 0 8px 24px rgba(28, 36, 48, 0.06);
+    box-shadow: var(--shadow-2);
     animation: rise 260ms ease-out;
   }
   .line {

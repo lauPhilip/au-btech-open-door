@@ -492,3 +492,32 @@ test("a team downloads its notes as a CyPro table and the teacher downloads the 
   const table = (await import("node:fs")).readFileSync((await debrief.path())!, "utf8");
   expect(table).toContain('"Problem on the day","Blue door"');
 });
+
+test("a table tells the teacher it is done, and the teacher sees it until the class moves on", async ({ page }) => {
+  await page.goto("/dev");
+  await page.getByRole("button", { name: /Create session/ }).click();
+  const teacher = page.frameLocator('iframe[title="Teacher"]');
+  const ana = page.frameLocator('iframe[title="Student Ana"]');
+  await expect(teacher.getByText("3 joined · 3 online")).toBeVisible({ timeout: 15_000 });
+  await teacher.getByRole("button", { name: "Start the story" }).click();
+  await teacher.getByRole("button", { name: "Start walking" }).click();
+  await expect(teacher.getByText(/^0 of \d teams say they are done/)).toBeVisible();
+
+  // One student speaks for the table.
+  await ana.getByRole("button", { name: "Our table is done" }).click();
+  await expect(ana.getByRole("button", { name: "Table is done" })).toHaveAttribute("aria-pressed", "true");
+  await expect(ana.getByText(/told your teacher your table is ready for the day/)).toBeVisible();
+  await expect(teacher.getByText(/Says it is done · Ana/)).toBeVisible();
+  await expect(teacher.getByText(/^1 of \d teams say they are done/)).toBeVisible();
+
+  // They can take it back.
+  await ana.getByRole("button", { name: "Table is done" }).click();
+  await expect(teacher.getByText(/Says it is done/)).toBeHidden();
+
+  // It is cleared when the class moves on, so each step starts fresh.
+  await ana.getByRole("button", { name: "Our table is done" }).click();
+  await expect(teacher.getByText(/Says it is done · Ana/)).toBeVisible();
+  await teacher.getByRole("button", { name: "Start the day" }).click();
+  await expect(teacher.getByText(/Says it is done/)).toBeHidden();
+  await expect(ana.getByRole("button", { name: "Our table is done" })).toBeVisible();
+});

@@ -89,13 +89,13 @@
     background: var(--paper);
     border-radius: var(--radius-l);
     padding: 24px;
-    box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06), 0 8px 24px rgba(28, 36, 48, 0.06);
+    box-shadow: var(--shadow-2);
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
   .card.wide {
-    width: min(560px, 100%);
+    width: min(var(--column), 100%);
     background: transparent;
     box-shadow: none;
     padding: 0;

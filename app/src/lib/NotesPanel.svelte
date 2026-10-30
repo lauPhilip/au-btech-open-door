@@ -115,7 +115,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    background: #fff9d6;
+    background: var(--sticky-paper);
     border-left: 4px solid var(--sticky);
     padding: 8px 10px;
     border-radius: 6px;

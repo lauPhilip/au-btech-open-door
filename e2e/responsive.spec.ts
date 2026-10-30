@@ -70,6 +70,11 @@ for (const size of SIZES) {
       await page.waitForTimeout(500); // let fade-ins finish
       await page.screenshot({ path: `${SHOTS}/${size.name}-${who}-${step}.png` });
       for (const p of await problems(page, size.touch)) found.push(`${who} · ${step}: ${p}`);
+      // On a laptop or a bigger screen the game fills the window and the page itself never scrolls.
+      if (who === "student" && step.startsWith("3-walk") && size.width >= 900 && size.height >= 600) {
+        const over = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
+        if (over > 1) found.push(`${who} · ${step}: the page scrolls ${over}px, it should fit the window`);
+      }
     };
 
     const teacherContext = await browser.newContext({ viewport: { width: size.width, height: size.height }, hasTouch: size.touch, isMobile: size.touch && size.width < 700 });

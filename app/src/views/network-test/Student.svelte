@@ -84,11 +84,11 @@
     color: #7a5b0a;
   }
   .status.connected {
-    background: #e2f3ec;
+    background: var(--safe-soft);
     color: var(--safe-dark);
   }
   .status.reconnecting {
-    background: #fde3dd;
+    background: var(--alert-soft);
     color: var(--alert-dark);
   }
   .hero {

@@ -18,6 +18,9 @@ export interface TeamProgress {
   /** How long nobody at the table has moved, in ms (0 outside the walk and the day). */
   idleMs: number;
   stuck: boolean;
+  /** The table says it is done with this step; `readyBy` is the student who pressed the button. */
+  ready: boolean;
+  readyBy: string | null;
   /** Names of rooms the team has not entered yet, in map order. */
   unvisited: string[];
 }
@@ -41,7 +44,9 @@ export function teamProgress(game: Game, scenario: Scenario, lastMove: Record<st
       notes: game.noteCounts?.[t.id] ?? 0,
       clues: game.clues?.[t.id]?.length ?? 0,
       idleMs,
-      stuck: playing && members.length > 0 && idleMs >= STUCK_MS,
+      stuck: playing && members.length > 0 && idleMs >= STUCK_MS && !game.ready?.[t.id],
+      ready: !!game.ready?.[t.id],
+      readyBy: game.ready?.[t.id]?.by ?? null,
       unvisited: scenario.map.rooms.filter((r) => !visited.has(r.id)).map((r) => r.name),
     };
   }).filter((t) => t.members > 0);

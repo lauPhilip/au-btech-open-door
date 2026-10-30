@@ -40,6 +40,10 @@
     { phase: "vote", label: "Vote", action: "Start the vote", help: "Each team decides what Karin should do. Notes are shared with the team again, so nothing is lost." },
     { phase: "debrief", label: "Debrief", action: "Show the result", help: "Teams see their decision. The big screen shows which team saw which problem coming, the CyPro names and your questions." },
   ];
+  /** Teams with students, and how many of them have said they are done with this step. */
+  const playingTeams = $derived(TEAMS.filter((t) => players.some((p) => p.team === t.id)));
+  const readyTeams = $derived(playingTeams.filter((t) => game?.ready?.[t.id]));
+  const everyoneReady = $derived(playingTeams.length > 0 && readyTeams.length === playingTeams.length);
   const nextStep = $derived(STEPS.find((s) => s.phase === next));
   const currentIndex = $derived(STEPS.findIndex((s) => s.phase === game?.phase));
 
@@ -124,6 +128,11 @@
         <div>
           <h2>Next: {nextStep.label.toLowerCase()}</h2>
           <p>{nextStep.help}</p>
+          {#if (game.phase === "walk" || game.phase === "day") && playingTeams.length > 0}
+            <p class="readiness" class:all={everyoneReady} role="status">
+              {#if everyoneReady}<strong>Every team says it is done.</strong> You can go on.{:else}<strong>{readyTeams.length} of {playingTeams.length} teams</strong> say they are done{readyTeams.length > 0 ? `: ${readyTeams.map((t) => t.name).join(", ")}` : ""}.{/if}
+            </p>
+          {/if}
           {#if game.phase === "vote"}
             <p>{Object.keys(game.votes).length} of {players.filter((p) => p.team).length} students have voted.</p>
           {/if}
@@ -144,6 +153,24 @@
         </div>
       {/if}
     </section>
+    {#if timer && game && scenario}
+      <section class="panel control" aria-label="Class controls">
+        <div class="readout">
+          {#if game.phase === "walk"}
+            <p class="label">Walk and spot</p>
+            <p class="value" role="timer">{left === 0 ? "Time is up" : `${formatLeft(left)} left`}</p>
+          {:else}
+            <p class="label">Game clock · {scenario.day.name}</p>
+            <p class="value" role="timer">{clock} <small>day ends {scenario.day.ends} · {messages} of {scenario.day.events.length} messages sent</small></p>
+          {/if}
+          {#if paused}<p class="paused-note" role="status">Paused: students cannot move or write.</p>{/if}
+        </div>
+        <div class="buttons">
+          <button class="secondary" onclick={() => connection.timer(paused ? "resume" : "pause")}>{paused ? "Resume all" : "Pause all"}</button>
+          {#if game.phase === "walk"}<button class="secondary" onclick={() => connection.timer("add")}>+5 minutes</button>{/if}
+        </div>
+      </section>
+    {/if}
     {#if game && (game.phase === "walk" || game.phase === "day" || game.phase === "vote")}
       <section class="panel end">
         <div>
@@ -176,26 +203,8 @@
       </section>
     {/if}
 
-    {#if timer && game && scenario}
-      <section class="panel control" aria-label="Class controls">
-        <div class="readout">
-          {#if game.phase === "walk"}
-            <p class="label">Walk and spot</p>
-            <p class="value" role="timer">{left === 0 ? "Time is up" : `${formatLeft(left)} left`}</p>
-          {:else}
-            <p class="label">Game clock · {scenario.day.name}</p>
-            <p class="value" role="timer">{clock} <small>day ends {scenario.day.ends} · {messages} of {scenario.day.events.length} messages sent</small></p>
-          {/if}
-          {#if paused}<p class="paused-note" role="status">Paused: students cannot move or write.</p>{/if}
-        </div>
-        <div class="buttons">
-          <button class="secondary" onclick={() => connection.timer(paused ? "resume" : "pause")}>{paused ? "Resume all" : "Pause all"}</button>
-          {#if game.phase === "walk"}<button class="secondary" onclick={() => connection.timer("add")}>+5 minutes</button>{/if}
-        </div>
-      </section>
-    {/if}
 
-    <section>
+    <section class="teams">
       {#if game && scenario && (game.phase === "walk" || game.phase === "day")}
         <h2 class="section-title">How the teams are doing</h2>
         <TeamOverview {connection} {game} {scenario} now={ticker.now} />
@@ -306,7 +315,7 @@
     background: var(--paper);
     border-radius: var(--radius-l);
     padding: 20px;
-    box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06);
+    box-shadow: var(--shadow-1);
   }
   .panel p {
     margin: 6px 0 0;
@@ -335,6 +344,28 @@
   .hint.link {
     word-break: break-all;
   }
+  /* Laptops and big screens: controls on the left, the teams beside them, so the teacher sees both without scrolling. */
+  @media (min-width: 1100px) {
+    .teacher {
+      max-width: 1500px;
+      display: grid;
+      grid-template-columns: minmax(380px, 460px) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-4) var(--space-5);
+    }
+    .teacher > :global(*) {
+      grid-column: 1;
+    }
+    .teacher > header {
+      grid-column: 1 / -1;
+    }
+    .teacher > .teams {
+      grid-column: 2;
+      grid-row: 2 / span 12;
+    }
+    .code { font-size: 56px; }
+    .actions { align-items: flex-start; }
+  }
   @media (max-width: 760px) {
     .actions {
       align-items: flex-start;
@@ -342,8 +373,8 @@
     .next {
       position: sticky;
       bottom: 12px;
-      z-index: 5;
-      box-shadow: 0 8px 30px rgb(28 36 48 / 0.25);
+      z-index: var(--z-sticky);
+      box-shadow: var(--shadow-lift);
     }
   }
   .next > div {
@@ -416,6 +447,8 @@
     color: var(--alert-dark);
     margin: 0;
   }
+  .readiness { color: var(--slate); }
+  .readiness.all { color: var(--safe-dark); }
   .prompt { font-size: 20px; font-weight: 600; }
   .prompts { display: flex; gap: 8px; flex-wrap: wrap; }
 </style>

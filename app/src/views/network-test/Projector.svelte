@@ -209,11 +209,11 @@
     padding: 6px 12px;
     border-radius: 999px;
     font-weight: 600;
-    background: #fde3dd;
+    background: var(--alert-soft);
     color: var(--alert-dark);
   }
   .status.connected {
-    background: #e2f3ec;
+    background: var(--safe-soft);
     color: var(--safe-dark);
   }
   .right {
@@ -265,7 +265,7 @@
     color: var(--slate);
   }
   li.slow {
-    background: #fde3dd;
+    background: var(--alert-soft);
     color: var(--alert-dark);
   }
   .name {

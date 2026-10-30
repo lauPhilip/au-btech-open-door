@@ -81,6 +81,11 @@ A short note on where development stands, so a new work session can pick up stra
   - **Teacher flow:** copyable join link, a sticky next-step button on phones, "End now and show summary" during the walk, day and vote, and a close button that deletes the session's data.
   - **Teaching material:** `docs/teaching/` has the facilitator guide, the pilot plan with consent text and SUS form, and `npm run paper-kit` builds printable kits into `docs/teaching/paper-kit/`. The debrief deck exists as a Slides artifact.
 
+- **Done signal, palette and full-window layout.** Built 30 October 2026:
+  - **"Our table is done":** any student can tell the teacher that the whole table is done with the walk or the day (`setReady` in `shared/src/game/rules.ts`, message `ready`). The teacher sees a green row with who pressed it and a line "2 of 4 teams say they are done" above the next-step button; nothing moves on by itself. It clears whenever the class moves on, and a team that says it is done is never flagged as stuck.
+  - **Design palette:** `docs/design-system.md` and the tokens in `app/src/app.css`. The shell's one-off colours, shadows and layers now use tokens, and `contrast.test.ts` reads the palette from `app.css`.
+  - **Fills the window:** from 861 by 600 pixels the play view fits the window with no page scroll, the teacher page has two columns from 1100 pixels, and single-column pages are wider on big screens. The responsive test checks that the page does not scroll.
+
 ## Known limits of slice 1
 
 - **No walls yet.** Players walk in straight lines through rooms, and every room they pass through is ticked as visited. Doors and walls need a small addition to the scenario format (for example a list of door gaps per room) and a collision check in `move()`.

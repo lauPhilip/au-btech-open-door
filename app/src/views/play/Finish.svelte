@@ -68,7 +68,7 @@
 
 <style>
   .page { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
-  .card { width: min(600px, 100%); display: flex; flex-direction: column; gap: 18px; }
+  .card { width: min(var(--column), 100%); display: flex; flex-direction: column; gap: 18px; }
   header { display: flex; justify-content: space-between; align-items: center; }
   .me { display: flex; align-items: center; gap: 10px; }
   .eyebrow { margin: 0; color: var(--slate); font-weight: 600; }
@@ -81,12 +81,12 @@
   .help { margin: 4px 0 0; color: var(--slate); }
   ul { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
   li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; padding: 12px; border-radius: var(--radius-m, 10px); background: var(--mist); }
-  li.hit { background: #e6f4ec; }
+  li.hit { background: var(--safe-soft); }
   li p { margin: 0; }
   .badge { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; border: 2px solid var(--slate); color: var(--slate); }
   .hit .badge { background: #1d7a4a; border-color: #1d7a4a; color: #fff; }
   .what { font-size: 15px; color: var(--slate); }
-  .note { margin-top: 6px !important; padding: 6px 10px; background: #ffe27a; border-radius: 4px; font-size: 15px; }
+  .note { margin-top: 6px !important; padding: 6px 10px; background: var(--sticky); border-radius: 4px; font-size: 15px; }
   .take { background: var(--paper); border-radius: var(--radius-l); padding: 20px 24px; }
   .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
   .buttons button { min-height: 48px; padding: 0 18px; border-radius: var(--radius-m); border: 2px solid var(--blue); background: var(--paper); color: var(--blue); font: inherit; font-weight: 700; cursor: pointer; }

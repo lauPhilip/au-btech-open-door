@@ -183,7 +183,7 @@
     border-radius: var(--radius-l);
     padding: 24px;
     text-align: center;
-    box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06);
+    box-shadow: var(--shadow-1);
   }
   .qr :global(svg) {
     width: 100%;
@@ -352,7 +352,7 @@
     margin: 0 0 4px;
   }
   .question {
-    background: #ffe27a;
+    background: var(--sticky);
     color: var(--ink);
     border-radius: var(--radius-l);
     padding: 16px 22px;

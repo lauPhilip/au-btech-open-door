@@ -43,7 +43,7 @@
     background: var(--paper);
     border-radius: var(--radius-l);
     padding: 28px 24px;
-    box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06), 0 8px 24px rgba(28, 36, 48, 0.06);
+    box-shadow: var(--shadow-2);
     display: flex;
     flex-direction: column;
     gap: 14px;

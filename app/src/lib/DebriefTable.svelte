@@ -54,14 +54,14 @@
   thead th.what { border-bottom: 6px solid transparent; font-weight: 700; }
   td { text-align: center; background: var(--paper); font-size: 26px; }
   .mark { font-size: 36px; font-weight: 800; line-height: 1; }
-  td.hit { background: #d6f0e0; color: #0f5a33; }
-  td.close { background: #ffeeb8; color: #6b4a00; }
-  td.miss { background: #eceff3; color: #3f4a59; }
+  td.hit { background: var(--safe-soft); color: var(--safe-ink); }
+  td.close { background: var(--close-soft); color: var(--close-ink); }
+  td.miss { background: var(--quiet-soft); color: var(--quiet-ink); }
   tfoot td, tfoot th { background: transparent; font-size: 24px; }
   .key { display: flex; gap: 28px; margin: 4px 8px 0; font-size: 20px; color: var(--slate); }
   .k { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; margin-right: 8px; font-size: 22px; }
-  .k.hit { background: #d6f0e0; color: #0f5a33; }
-  .k.close { background: #ffeeb8; color: #6b4a00; }
-  .k.miss { background: #eceff3; color: #3f4a59; }
+  .k.hit { background: var(--safe-soft); color: var(--safe-ink); }
+  .k.close { background: var(--close-soft); color: var(--close-ink); }
+  .k.miss { background: var(--quiet-soft); color: var(--quiet-ink); }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 </style>

@@ -57,6 +57,8 @@ export interface Game {
   noteCounts: Partial<Record<TeamId, number>>;
   /** The latest hint the teacher sent to each team (issue #33). */
   hints: Partial<Record<TeamId, { text: string; at: number }>>;
+  /** Teams that say they are done with this step, and who pressed the button. Cleared whenever the class moves on. */
+  ready: Partial<Record<TeamId, { by: string; at: number }>>;
 }
 
 export type GameError =
@@ -118,7 +120,7 @@ export const AVATAR_RADIUS = 14;
 const SPAWN_GAP = 36;
 
 export function newGame(code: string, scenario: string, minutes: Minutes, now: number): Game {
-  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0, noteCounts: {}, hints: {} };
+  return { code, scenario, minutes, phase: "lobby", createdAt: now, players: [], revealed: {}, timer: null, clues: {}, votes: {}, results: {}, prompt: 0, noteCounts: {}, hints: {}, ready: {} };
 }
 
 export function findPlayer(game: Game, id: string): Player | undefined {
@@ -220,7 +222,7 @@ export function canGoTo(from: Phase, to: Phase): boolean {
 export function setPhase(game: Game, phase: Phase, ctx?: { scenario: Scenario; now: number }): Result<Game> {
   if (phase === game.phase) return ok(game);
   if (!canGoTo(game.phase, phase)) return fail("bad-phase");
-  let next: Game = { ...game, phase, timer: ctx ? timerFor(phase, ctx.scenario, game.minutes, ctx.now) : null };
+  let next: Game = { ...game, phase, ready: {}, timer: ctx ? timerFor(phase, ctx.scenario, game.minutes, ctx.now) : null };
   if (ctx && phase === "day") next = findCluesInPlace(next, ctx.scenario);
   return ok(next);
 }
@@ -310,6 +312,18 @@ export function setPrompt(game: Game, scenario: Scenario, index: number): Result
 export function assignTeam(game: Game, id: string, team: TeamId): Result<Game> {
   if (game.phase !== "lobby" && game.phase !== "story") return fail("too-late");
   return chooseTeam(game, id, team);
+}
+
+/** A student tells the teacher their whole table is done with this step (or takes it back). Anyone at the table can press it. */
+export function setReady(game: Game, id: string, ready: boolean, now: number): Result<Game> {
+  const player = findPlayer(game, id);
+  if (!player) return fail("not-joined");
+  if (!isPlaying(game)) return fail("not-walking");
+  if (!player.team) return fail("no-team");
+  const mine = game.ready?.[player.team];
+  if (ready === !!mine) return ok(game);
+  const { [player.team]: _gone, ...others } = game.ready ?? {};
+  return ok({ ...game, ready: ready ? { ...others, [player.team]: { by: player.name, at: now } } : others });
 }
 
 export const HINT_MAX_CHARS = 120;

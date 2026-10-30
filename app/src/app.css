@@ -1,23 +1,71 @@
 /* Design tokens from the concept book (board 07). */
 :root {
-  --ink: #1c2430;
-  --slate: #5a6574;
-  --line: #dde2e9;
-  --mist: #f2f4f7;
-  --paper: #ffffff;
-  --blue: #2e5bdb;
+  /* ── Colour: brand ───────────────────────────────────────────── */
+  --ink: #1c2430;          /* body text, headings */
+  --slate: #5a6574;        /* secondary text */
+  --line: #dde2e9;         /* borders, dividers */
+  --mist: #f2f4f7;         /* page background */
+  --paper: #ffffff;        /* cards, panels */
+  --blue: #2e5bdb;         /* the one action colour: primary buttons, links, focus */
   --blue-dark: #1e40a8;
   --blue-soft: #eef2fc;
-  --sticky: #ffe27a;
-  --alert: #e8573f;
-  --alert-dark: #b93a25;
+  --sticky: #ffe27a;       /* the sticky note and the teacher's hint */
+  --sticky-hover: #f5d450;
+  --sticky-paper: #fff9d6;
+
+  /* ── Colour: meaning (always paired with a word or an icon, never colour alone) ── */
   --safe: #2f9e6e;
   --safe-dark: #1e6b4e;
+  --safe-ink: #0f5a33;     /* text on --safe-soft */
+  --safe-soft: #e6f4ec;
+  --alert: #e8573f;
+  --alert-dark: #b93a25;
+  --alert-soft: #fde3dd;
+  --warn-edge: #b36b00;    /* "may need help" */
+  --warn-ink: #7a4600;
+  --warn-soft: #fff4d6;
+  --close-ink: #6b4a00;    /* "nearly" in the debrief table */
+  --close-soft: #ffeeb8;
+  --quiet-ink: #3f4a59;    /* "missed" in the debrief table */
+  --quiet-soft: #eceff3;
+
+  /* ── Space: a 4px grid ───────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ── Shape and depth ─────────────────────────────────────────── */
   --radius-s: 8px;
   --radius-m: 14px;
   --radius-l: 20px;
+  --shadow-1: 0 1px 2px rgb(28 36 48 / 0.06);
+  --shadow-2: 0 1px 2px rgb(28 36 48 / 0.06), 0 8px 24px rgb(28 36 48 / 0.06);
+  --shadow-lift: 0 8px 30px rgb(28 36 48 / 0.25);
+  --shadow-3: 0 20px 60px rgb(28 36 48 / 0.35);
+  --scrim: rgb(28 36 48 / 0.8);
+
+  /* ── Type: one scale. Bigger screens get a little more room, never smaller text ── */
   --font-display: "Bricolage Grotesque", system-ui, sans-serif;
   --font-body: "Figtree", system-ui, sans-serif;
+  --text-s: 14px;
+  --text-m: 16px;
+  --text-l: clamp(17px, 0.9vw + 11px, 20px);
+  --text-xl: clamp(20px, 1vw + 12px, 24px);
+  --text-2xl: clamp(24px, 1.6vw + 14px, 32px);
+  --text-3xl: clamp(32px, 3vw + 14px, 56px);
+
+  /* ── Touch, layers and page width ────────────────────────────── */
+  --tap: 44px;             /* smallest thing a thumb has to hit */
+  --z-sticky: 5;
+  --z-modal: 30;
+  --z-overlay: 40;
+  --page: 1700px;          /* widest the play view ever grows */
+  --column: clamp(520px, 40vw, 760px); /* a single-column page (join, vote, result): roomier on big screens */
+
   color-scheme: light;
 }
 

@@ -20,6 +20,7 @@ export type GameClientMessage =
   | { t: "merge"; keep: string; drop: string }
   | { t: "phase"; phase: Phase }
   | { t: "vote"; option: number }
+  | { t: "ready"; ready: boolean }
   | { t: "prompt"; index: number }
   | { t: "summary" }
   | { t: "close" }
@@ -93,6 +94,8 @@ export function parseGameMessage(raw: string): GameClientMessage | null {
       return typeof m.index === "number" && Number.isInteger(m.index) && m.index >= 0 && m.index < 20 ? { t: "prompt", index: m.index } : null;
     case "vote":
       return typeof m.option === "number" && Number.isInteger(m.option) && m.option >= 0 && m.option < 10 ? { t: "vote", option: m.option } : null;
+    case "ready":
+      return typeof m.ready === "boolean" ? { t: "ready", ready: m.ready } : null;
     case "timer":
       return m.action === "pause" || m.action === "resume" || m.action === "add" ? { t: "timer", action: m.action } : null;
     case "phase":

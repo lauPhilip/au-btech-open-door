@@ -24,13 +24,15 @@
 <div class="overview" role="table" aria-label="Progress per team">
   {#each rows as r (r.team)}
     {@const t = teamById(r.team)}
-    <div class="row" class:stuck={r.stuck} role="row" style="--team: {t.color}">
+    <div class="row" class:stuck={r.stuck} class:ready={r.ready} role="row" style="--team: {t.color}">
       <div class="name" role="cell"><span class="sw" aria-hidden="true"></span><strong>{t.name}</strong> <small>{r.members} {r.members === 1 ? "student" : "students"}</small></div>
       <div role="cell"><b>{r.rooms}</b> of {r.roomsTotal} rooms</div>
       <div role="cell"><b>{r.notes}</b> {r.notes === 1 ? "note" : "notes"}</div>
       {#if game.phase === "day"}<div role="cell"><b>{r.clues}</b> of {scenario.day.clues.length} clues</div>{/if}
       <div class="state" role="cell">
-        {#if r.stuck}
+        {#if r.ready}
+          <span class="done"><span aria-hidden="true">✓</span> Says it is done · {r.readyBy}</span>
+        {:else if r.stuck}
           <span class="flag"><span aria-hidden="true">⚠</span> May need help · no movement for {minutes(r.idleMs)} min</span>
         {:else}
           <span class="ok"><span aria-hidden="true">✓</span> Moving</span>
@@ -56,14 +58,16 @@
   .row {
     display: grid; grid-template-columns: minmax(150px, 1.3fr) repeat(3, minmax(90px, 1fr)) minmax(180px, 1.6fr) auto;
     align-items: center; gap: 12px; background: var(--paper); border-left: 8px solid var(--team);
-    border-radius: var(--radius-m); padding: 10px 14px; box-shadow: 0 1px 2px rgba(28, 36, 48, 0.06);
+    border-radius: var(--radius-m); padding: 10px 14px; box-shadow: var(--shadow-1);
   }
-  .row.stuck { background: #fff4d6; outline: 2px solid #b36b00; }
+  .row.stuck { background: var(--warn-soft); outline: 2px solid var(--warn-edge); }
   .name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .name small { color: var(--slate); }
   .sw { width: 12px; height: 12px; border-radius: 50%; background: var(--team); }
-  .flag { color: #7a4600; font-weight: 700; }
-  .ok { color: #0f5a33; font-weight: 600; }
+  .row.ready { background: var(--safe-soft); outline: 2px solid var(--safe-dark); }
+  .done { color: var(--safe-dark); font-weight: 700; }
+  .flag { color: var(--warn-ink); font-weight: 700; }
+  .ok { color: var(--safe-ink); font-weight: 600; }
   .hints { grid-column: 1 / -1; list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .choice {
     width: 100%; min-height: 44px; text-align: left; font: inherit; padding: 8px 14px; cursor: pointer;

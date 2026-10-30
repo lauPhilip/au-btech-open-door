@@ -19,6 +19,8 @@ import {
   ERROR_TEXT,
   findPlayer,
   isCode,
+  LIMITS,
+  RateLimiter,
   join,
   mayRoleSend,
   move,
@@ -47,6 +49,10 @@ const SAVE_POSITIONS_MS = 5000;
 const MAX_CONNECTIONS = 60;
 /** Player ids come from the browser: a random id kept per session code. */
 export const PLAYER_ID = /^[A-Za-z0-9_-]{8,64}$/;
+
+/** Messages per connection per second; extra ones are dropped, and a connection that keeps flooding is closed. */
+const messageRate = new RateLimiter(LIMITS.messagesPerSecond, 1000);
+const floodDrops = new Map<string, number>();
 
 interface ConnState {
   role: Role;
@@ -143,6 +149,12 @@ export class GameRoom extends Server {
     const game = this.game;
     const role = connection.state?.role;
     if (!game || !role || typeof raw !== "string") return;
+    if (!messageRate.hit(`${this.name}:${connection.id}`, Date.now()).ok) {
+      const drops = (floodDrops.get(connection.id) ?? 0) + 1;
+      floodDrops.set(connection.id, drops);
+      if (drops > LIMITS.floodDropsBeforeClose) connection.close(1008, "Too many messages");
+      return;
+    }
     const message = parseGameMessage(raw);
     if (!message) return;
     if (!mayRoleSend(role, message)) {
@@ -241,6 +253,8 @@ export class GameRoom extends Server {
   }
 
   onClose(connection: Connection<ConnState>): void {
+    floodDrops.delete(connection.id);
+    messageRate.forget(`${this.name}:${connection.id}`);
     this.leave(connection);
   }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fileName, matchNotes, teamTable, THREAT_COLUMNS, toCsv, teamById, teamVote, type Game, type Note, type Player, type Scenario } from "@open-door/shared";
+  import { fileName, matchNotes, teamTable, THREAT_COLUMNS, toCsv, teamById, teamVote, classVote, type Game, type Note, type Player, type Scenario } from "@open-door/shared";
   import { download, printTables } from "../../lib/exporting";
   import type { GameConnection } from "../../lib/game.svelte";
   import Face from "../../lib/Face.svelte";
@@ -10,6 +10,9 @@
   const team = $derived(me.team ? teamById(me.team) : null);
   const vote = $derived(me.team ? teamVote(game, scenario, me.team) : null);
   const picked = $derived(vote?.winner != null ? scenario.day.final_choice.options[vote.winner] : null);
+  const klass = $derived(classVote(game, scenario));
+  const options = $derived(scenario.day.final_choice.options);
+  const bestOption = $derived(klass.best !== null ? options[klass.best] : null);
   const matches = $derived(me.team ? matchNotes(scenario, connection.notes as Note[], me.team) : []);
   const saw = $derived(matches.filter((m) => m.note).length);
   const table = $derived(me.team ? [[...THREAT_COLUMNS], ...teamTable(scenario, game, connection.notes as Note[], me.team)] : []);
@@ -34,6 +37,27 @@
       {:else}
         <h1>Your table did not agree</h1>
         <p class="outcome">The votes were split, so the CEO had to wait. Real teams meet this too: agree on one answer before the clock runs out.</p>
+      {/if}
+    </section>
+
+    <section class="class" aria-labelledby="class-title">
+      <h2 id="class-title">How the class decided</h2>
+      {#if klass.decided === 0}
+        <p>No table agreed on one choice.</p>
+      {:else}
+        <ul>
+          {#each options as option, i (option.text)}
+            {#if klass.tables[i]}
+              <li class:mine={vote?.winner === i}>
+                <strong>{klass.tables[i]} {klass.tables[i] === 1 ? "table" : "tables"}</strong> chose: {option.text}{vote?.winner === i ? " (your table)" : ""}
+              </li>
+            {/if}
+          {/each}
+        </ul>
+        {#if klass.split > 0}<p class="help">{klass.split} {klass.split === 1 ? "table" : "tables"} could not agree.</p>{/if}
+      {/if}
+      {#if bestOption}
+        <p class="best"><strong>Best answer:</strong> {bestOption.text}</p>
       {/if}
     </section>
 
@@ -67,6 +91,9 @@
 </main>
 
 <style>
+  .class ul { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 6px; }
+  .class li.mine { font-weight: 700; }
+  .best { margin: 8px 0 0; padding: 10px 14px; border-radius: var(--radius-m); background: var(--safe-soft); color: var(--safe-dark); }
   .page { min-height: 100dvh; display: grid; place-items: center; padding: 16px; }
   .card { width: min(var(--column), 100%); display: flex; flex-direction: column; gap: 18px; }
   header { display: flex; justify-content: space-between; align-items: center; }

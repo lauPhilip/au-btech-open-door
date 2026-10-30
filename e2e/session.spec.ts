@@ -315,6 +315,8 @@ test("the class votes on what the CEO should do and sees what their notes predic
   await moveOn(teacher, "Show the result");
   await expect(ana.getByText("Labels print from 09:05. The truck leaves full at 10:00.")).toBeVisible();
   await expect(ana.getByText(/the best choice/)).toBeVisible();
+  await expect(ana.getByRole("heading", { name: "How the class decided" })).toBeVisible();
+  await expect(ana.getByText(/Best answer:/)).toBeVisible();
   await expect(ana.getByRole("heading", { name: /You saw it coming: 0 of 6/ })).toBeVisible();
   await expect(chen.getByText("Labels print again at 09:10. At 09:25 the printer is paused again.")).toBeVisible();
   await expect(projector.getByText("Labels print from 09:05. The truck leaves full at 10:00.")).toBeVisible();

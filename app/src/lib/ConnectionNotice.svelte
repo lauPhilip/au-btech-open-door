@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "./i18n.svelte";
   import type { GameConnection } from "./game.svelte";
 
   /** What a student needs to know about the connection: errors stay until closed, and a drop never feels like lost work. */
@@ -10,13 +11,13 @@
   {#if connection.error}
     <p class="notice error" role="alert">
       <span>{connection.error}</span>
-      <button aria-label="Close this message" onclick={() => connection.dismissError()}>×</button>
+      <button aria-label={t("notice.close")} onclick={() => connection.dismissError()}>×</button>
     </p>
   {/if}
   {#if offline && connection.status === "reconnecting"}
-    <p class="notice info" role="status">The connection dropped. Trying again. Your notes are safe.</p>
+    <p class="notice info" role="status">{t("notice.dropped")}</p>
   {:else if connection.reconnected}
-    <p class="notice ok" role="status">Back online. Your notes are safe.</p>
+    <p class="notice ok" role="status">{t("notice.back")}</p>
   {/if}
 </div>
 
